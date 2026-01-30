@@ -175,6 +175,37 @@
   border-radius: 6px;
 }
 
+.nwmBadge {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: #86efac;
+}
+
+.nwmLive {
+  color: #22c55e;
+  font-weight: 600;
+  margin-right: 0.5rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.nwmTime {
+  color: #64748b;
+  margin-left: 0.25rem;
+}
+
+.nwmFallback {
+  color: #94a3b8;
+}
+
 .flowButtons {
   display: flex;
   gap: 0.5rem;

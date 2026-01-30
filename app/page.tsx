@@ -33,6 +33,13 @@ interface RouteStats {
   flow_multiplier: number;
   elevation_profile: ElevationPoint[];
   steep_sections: SteepSection[];
+  velocity_source: {
+    nwm_segments: number;
+    erom_segments: number;
+    nwm_percent: number;
+    nwm_timestamp: string | null;
+    avg_streamflow_cms: number | null;
+  };
 }
 
 const FLOW_CONDITIONS = {
@@ -864,6 +871,25 @@ export default function Home() {
                 {route.stats.waterways.length > 0 && (
                   <div className={styles.waterways}>
                     Via: {route.stats.waterways.join(' → ')}
+                  </div>
+                )}
+                
+                {/* NWM Real-Time Indicator */}
+                {route.stats.velocity_source && (
+                  <div className={styles.nwmBadge}>
+                    {route.stats.velocity_source.nwm_percent > 0 ? (
+                      <>
+                        <span className={styles.nwmLive}>● LIVE</span>
+                        {route.stats.velocity_source.nwm_percent}% real-time velocities
+                        {route.stats.velocity_source.nwm_timestamp && (
+                          <span className={styles.nwmTime}>
+                            (as of {new Date(route.stats.velocity_source.nwm_timestamp).toLocaleTimeString()})
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className={styles.nwmFallback}>Using historical averages</span>
+                    )}
                   </div>
                 )}
               </div>

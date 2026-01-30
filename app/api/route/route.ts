@@ -26,6 +26,8 @@ interface Edge {
   velocity_fps: number | null;
   min_elev_m: number | null;
   max_elev_m: number | null;
+  nwm_velocity_ms: number | null;  // Real-time NWM velocity
+  nwm_streamflow_cms: number | null;  // Real-time NWM streamflow
 }
 
 interface GraphNode {
@@ -153,22 +155,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'End point too far from river network' }, { status: 400 });
     }
     
-    // Load edges within bounding box
+    // Load edges within bounding box, joined with NWM real-time velocities
     const edgesResult = await query<Edge>(`
       SELECT 
-        comid,
-        from_node::text as from_node,
-        to_node::text as to_node,
-        lengthkm,
-        gnis_name,
-        stream_order,
-        velocity_fps,
-        min_elev_m,
-        max_elev_m
-      FROM river_edges
-      WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)
-        AND from_node IS NOT NULL 
-        AND to_node IS NOT NULL
+        r.comid,
+        r.from_node::text as from_node,
+        r.to_node::text as to_node,
+        r.lengthkm,
+        r.gnis_name,
+        r.stream_order,
+        r.velocity_fps,
+        r.min_elev_m,
+        r.max_elev_m,
+        n.velocity_ms as nwm_velocity_ms,
+        n.streamflow_cms as nwm_streamflow_cms
+      FROM river_edges r
+      LEFT JOIN nwm_velocity n ON r.comid = n.comid
+      WHERE r.geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)
+        AND r.from_node IS NOT NULL 
+        AND r.to_node IS NOT NULL
     `, [minLng, minLat, maxLng, maxLat]);
     
     if (edgesResult.rows.length === 0) {
@@ -230,6 +235,11 @@ export async function GET(request: NextRequest) {
     const steepSections: { start_m: number; end_m: number; gradient_ft_mi: number; classification: string }[] = [];
     let accumDist = 0;
     
+    // Track velocity source usage
+    let nwmVelocityCount = 0;
+    let eromVelocityCount = 0;
+    let totalStreamflow = 0;
+    
     for (const edge of result.edges) {
       const segmentStartDist = accumDist;
       
@@ -279,16 +289,34 @@ export async function GET(request: NextRequest) {
         elevEnd = edge.min_elev_m;
       }
       
-      // Velocity: EROM value (or default) × flow condition multiplier
-      const baseVelocityMs = (edge.velocity_fps || DEFAULT_VELOCITY_FPS) * 0.3048;
-      const adjustedVelocity = baseVelocityMs * flowMultiplier;
-      totalFloatTime += (edge.lengthkm * 1000) / adjustedVelocity;
+      // Velocity priority: NWM real-time > EROM > default
+      // NWM velocities are already current conditions, no flow multiplier needed
+      let velocityMs: number;
+      if (edge.nwm_velocity_ms && edge.nwm_velocity_ms > 0.01) {
+        // Use NWM real-time velocity (already in m/s, no multiplier)
+        velocityMs = edge.nwm_velocity_ms;
+        nwmVelocityCount++;
+        if (edge.nwm_streamflow_cms) totalStreamflow += edge.nwm_streamflow_cms;
+      } else {
+        // Fallback to EROM with flow condition multiplier
+        const baseVelocityMs = (edge.velocity_fps || DEFAULT_VELOCITY_FPS) * 0.3048;
+        velocityMs = baseVelocityMs * flowMultiplier;
+        eromVelocityCount++;
+      }
+      
+      totalFloatTime += (edge.lengthkm * 1000) / velocityMs;
       
       if (edge.gnis_name) waterways.add(edge.gnis_name);
     }
     
     const distanceMiles = totalDistance / 1609.34;
     const elevDropFt = (elevStart && elevEnd) ? (elevStart - elevEnd) * 3.28084 : 0;
+    
+    // Get NWM data freshness
+    const nwmFreshnessResult = await query(`
+      SELECT updated_at FROM nwm_velocity LIMIT 1
+    `);
+    const nwmTimestamp = nwmFreshnessResult.rows[0]?.updated_at || null;
     
     // Build GeoJSON
     const geojson = {
@@ -321,7 +349,15 @@ export async function GET(request: NextRequest) {
         flow_condition: flowCondition,
         flow_multiplier: flowMultiplier,
         elevation_profile: elevationProfile,
-        steep_sections: steepSections
+        steep_sections: steepSections,
+        // NWM real-time velocity info
+        velocity_source: {
+          nwm_segments: nwmVelocityCount,
+          erom_segments: eromVelocityCount,
+          nwm_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount)) * 100),
+          nwm_timestamp: nwmTimestamp,
+          avg_streamflow_cms: nwmVelocityCount > 0 ? Math.round(totalStreamflow / nwmVelocityCount * 100) / 100 : null
+        }
       },
       snap: {
         start: snapStart,

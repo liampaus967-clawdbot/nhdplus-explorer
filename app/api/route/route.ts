@@ -5,6 +5,8 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
+import { validateCoordinate, validateFlowCondition } from '@/lib/validation';
 
 // Flow condition multipliers based on Leopold & Maddock (1953) hydraulic geometry
 // EROM velocities represent baseflow; these adjust for actual conditions
@@ -119,19 +121,40 @@ function dijkstra(graph: Map<string, GraphNode>, start: string, end: string): { 
 }
 
 export async function GET(request: NextRequest) {
+  // Rate limiting
+  const ip = getClientIP(request);
+  const rateLimit = checkRateLimit(ip);
+  
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Try again later.' },
+      { 
+        status: 429,
+        headers: {
+          'Retry-After': Math.ceil(rateLimit.resetIn / 1000).toString(),
+          'X-RateLimit-Remaining': '0'
+        }
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   
   const startLng = parseFloat(searchParams.get('start_lng') || '');
   const startLat = parseFloat(searchParams.get('start_lat') || '');
   const endLng = parseFloat(searchParams.get('end_lng') || '');
   const endLat = parseFloat(searchParams.get('end_lat') || '');
-  const flowCondition = searchParams.get('flow') || 'normal';
+  const flowCondition = validateFlowCondition(searchParams.get('flow'));
   
-  if (isNaN(startLng) || isNaN(startLat) || isNaN(endLng) || isNaN(endLat)) {
-    return NextResponse.json(
-      { error: 'Missing coordinates. Required: start_lng, start_lat, end_lng, end_lat' },
-      { status: 400 }
-    );
+  // Validate all coordinates
+  const startCheck = validateCoordinate(startLng, startLat);
+  const endCheck = validateCoordinate(endLng, endLat);
+  
+  if (!startCheck.valid) {
+    return NextResponse.json({ error: `Start point: ${startCheck.error}` }, { status: 400 });
+  }
+  if (!endCheck.valid) {
+    return NextResponse.json({ error: `End point: ${endCheck.error}` }, { status: 400 });
   }
   
   const flowMultiplier = FLOW_MULTIPLIERS[flowCondition] || FLOW_MULTIPLIERS.normal;

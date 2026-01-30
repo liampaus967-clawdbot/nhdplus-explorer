@@ -4,16 +4,37 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
+import { validateCoordinate } from '@/lib/validation';
 
 export async function GET(request: NextRequest) {
+  // Rate limiting
+  const ip = getClientIP(request);
+  const rateLimit = checkRateLimit(ip);
+  
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Rate limit exceeded. Try again later.' },
+      { 
+        status: 429,
+        headers: {
+          'Retry-After': Math.ceil(rateLimit.resetIn / 1000).toString(),
+          'X-RateLimit-Remaining': '0'
+        }
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   
   const lng = parseFloat(searchParams.get('lng') || '');
   const lat = parseFloat(searchParams.get('lat') || '');
   
-  if (isNaN(lng) || isNaN(lat)) {
+  // Validate coordinates
+  const coordCheck = validateCoordinate(lng, lat);
+  if (!coordCheck.valid) {
     return NextResponse.json(
-      { error: 'Missing or invalid lng/lat parameters' },
+      { error: coordCheck.error },
       { status: 400 }
     );
   }
@@ -89,9 +110,10 @@ export async function GET(request: NextRequest) {
     });
     
   } catch (error) {
+    // Log internally but don't expose details to client
     console.error('Snap error:', error);
     return NextResponse.json(
-      { error: 'Database error' },
+      { error: 'An error occurred processing your request' },
       { status: 500 }
     );
   }

@@ -436,6 +436,10 @@ export default function Home() {
         type: 'line',
         source: 'vt-rivers',
         'source-layer': 'vtRivers-3bijjc',
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round'
+        },
         paint: {
           'line-color': '#3b82f6',
           'line-width': [
@@ -458,6 +462,10 @@ export default function Home() {
         type: 'line',
         source: 'test-rivers',
         'source-layer': 'testRiversSet-cr53z3',
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round'
+        },
         paint: {
           'line-color': '#3b82f6',
           'line-width': [

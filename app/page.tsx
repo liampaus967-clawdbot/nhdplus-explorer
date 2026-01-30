@@ -7,6 +7,15 @@ import styles from './page.module.css';
 interface ElevationPoint {
   dist_m: number;
   elev_m: number;
+  gradient_ft_mi?: number;
+  classification?: string;
+}
+
+interface SteepSection {
+  start_m: number;
+  end_m: number;
+  gradient_ft_mi: number;
+  classification: string;
 }
 
 interface RouteStats {
@@ -23,6 +32,7 @@ interface RouteStats {
   flow_condition: string;
   flow_multiplier: number;
   elevation_profile: ElevationPoint[];
+  steep_sections: SteepSection[];
 }
 
 const FLOW_CONDITIONS = {
@@ -63,8 +73,16 @@ export default function Home() {
   const takeOutMarker = useRef<mapboxgl.Marker | null>(null);
   const elevationCanvas = useRef<HTMLCanvasElement | null>(null);
 
-  // Draw elevation profile on canvas
-  const drawElevationProfile = useCallback((profile: ElevationPoint[]) => {
+  // Classification colors
+  const GRADIENT_COLORS: Record<string, string> = {
+    pool: 'rgba(96, 165, 250, 0.3)',      // Blue - calm
+    riffle: 'rgba(250, 204, 21, 0.5)',    // Yellow - riffles
+    rapid_mild: 'rgba(251, 146, 60, 0.6)', // Orange - Class I-II
+    rapid_steep: 'rgba(239, 68, 68, 0.7)'  // Red - Class III+
+  };
+
+  // Draw elevation profile on canvas with steep section highlighting
+  const drawElevationProfile = useCallback((profile: ElevationPoint[], steepSections: SteepSection[]) => {
     const canvas = elevationCanvas.current;
     if (!canvas || profile.length < 2) return;
     
@@ -98,9 +116,19 @@ export default function Home() {
     const toX = (d: number) => pad.left + (d / maxDist) * chartW;
     const toY = (e: number) => pad.top + (1 - (e - minElev) / elevRange) * chartH;
     
-    // Fill gradient
+    // Draw steep section highlights first (behind the line)
+    for (const section of steepSections) {
+      const x1 = toX(section.start_m);
+      const x2 = toX(section.end_m);
+      const color = GRADIENT_COLORS[section.classification] || GRADIENT_COLORS.riffle;
+      
+      ctx.fillStyle = color;
+      ctx.fillRect(x1, pad.top, x2 - x1, chartH);
+    }
+    
+    // Fill gradient for main profile
     const grad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
-    grad.addColorStop(0, 'rgba(96, 165, 250, 0.3)');
+    grad.addColorStop(0, 'rgba(96, 165, 250, 0.25)');
     grad.addColorStop(1, 'rgba(96, 165, 250, 0.05)');
     
     ctx.beginPath();
@@ -111,16 +139,32 @@ export default function Home() {
     ctx.fillStyle = grad;
     ctx.fill();
     
-    // Line
-    ctx.beginPath();
-    profile.forEach((p, i) => {
-      const x = toX(p.dist_m);
-      const y = toY(p.elev_m);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.strokeStyle = '#60a5fa';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    // Draw line with color segments based on gradient
+    for (let i = 1; i < profile.length; i++) {
+      const p1 = profile[i - 1];
+      const p2 = profile[i];
+      const classification = p1.classification || 'pool';
+      
+      ctx.beginPath();
+      ctx.moveTo(toX(p1.dist_m), toY(p1.elev_m));
+      ctx.lineTo(toX(p2.dist_m), toY(p2.elev_m));
+      
+      // Color based on classification
+      if (classification === 'rapid_steep') {
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 3;
+      } else if (classification === 'rapid_mild') {
+        ctx.strokeStyle = '#fb923c';
+        ctx.lineWidth = 2.5;
+      } else if (classification === 'riffle') {
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 2;
+      } else {
+        ctx.strokeStyle = '#60a5fa';
+        ctx.lineWidth = 2;
+      }
+      ctx.stroke();
+    }
     
     // Axes
     ctx.strokeStyle = 'rgba(255,255,255,0.2)';
@@ -438,7 +482,10 @@ export default function Home() {
   useEffect(() => {
     if (route?.stats.elevation_profile) {
       // Small delay to ensure canvas is rendered
-      setTimeout(() => drawElevationProfile(route.stats.elevation_profile), 100);
+      setTimeout(() => drawElevationProfile(
+        route.stats.elevation_profile, 
+        route.stats.steep_sections || []
+      ), 100);
     }
   }, [route, drawElevationProfile]);
 
@@ -491,6 +538,33 @@ export default function Home() {
           {error && (
             <div className={styles.error}>
               ⚠️ {error}
+              {error.includes('Upstream') && (
+                <button 
+                  className={styles.swapBtn}
+                  onClick={() => {
+                    // Swap put-in and take-out
+                    if (putIn && takeOut) {
+                      const temp = putIn;
+                      setPutIn(takeOut);
+                      setTakeOut(temp);
+                      setError(null);
+                      
+                      // Swap markers
+                      if (putInMarker.current && takeOutMarker.current) {
+                        const putInPos = putInMarker.current.getLngLat();
+                        const takeOutPos = takeOutMarker.current.getLngLat();
+                        putInMarker.current.setLngLat(takeOutPos);
+                        takeOutMarker.current.setLngLat(putInPos);
+                      }
+                      
+                      // Recalculate with swapped points
+                      calculateRoute(takeOut, temp);
+                    }
+                  }}
+                >
+                  🔄 Swap Points
+                </button>
+              )}
             </div>
           )}
           
@@ -576,6 +650,29 @@ export default function Home() {
                     ref={elevationCanvas} 
                     className={styles.elevationChart}
                   />
+                  <div className={styles.legend}>
+                    <span className={styles.legendItem}>
+                      <span className={styles.legendColor} style={{ background: '#60a5fa' }}></span>
+                      Pool (&lt;5 ft/mi)
+                    </span>
+                    <span className={styles.legendItem}>
+                      <span className={styles.legendColor} style={{ background: '#facc15' }}></span>
+                      Riffle (5-15)
+                    </span>
+                    <span className={styles.legendItem}>
+                      <span className={styles.legendColor} style={{ background: '#fb923c' }}></span>
+                      Rapid I-II (15-30)
+                    </span>
+                    <span className={styles.legendItem}>
+                      <span className={styles.legendColor} style={{ background: '#ef4444' }}></span>
+                      Rapid III+ (&gt;30)
+                    </span>
+                  </div>
+                  {route.stats.steep_sections && route.stats.steep_sections.length > 0 && (
+                    <div className={styles.steepWarning}>
+                      ⚠️ {route.stats.steep_sections.length} potential rapid/riffle section{route.stats.steep_sections.length > 1 ? 's' : ''} detected
+                    </div>
+                  )}
                 </div>
               )}
             </>

@@ -120,6 +120,25 @@
   color: #fecaca;
 }
 
+.swapBtn {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fecaca;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.15s;
+}
+
+.swapBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
 .statGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -240,6 +259,37 @@
   height: 120px;
   border-radius: 8px;
   background: #0f172a;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.legendColor {
+  width: 12px;
+  height: 3px;
+  border-radius: 1px;
+}
+
+.steepWarning {
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(251, 146, 60, 0.15);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: #fb923c;
 }
 
 @media (max-width: 900px) {

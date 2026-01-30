@@ -32,21 +32,27 @@ interface GraphNode {
   edges: { target: string; edge: Edge }[];
 }
 
-// Build adjacency graph from edges
-function buildGraph(edges: Edge[]): Map<string, GraphNode> {
+// Build adjacency graph from edges (downstream only)
+function buildGraph(edges: Edge[], downstreamOnly: boolean = true): Map<string, GraphNode> {
   const graph = new Map<string, GraphNode>();
   
   for (const edge of edges) {
     const from = edge.from_node;
     const to = edge.to_node;
     
-    // Forward direction
+    // NHDPlus convention: from_node → to_node is downstream direction
+    // We verify with elevation: max_elev (upstream) > min_elev (downstream)
+    const isDownstream = !edge.max_elev_m || !edge.min_elev_m || edge.max_elev_m >= edge.min_elev_m;
+    
+    // Forward direction (downstream: from → to)
     if (!graph.has(from)) graph.set(from, { edges: [] });
     graph.get(from)!.edges.push({ target: to, edge });
     
-    // Reverse direction (bidirectional for paddling)
-    if (!graph.has(to)) graph.set(to, { edges: [] });
-    graph.get(to)!.edges.push({ target: from, edge });
+    // Reverse direction only if not downstream-only mode
+    if (!downstreamOnly) {
+      if (!graph.has(to)) graph.set(to, { edges: [] });
+      graph.get(to)!.edges.push({ target: from, edge });
+    }
   }
   
   return graph;
@@ -171,13 +177,26 @@ export async function GET(request: NextRequest) {
     
     console.log(`Loaded ${edgesResult.rows.length} edges for routing`);
     
-    // Build graph and run Dijkstra
-    const graph = buildGraph(edgesResult.rows);
-    const result = dijkstra(graph, snapStart.node_id, snapEnd.node_id);
+    // Build downstream-only graph and run Dijkstra
+    const graph = buildGraph(edgesResult.rows, true);
+    let result = dijkstra(graph, snapStart.node_id, snapEnd.node_id);
     
     if (!result) {
+      // Check if reverse route exists (user clicked upstream → downstream)
+      const reverseResult = dijkstra(graph, snapEnd.node_id, snapStart.node_id);
+      
+      if (reverseResult) {
+        return NextResponse.json(
+          { 
+            error: 'Upstream routing not available. Try swapping your put-in and take-out — your take-out appears to be upstream of your put-in.',
+            suggestion: 'swap_points'
+          },
+          { status: 400 }
+        );
+      }
+      
       return NextResponse.json(
-        { error: 'No route found between these points. They may not be connected.' },
+        { error: 'No route found between these points. They may not be connected on the river network.' },
         { status: 404 }
       );
     }
@@ -192,19 +211,57 @@ export async function GET(request: NextRequest) {
     
     const geomMap = new Map(geomResult.rows.map(r => [r.comid, r.geometry]));
     
-    // Calculate stats and build elevation profile
+    // Gradient classifications (ft/mi)
+    // Pool: < 5, Riffle: 5-15, Class I-II: 15-30, Class III+: > 30
+    const classifyGradient = (ftPerMi: number): string => {
+      if (ftPerMi < 5) return 'pool';
+      if (ftPerMi < 15) return 'riffle';
+      if (ftPerMi < 30) return 'rapid_mild';
+      return 'rapid_steep';
+    };
+
+    // Calculate stats and build elevation profile with gradient data
     let totalDistance = 0;
     let totalFloatTime = 0;
     let elevStart: number | null = null;
     let elevEnd: number | null = null;
     const waterways = new Set<string>();
-    const elevationProfile: { dist_m: number; elev_m: number }[] = [];
+    const elevationProfile: { dist_m: number; elev_m: number; gradient_ft_mi?: number; classification?: string }[] = [];
+    const steepSections: { start_m: number; end_m: number; gradient_ft_mi: number; classification: string }[] = [];
     let accumDist = 0;
     
     for (const edge of result.edges) {
+      const segmentStartDist = accumDist;
+      
+      // Calculate segment gradient
+      let segmentGradient = 0;
+      let classification = 'pool';
+      if (edge.max_elev_m !== null && edge.min_elev_m !== null && edge.lengthkm > 0) {
+        const dropM = edge.max_elev_m - edge.min_elev_m;
+        const dropFt = dropM * 3.28084;
+        const lengthMi = edge.lengthkm * 0.621371;
+        segmentGradient = lengthMi > 0 ? dropFt / lengthMi : 0;
+        classification = classifyGradient(segmentGradient);
+        
+        // Track steep sections for highlighting
+        if (classification === 'riffle' || classification === 'rapid_mild' || classification === 'rapid_steep') {
+          steepSections.push({
+            start_m: segmentStartDist,
+            end_m: segmentStartDist + edge.lengthkm * 1000,
+            gradient_ft_mi: Math.round(segmentGradient * 10) / 10,
+            classification
+          });
+        }
+      }
+      
       // Add elevation point at start of segment
       if (edge.max_elev_m !== null) {
-        elevationProfile.push({ dist_m: accumDist, elev_m: edge.max_elev_m });
+        elevationProfile.push({ 
+          dist_m: accumDist, 
+          elev_m: edge.max_elev_m,
+          gradient_ft_mi: Math.round(segmentGradient * 10) / 10,
+          classification
+        });
         if (elevStart === null) elevStart = edge.max_elev_m;
       }
       
@@ -213,7 +270,12 @@ export async function GET(request: NextRequest) {
       
       // Add elevation point at end of segment
       if (edge.min_elev_m !== null) {
-        elevationProfile.push({ dist_m: accumDist, elev_m: edge.min_elev_m });
+        elevationProfile.push({ 
+          dist_m: accumDist, 
+          elev_m: edge.min_elev_m,
+          gradient_ft_mi: Math.round(segmentGradient * 10) / 10,
+          classification
+        });
         elevEnd = edge.min_elev_m;
       }
       
@@ -258,7 +320,8 @@ export async function GET(request: NextRequest) {
         waterways: Array.from(waterways),
         flow_condition: flowCondition,
         flow_multiplier: flowMultiplier,
-        elevation_profile: elevationProfile
+        elevation_profile: elevationProfile,
+        steep_sections: steepSections
       },
       snap: {
         start: snapStart,

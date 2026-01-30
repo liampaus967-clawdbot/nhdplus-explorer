@@ -12,11 +12,13 @@
     "next": "14.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "mapbox-gl": "^3.3.0"
+    "mapbox-gl": "^3.3.0",
+    "pg": "^8.11.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "@types/react": "^18.2.47",
+    "@types/pg": "^8.10.9",
     "typescript": "^5.3.3"
   }
 }

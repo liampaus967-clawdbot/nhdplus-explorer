@@ -4,121 +4,183 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import styles from './page.module.css';
 
-// Feature types
-const FTYPES: Record<number, string> = {
-  361: 'Playa',
-  378: 'Ice Mass',
-  390: 'Lake/Pond',
-  436: 'Reservoir',
-  466: 'Swamp/Marsh',
-  493: 'Estuary'
-};
-
-interface WaterbodyFeature {
-  type: 'Feature';
-  id: number;
-  geometry: GeoJSON.Geometry;
-  properties: {
-    OBJECTID: number;
-    permanent_identifier: string;
-    gnis_id: string | null;
-    gnis_name: string | null;
-    areasqkm: number;
-    elevation: number | null;
-    ftype: number;
-    fcode: number;
-    reachcode: string;
-  };
+interface RouteStats {
+  distance_m: number;
+  distance_mi: number;
+  float_time_h: number;
+  float_time_s: number;
+  elev_start_m: number | null;
+  elev_end_m: number | null;
+  elev_drop_ft: number;
+  gradient_ft_mi: number;
+  segment_count: number;
+  waterways: string[];
 }
 
-interface WaterbodiesResponse {
-  type: 'FeatureCollection';
-  features: WaterbodyFeature[];
-  metadata: {
-    bbox: number[];
-    limit: number;
-    returned: number;
-  };
+interface SnapResult {
+  node_id: string;
+  comid: number;
+  gnis_name: string | null;
+  stream_order: number;
+  distance_m: number;
+  snap_point: { lng: number; lat: number };
+  node_point: { lng: number; lat: number };
+}
+
+interface RouteResult {
+  route: GeoJSON.FeatureCollection;
+  stats: RouteStats;
+  path: { nodes: string[]; comids: number[] };
 }
 
 export default function Home() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [selectedFeature, setSelectedFeature] = useState<WaterbodyFeature | null>(null);
+  
+  const [putIn, setPutIn] = useState<SnapResult | null>(null);
+  const [takeOut, setTakeOut] = useState<SnapResult | null>(null);
+  const [route, setRoute] = useState<RouteResult | null>(null);
   const [loading, setLoading] = useState(false);
-  const [featureCount, setFeatureCount] = useState(0);
-  const [filterType, setFilterType] = useState<string>('');
-  const [minArea, setMinArea] = useState<string>('');
-  const abortController = useRef<AbortController | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [paddleSpeed, setPaddleSpeed] = useState(0);
+  
+  const putInMarker = useRef<mapboxgl.Marker | null>(null);
+  const takeOutMarker = useRef<mapboxgl.Marker | null>(null);
 
-  // Fetch waterbodies for current map bounds
-  const fetchWaterbodies = useCallback(async () => {
-    if (!map.current) return;
+  // Format time display
+  const formatTime = (seconds: number, paddleMph: number = 0): string => {
+    // Adjust for paddle speed (convert mph to m/s and reduce time proportionally)
+    const paddleMs = paddleMph * 0.44704;
+    const baseSpeed = 0.89; // 2 mph default
+    const effectiveSpeed = baseSpeed + paddleMs;
+    const adjustedSeconds = seconds * (baseSpeed / effectiveSpeed);
     
-    const bounds = map.current.getBounds();
-    if (!bounds) return;
+    const hours = Math.floor(adjustedSeconds / 3600);
+    const mins = Math.round((adjustedSeconds % 3600) / 60);
     
-    const zoom = map.current.getZoom();
-    
-    // Only fetch at reasonable zoom levels
-    if (zoom < 8) {
-      // Clear layer at low zoom
-      const source = map.current.getSource('waterbodies') as mapboxgl.GeoJSONSource;
-      if (source) {
-        source.setData({ type: 'FeatureCollection', features: [] });
+    if (hours > 0) return `${hours}h ${mins.toString().padStart(2, '0')}m`;
+    return `${mins}m`;
+  };
+
+  // Snap a click to the river network
+  const snapToRiver = async (lng: number, lat: number): Promise<SnapResult | null> => {
+    try {
+      const res = await fetch(`/api/snap?lng=${lng}&lat=${lat}`);
+      if (!res.ok) {
+        const err = await res.json();
+        setError(err.error || 'Failed to snap to river');
+        return null;
       }
-      setFeatureCount(0);
-      return;
+      return await res.json();
+    } catch (e) {
+      setError('Network error');
+      return null;
     }
-    
-    // Cancel previous request
-    if (abortController.current) {
-      abortController.current.abort();
-    }
-    abortController.current = new AbortController();
-    
+  };
+
+  // Calculate route between two points
+  const calculateRoute = async (startSnap: SnapResult, endSnap: SnapResult) => {
     setLoading(true);
-    
-    const params = new URLSearchParams({
-      min_lon: bounds.getWest().toFixed(6),
-      min_lat: bounds.getSouth().toFixed(6),
-      max_lon: bounds.getEast().toFixed(6),
-      max_lat: bounds.getNorth().toFixed(6),
-      limit: '1000'
-    });
-    
-    if (filterType) params.set('ftype', filterType);
-    if (minArea) params.set('min_area_sqkm', minArea);
+    setError(null);
     
     try {
-      const response = await fetch(`/api/waterbodies?${params}`, {
-        signal: abortController.current.signal
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        console.error('API error:', error);
+      const res = await fetch(`/api/route?start_lng=${startSnap.snap_point.lng}&start_lat=${startSnap.snap_point.lat}&end_lng=${endSnap.snap_point.lng}&end_lat=${endSnap.snap_point.lat}`);
+      if (!res.ok) {
+        const err = await res.json();
+        setError(err.error || 'Failed to calculate route');
+        setRoute(null);
         return;
       }
       
-      const data: WaterbodiesResponse = await response.json();
+      const data: RouteResult = await res.json();
+      setRoute(data);
       
-      // Update map source
-      const source = map.current?.getSource('waterbodies') as mapboxgl.GeoJSONSource;
+      // Draw route on map
+      const source = map.current?.getSource('route') as mapboxgl.GeoJSONSource;
       if (source) {
-        source.setData(data);
+        source.setData(data.route);
       }
       
-      setFeatureCount(data.metadata.returned);
-      
-    } catch (error) {
-      if ((error as Error).name !== 'AbortError') {
-        console.error('Fetch error:', error);
+      // Fit map to route
+      if (data.route.features.length > 0) {
+        const coords = data.route.features.flatMap((f: any) => f.geometry.coordinates);
+        const bounds = coords.reduce(
+          (b: mapboxgl.LngLatBounds, c: [number, number]) => b.extend(c),
+          new mapboxgl.LngLatBounds(coords[0], coords[0])
+        );
+        map.current?.fitBounds(bounds, { padding: 80 });
       }
+      
+    } catch (e) {
+      setError('Network error calculating route');
     } finally {
       setLoading(false);
     }
-  }, [filterType, minArea]);
+  };
+
+  // Handle map click
+  const handleMapClick = useCallback(async (e: mapboxgl.MapMouseEvent) => {
+    const { lng, lat } = e.lngLat;
+    setError(null);
+    
+    if (!putIn) {
+      // Set put-in point
+      setLoading(true);
+      const snap = await snapToRiver(lng, lat);
+      setLoading(false);
+      
+      if (snap) {
+        setPutIn(snap);
+        
+        // Add marker
+        if (putInMarker.current) putInMarker.current.remove();
+        putInMarker.current = new mapboxgl.Marker({ color: '#22c55e' })
+          .setLngLat([snap.snap_point.lng, snap.snap_point.lat])
+          .addTo(map.current!);
+      }
+    } else if (!takeOut) {
+      // Set take-out point
+      setLoading(true);
+      const snap = await snapToRiver(lng, lat);
+      
+      if (snap) {
+        setTakeOut(snap);
+        
+        // Add marker
+        if (takeOutMarker.current) takeOutMarker.current.remove();
+        takeOutMarker.current = new mapboxgl.Marker({ color: '#ef4444' })
+          .setLngLat([snap.snap_point.lng, snap.snap_point.lat])
+          .addTo(map.current!);
+        
+        // Calculate route
+        await calculateRoute(putIn, snap);
+      }
+      setLoading(false);
+    }
+  }, [putIn, takeOut]);
+
+  // Clear route
+  const clearRoute = () => {
+    setPutIn(null);
+    setTakeOut(null);
+    setRoute(null);
+    setError(null);
+    setPaddleSpeed(0);
+    
+    if (putInMarker.current) {
+      putInMarker.current.remove();
+      putInMarker.current = null;
+    }
+    if (takeOutMarker.current) {
+      takeOutMarker.current.remove();
+      takeOutMarker.current = null;
+    }
+    
+    const source = map.current?.getSource('route') as mapboxgl.GeoJSONSource;
+    if (source) {
+      source.setData({ type: 'FeatureCollection', features: [] });
+    }
+  };
 
   // Initialize map
   useEffect(() => {
@@ -128,9 +190,9 @@ export default function Home() {
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/dark-v11',
-      center: [-72.5754, 44.2601], // Vermont
-      zoom: 10,
+      style: 'mapbox://styles/mapbox/outdoors-v12',
+      center: [-72.70, 44.0], // Vermont
+      zoom: 9,
       pitch: 0
     });
     
@@ -138,124 +200,96 @@ export default function Home() {
     map.current.addControl(new mapboxgl.FullscreenControl());
     
     map.current.on('load', () => {
-      // Add waterbodies source (empty initially)
-      map.current!.addSource('waterbodies', {
-        type: 'geojson',
-        data: { type: 'FeatureCollection', features: [] }
+      // Add Vermont rivers tileset
+      map.current!.addSource('vt-rivers', {
+        type: 'vector',
+        url: 'mapbox://lman967.9hfg3bbo'
       });
       
-      // Waterbody fill
+      // River lines - styled by stream order
       map.current!.addLayer({
-        id: 'waterbodies-fill',
-        type: 'fill',
-        source: 'waterbodies',
-        paint: {
-          'fill-color': '#60a5fa',
-          'fill-opacity': [
-            'case',
-            ['boolean', ['feature-state', 'hover'], false],
-            0.6,
-            0.4
-          ]
-        }
-      });
-      
-      // Waterbody outline
-      map.current!.addLayer({
-        id: 'waterbodies-outline',
+        id: 'rivers-line',
         type: 'line',
-        source: 'waterbodies',
+        source: 'vt-rivers',
+        'source-layer': 'vtRivers-3bijjc',
         paint: {
           'line-color': '#3b82f6',
           'line-width': [
-            'case',
-            ['boolean', ['feature-state', 'selected'], false],
-            3,
-            1
-          ]
+            'interpolate', ['linear'], ['get', 'stream_order'],
+            1, 1,
+            2, 1.5,
+            3, 2,
+            4, 3,
+            5, 4,
+            6, 6,
+            7, 8
+          ],
+          'line-opacity': 0.7
         }
       });
       
-      // Labels for named waterbodies
+      // River labels
       map.current!.addLayer({
-        id: 'waterbodies-labels',
+        id: 'rivers-labels',
         type: 'symbol',
-        source: 'waterbodies',
+        source: 'vt-rivers',
+        'source-layer': 'vtRivers-3bijjc',
         filter: ['!=', ['get', 'gnis_name'], null],
         layout: {
+          'symbol-placement': 'line-center',
           'text-field': ['get', 'gnis_name'],
+          'text-font': ['DIN Pro Italic', 'Arial Unicode MS Regular'],
           'text-size': 11,
-          'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
           'text-allow-overlap': false,
           'text-optional': true
         },
         paint: {
-          'text-color': '#a8d4ff',
-          'text-halo-color': 'rgba(10, 40, 80, 0.9)',
+          'text-color': '#1e40af',
+          'text-halo-color': 'rgba(255, 255, 255, 0.9)',
           'text-halo-width': 1.5
         }
       });
       
-      // Initial fetch
-      fetchWaterbodies();
-    });
-    
-    // Fetch on map move
-    map.current.on('moveend', fetchWaterbodies);
-    
-    // Hover effect
-    let hoveredId: number | null = null;
-    
-    map.current.on('mousemove', 'waterbodies-fill', (e) => {
-      if (e.features && e.features.length > 0) {
-        if (hoveredId !== null) {
-          map.current!.setFeatureState(
-            { source: 'waterbodies', id: hoveredId },
-            { hover: false }
-          );
-        }
-        hoveredId = e.features[0].id as number;
-        map.current!.setFeatureState(
-          { source: 'waterbodies', id: hoveredId },
-          { hover: true }
-        );
-        map.current!.getCanvas().style.cursor = 'pointer';
-      }
-    });
-    
-    map.current.on('mouseleave', 'waterbodies-fill', () => {
-      if (hoveredId !== null) {
-        map.current!.setFeatureState(
-          { source: 'waterbodies', id: hoveredId },
-          { hover: false }
-        );
-      }
-      hoveredId = null;
-      map.current!.getCanvas().style.cursor = '';
-    });
-    
-    // Click to select
-    map.current.on('click', 'waterbodies-fill', (e) => {
-      if (e.features && e.features.length > 0) {
-        const feature = e.features[0] as unknown as WaterbodyFeature;
-        setSelectedFeature(feature);
-        
-        // Highlight selected
-        map.current!.setFeatureState(
-          { source: 'waterbodies', id: feature.id },
-          { selected: true }
-        );
-      }
-    });
-    
-    // Click elsewhere to deselect
-    map.current.on('click', (e) => {
-      const features = map.current!.queryRenderedFeatures(e.point, {
-        layers: ['waterbodies-fill']
+      // Route layer (empty initially)
+      map.current!.addSource('route', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
       });
-      if (features.length === 0) {
-        setSelectedFeature(null);
-      }
+      
+      // Route glow
+      map.current!.addLayer({
+        id: 'route-glow',
+        type: 'line',
+        source: 'route',
+        paint: {
+          'line-color': '#fbbf24',
+          'line-width': 14,
+          'line-opacity': 0.3
+        },
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round'
+        }
+      });
+      
+      // Route line
+      map.current!.addLayer({
+        id: 'route-line',
+        type: 'line',
+        source: 'route',
+        paint: {
+          'line-color': '#f59e0b',
+          'line-width': 5,
+          'line-opacity': 0.95
+        },
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round'
+        }
+      });
+      
+      // Click handler
+      map.current!.getCanvas().style.cursor = 'crosshair';
     });
     
     return () => {
@@ -264,170 +298,133 @@ export default function Home() {
     };
   }, []);
 
-  // Re-fetch when filters change
+  // Update click handler when putIn/takeOut changes
   useEffect(() => {
-    fetchWaterbodies();
-  }, [fetchWaterbodies]);
-
-  // Clear selection highlight when deselecting
-  useEffect(() => {
-    if (!selectedFeature && map.current) {
-      // Clear all selected states
-      const source = map.current.getSource('waterbodies');
-      if (source) {
-        // Reset feature states by re-fetching
-        const src = source as mapboxgl.GeoJSONSource;
-        // This is a workaround - ideally track selected IDs
-      }
-    }
-  }, [selectedFeature]);
-
-  const formatArea = (sqkm: number) => {
-    if (sqkm < 0.01) return `${(sqkm * 1000000).toFixed(0)} m²`;
-    if (sqkm < 1) return `${(sqkm * 100).toFixed(1)} ha`;
-    return `${sqkm.toFixed(2)} km²`;
-  };
-
-  const formatAreaAcres = (sqkm: number) => {
-    const acres = sqkm * 247.105;
-    if (acres < 1) return `${(acres).toFixed(2)} acres`;
-    return `${acres.toFixed(0)} acres`;
-  };
+    if (!map.current) return;
+    
+    const handler = (e: mapboxgl.MapMouseEvent) => handleMapClick(e);
+    map.current.on('click', handler);
+    
+    return () => {
+      map.current?.off('click', handler);
+    };
+  }, [handleMapClick]);
 
   return (
     <main className={styles.main}>
       <div className={styles.header}>
-        <h1>🌊 NHDPlus Waterbody Explorer</h1>
-        <p>Click on lakes and ponds to explore their attributes</p>
+        <h1>🛶 River Router</h1>
+        <p>Click to set a put-in and take-out, then get your float route with estimated times</p>
       </div>
       
       <div className={styles.container}>
         <div ref={mapContainer} className={styles.map} />
         
         <div className={styles.panel}>
-          {/* Status */}
+          {/* Route points */}
           <div className={styles.section}>
-            <h3>📍 Status</h3>
-            <div className={styles.status}>
-              {loading ? (
-                <span className={styles.loading}>Loading...</span>
-              ) : (
-                <span>{featureCount} waterbodies in view</span>
-              )}
-            </div>
-            <p className={styles.hint}>Zoom in to load waterbodies (min zoom: 8)</p>
-          </div>
-          
-          {/* Filters */}
-          <div className={styles.section}>
-            <h3>🔍 Filters</h3>
-            <div className={styles.filterGroup}>
-              <label>Type</label>
-              <select 
-                value={filterType} 
-                onChange={(e) => setFilterType(e.target.value)}
-                className={styles.select}
-              >
-                <option value="">All Types</option>
-                {Object.entries(FTYPES).map(([code, name]) => (
-                  <option key={code} value={code}>{name}</option>
-                ))}
-              </select>
-            </div>
-            <div className={styles.filterGroup}>
-              <label>Min Area (km²)</label>
-              <input 
-                type="number" 
-                value={minArea}
-                onChange={(e) => setMinArea(e.target.value)}
-                placeholder="e.g., 0.1"
-                className={styles.input}
-                step="0.01"
-                min="0"
-              />
-            </div>
-          </div>
-          
-          {/* Selected waterbody details */}
-          {selectedFeature && (
-            <div className={styles.section}>
-              <h3>📊 Waterbody Details</h3>
-              <div className={styles.details}>
-                <div className={styles.detailName}>
-                  {selectedFeature.properties.gnis_name || 'Unnamed Waterbody'}
-                </div>
-                
-                <div className={styles.statGrid}>
-                  <div className={styles.stat}>
-                    <span className={styles.statValue}>
-                      {formatArea(selectedFeature.properties.areasqkm)}
-                    </span>
-                    <span className={styles.statLabel}>Area</span>
-                  </div>
-                  <div className={styles.stat}>
-                    <span className={styles.statValue}>
-                      {formatAreaAcres(selectedFeature.properties.areasqkm)}
-                    </span>
-                    <span className={styles.statLabel}>Acres</span>
-                  </div>
-                  <div className={styles.stat}>
-                    <span className={styles.statValue}>
-                      {FTYPES[selectedFeature.properties.ftype] || 'Unknown'}
-                    </span>
-                    <span className={styles.statLabel}>Type</span>
-                  </div>
-                  {selectedFeature.properties.elevation && (
-                    <div className={styles.stat}>
-                      <span className={styles.statValue}>
-                        {Math.round(selectedFeature.properties.elevation * 3.28084)} ft
-                      </span>
-                      <span className={styles.statLabel}>Elevation</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div className={styles.metadata}>
-                  <div><strong>GNIS ID:</strong> {selectedFeature.properties.gnis_id || '—'}</div>
-                  <div><strong>Reach Code:</strong> {selectedFeature.properties.reachcode}</div>
-                  <div className={styles.permId}>
-                    <strong>Permanent ID:</strong><br />
-                    <code>{selectedFeature.properties.permanent_identifier}</code>
-                  </div>
-                </div>
-                
-                <button 
-                  className={styles.clearBtn}
-                  onClick={() => setSelectedFeature(null)}
-                >
-                  Clear Selection
-                </button>
+            <h3>📍 Route</h3>
+            <div className={styles.routeInputs}>
+              <div className={styles.inputRow}>
+                <span className={`${styles.dot} ${styles.putInDot}`}></span>
+                <span className={putIn ? styles.inputSet : styles.inputLabel}>
+                  {putIn 
+                    ? `${putIn.gnis_name || 'River'} (${putIn.snap_point.lat.toFixed(4)}, ${putIn.snap_point.lng.toFixed(4)})`
+                    : 'Click map to set put-in'
+                  }
+                </span>
               </div>
+              <div className={styles.inputRow}>
+                <span className={`${styles.dot} ${styles.takeOutDot}`}></span>
+                <span className={takeOut ? styles.inputSet : styles.inputLabel}>
+                  {takeOut 
+                    ? `${takeOut.gnis_name || 'River'} (${takeOut.snap_point.lat.toFixed(4)}, ${takeOut.snap_point.lng.toFixed(4)})`
+                    : putIn ? 'Click map to set take-out' : 'Then click to set take-out'
+                  }
+                </span>
+              </div>
+            </div>
+            {(putIn || loading) && (
+              <button 
+                className={styles.clearBtn} 
+                onClick={clearRoute}
+                disabled={loading}
+              >
+                {loading ? 'Loading...' : 'Clear Route'}
+              </button>
+            )}
+          </div>
+          
+          {/* Error display */}
+          {error && (
+            <div className={styles.error}>
+              ⚠️ {error}
             </div>
           )}
           
-          {/* Quick locations */}
+          {/* Route stats */}
+          {route && (
+            <>
+              <div className={styles.section}>
+                <h3>📊 Trip Stats</h3>
+                <div className={styles.statGrid}>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{route.stats.distance_mi}</span>
+                    <span className={styles.statLabel}>miles</span>
+                  </div>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{formatTime(route.stats.float_time_s, 0)}</span>
+                    <span className={styles.statLabel}>float time</span>
+                  </div>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{route.stats.elev_drop_ft}</span>
+                    <span className={styles.statLabel}>ft drop</span>
+                  </div>
+                  <div className={styles.stat}>
+                    <span className={styles.statValue}>{route.stats.gradient_ft_mi}</span>
+                    <span className={styles.statLabel}>ft/mi</span>
+                  </div>
+                </div>
+                {route.stats.waterways.length > 0 && (
+                  <div className={styles.waterways}>
+                    Via: {route.stats.waterways.join(' → ')}
+                  </div>
+                )}
+              </div>
+              
+              {/* Paddle speed */}
+              <div className={styles.section}>
+                <h3>🏋️ Paddle Speed</h3>
+                <div className={styles.sliderContainer}>
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="5" 
+                    step="0.5"
+                    value={paddleSpeed}
+                    onChange={(e) => setPaddleSpeed(parseFloat(e.target.value))}
+                    className={styles.slider}
+                  />
+                  <div className={styles.sliderLabels}>
+                    <span>Float</span>
+                    <span>+{paddleSpeed} mph</span>
+                    <span>+5 mph</span>
+                  </div>
+                </div>
+                <div className={styles.paddleTime}>
+                  Paddle time: <strong>{formatTime(route.stats.float_time_s, paddleSpeed)}</strong>
+                </div>
+              </div>
+            </>
+          )}
+          
+          {/* Info */}
           <div className={styles.section}>
-            <h3>📌 Quick Locations</h3>
-            <div className={styles.locations}>
-              {[
-                { name: 'Vermont', lng: -72.5754, lat: 44.2601, zoom: 9 },
-                { name: 'Lake Champlain', lng: -73.2121, lat: 44.4759, zoom: 10 },
-                { name: 'Finger Lakes, NY', lng: -76.8, lat: 42.6, zoom: 9 },
-                { name: 'Lake Tahoe', lng: -120.0, lat: 39.1, zoom: 10 },
-              ].map((loc) => (
-                <button
-                  key={loc.name}
-                  className={styles.locBtn}
-                  onClick={() => map.current?.flyTo({
-                    center: [loc.lng, loc.lat],
-                    zoom: loc.zoom,
-                    duration: 2000
-                  })}
-                >
-                  {loc.name}
-                </button>
-              ))}
-            </div>
+            <h3>ℹ️ About</h3>
+            <p className={styles.info}>
+              Route data from NHDPlus. Float times estimated at ~2 mph base current. 
+              Adjust paddle speed for faster travel.
+            </p>
           </div>
         </div>
       </div>

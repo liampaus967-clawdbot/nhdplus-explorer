@@ -742,7 +742,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <div className={styles.header}>
-        <h1>🛶 River Router</h1>
+        <h1>River Router</h1>
         <p>Click to set a put-in and take-out, then get your float route with estimated times</p>
       </div>
       

@@ -235,6 +235,13 @@
   line-height: 1.5;
 }
 
+.elevationChart {
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  background: #0f172a;
+}
+
 @media (max-width: 900px) {
   .main {
     padding: 1rem;

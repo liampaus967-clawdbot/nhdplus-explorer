@@ -192,23 +192,35 @@ export async function GET(request: NextRequest) {
     
     const geomMap = new Map(geomResult.rows.map(r => [r.comid, r.geometry]));
     
-    // Calculate stats
+    // Calculate stats and build elevation profile
     let totalDistance = 0;
     let totalFloatTime = 0;
     let elevStart: number | null = null;
     let elevEnd: number | null = null;
     const waterways = new Set<string>();
+    const elevationProfile: { dist_m: number; elev_m: number }[] = [];
+    let accumDist = 0;
     
     for (const edge of result.edges) {
+      // Add elevation point at start of segment
+      if (edge.max_elev_m !== null) {
+        elevationProfile.push({ dist_m: accumDist, elev_m: edge.max_elev_m });
+        if (elevStart === null) elevStart = edge.max_elev_m;
+      }
+      
+      accumDist += edge.lengthkm * 1000;
       totalDistance += edge.lengthkm * 1000;
+      
+      // Add elevation point at end of segment
+      if (edge.min_elev_m !== null) {
+        elevationProfile.push({ dist_m: accumDist, elev_m: edge.min_elev_m });
+        elevEnd = edge.min_elev_m;
+      }
       
       // Velocity: EROM value (or default) × flow condition multiplier
       const baseVelocityMs = (edge.velocity_fps || DEFAULT_VELOCITY_FPS) * 0.3048;
       const adjustedVelocity = baseVelocityMs * flowMultiplier;
       totalFloatTime += (edge.lengthkm * 1000) / adjustedVelocity;
-      
-      if (elevStart === null && edge.max_elev_m) elevStart = edge.max_elev_m;
-      if (edge.min_elev_m) elevEnd = edge.min_elev_m;
       
       if (edge.gnis_name) waterways.add(edge.gnis_name);
     }
@@ -245,7 +257,8 @@ export async function GET(request: NextRequest) {
         segment_count: result.edges.length,
         waterways: Array.from(waterways),
         flow_condition: flowCondition,
-        flow_multiplier: flowMultiplier
+        flow_multiplier: flowMultiplier,
+        elevation_profile: elevationProfile
       },
       snap: {
         start: snapStart,

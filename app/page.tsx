@@ -4,6 +4,11 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import mapboxgl from 'mapbox-gl';
 import styles from './page.module.css';
 
+interface ElevationPoint {
+  dist_m: number;
+  elev_m: number;
+}
+
 interface RouteStats {
   distance_m: number;
   distance_mi: number;
@@ -17,6 +22,7 @@ interface RouteStats {
   waterways: string[];
   flow_condition: string;
   flow_multiplier: number;
+  elevation_profile: ElevationPoint[];
 }
 
 const FLOW_CONDITIONS = {
@@ -55,6 +61,104 @@ export default function Home() {
   
   const putInMarker = useRef<mapboxgl.Marker | null>(null);
   const takeOutMarker = useRef<mapboxgl.Marker | null>(null);
+  const elevationCanvas = useRef<HTMLCanvasElement | null>(null);
+
+  // Draw elevation profile on canvas
+  const drawElevationProfile = useCallback((profile: ElevationPoint[]) => {
+    const canvas = elevationCanvas.current;
+    if (!canvas || profile.length < 2) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    // High DPI support
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    
+    const W = rect.width;
+    const H = rect.height;
+    const pad = { top: 20, right: 15, bottom: 30, left: 45 };
+    const chartW = W - pad.left - pad.right;
+    const chartH = H - pad.top - pad.bottom;
+    
+    // Clear
+    ctx.clearRect(0, 0, W, H);
+    
+    // Data bounds
+    const maxDist = profile[profile.length - 1].dist_m;
+    const elevs = profile.map(p => p.elev_m);
+    const minElev = Math.min(...elevs) - 5;
+    const maxElev = Math.max(...elevs) + 5;
+    const elevRange = maxElev - minElev || 1;
+    
+    // Coordinate transforms
+    const toX = (d: number) => pad.left + (d / maxDist) * chartW;
+    const toY = (e: number) => pad.top + (1 - (e - minElev) / elevRange) * chartH;
+    
+    // Fill gradient
+    const grad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
+    grad.addColorStop(0, 'rgba(96, 165, 250, 0.3)');
+    grad.addColorStop(1, 'rgba(96, 165, 250, 0.05)');
+    
+    ctx.beginPath();
+    ctx.moveTo(toX(profile[0].dist_m), H - pad.bottom);
+    profile.forEach(p => ctx.lineTo(toX(p.dist_m), toY(p.elev_m)));
+    ctx.lineTo(toX(profile[profile.length - 1].dist_m), H - pad.bottom);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+    
+    // Line
+    ctx.beginPath();
+    profile.forEach((p, i) => {
+      const x = toX(p.dist_m);
+      const y = toY(p.elev_m);
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.strokeStyle = '#60a5fa';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // Axes
+    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top);
+    ctx.lineTo(pad.left, H - pad.bottom);
+    ctx.lineTo(W - pad.right, H - pad.bottom);
+    ctx.stroke();
+    
+    // Y-axis labels (elevation in ft)
+    ctx.fillStyle = 'rgba(255,255,255,0.5)';
+    ctx.font = '10px sans-serif';
+    ctx.textAlign = 'right';
+    
+    for (let i = 0; i <= 4; i++) {
+      const elevM = minElev + (elevRange * i / 4);
+      const elevFt = Math.round(elevM * 3.28084);
+      const y = toY(elevM);
+      ctx.fillText(`${elevFt}'`, pad.left - 5, y + 3);
+      
+      // Grid line
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(W - pad.right, y);
+      ctx.stroke();
+    }
+    
+    // X-axis labels (distance in miles)
+    ctx.textAlign = 'center';
+    for (let i = 0; i <= 4; i++) {
+      const d = (maxDist * i) / 4;
+      const mi = (d / 1609.34).toFixed(1);
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.fillText(`${mi} mi`, toX(d), H - pad.bottom + 15);
+    }
+  }, []);
 
   // Format time display
   const formatTime = (seconds: number, paddleMph: number = 0): string => {
@@ -330,6 +434,14 @@ export default function Home() {
     };
   }, [handleMapClick]);
 
+  // Draw elevation profile when route changes
+  useEffect(() => {
+    if (route?.stats.elevation_profile) {
+      // Small delay to ensure canvas is rendered
+      setTimeout(() => drawElevationProfile(route.stats.elevation_profile), 100);
+    }
+  }, [route, drawElevationProfile]);
+
   return (
     <main className={styles.main}>
       <div className={styles.header}>
@@ -455,6 +567,17 @@ export default function Home() {
                   Paddle time: <strong>{formatTime(route.stats.float_time_s, paddleSpeed)}</strong>
                 </div>
               </div>
+
+              {/* Elevation profile */}
+              {route.stats.elevation_profile && route.stats.elevation_profile.length > 0 && (
+                <div className={styles.section}>
+                  <h3>📈 Elevation Profile</h3>
+                  <canvas 
+                    ref={elevationCanvas} 
+                    className={styles.elevationChart}
+                  />
+                </div>
+              )}
             </>
           )}
           

@@ -156,6 +156,48 @@
   border-radius: 6px;
 }
 
+.flowButtons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.flowBtn {
+  flex: 1;
+  padding: 0.6rem 0.5rem;
+  background: #0f172a;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+
+.flowBtn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  color: #e2e8f0;
+}
+
+.flowBtnActive {
+  background: #1e3a5f;
+  border-color: #3b82f6;
+  color: #60a5fa;
+}
+
+.flowBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.flowDesc {
+  font-size: 0.75rem;
+  color: #64748b;
+  margin: 0;
+  text-align: center;
+  font-style: italic;
+}
+
 .sliderContainer {
   padding: 0 0.25rem;
 }

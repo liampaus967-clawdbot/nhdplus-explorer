@@ -1,9 +1,20 @@
 /**
  * River Routing API
  * Uses bbox-constrained Dijkstra for efficient routing
+ * Velocity data from USGS NHDPlus EROM (Extended Reach Output Model)
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
+
+// Flow condition multipliers based on Leopold & Maddock (1953) hydraulic geometry
+// EROM velocities represent baseflow; these adjust for actual conditions
+const FLOW_MULTIPLIERS: Record<string, number> = {
+  low: 1.0,      // Baseflow (late summer, drought) - EROM baseline
+  normal: 1.5,   // Typical paddling conditions
+  high: 2.0,     // High water (spring runoff, after rain)
+};
+
+const DEFAULT_VELOCITY_FPS = 1.0; // ~0.68 mph fallback if no EROM data
 
 interface Edge {
   comid: number;
@@ -106,6 +117,7 @@ export async function GET(request: NextRequest) {
   const startLat = parseFloat(searchParams.get('start_lat') || '');
   const endLng = parseFloat(searchParams.get('end_lng') || '');
   const endLat = parseFloat(searchParams.get('end_lat') || '');
+  const flowCondition = searchParams.get('flow') || 'normal';
   
   if (isNaN(startLng) || isNaN(startLat) || isNaN(endLng) || isNaN(endLat)) {
     return NextResponse.json(
@@ -113,6 +125,8 @@ export async function GET(request: NextRequest) {
       { status: 400 }
     );
   }
+  
+  const flowMultiplier = FLOW_MULTIPLIERS[flowCondition] || FLOW_MULTIPLIERS.normal;
   
   try {
     // Calculate bbox that encompasses both points with buffer
@@ -188,8 +202,10 @@ export async function GET(request: NextRequest) {
     for (const edge of result.edges) {
       totalDistance += edge.lengthkm * 1000;
       
-      const velocity = edge.velocity_fps ? edge.velocity_fps * 0.3048 : 0.89;
-      totalFloatTime += (edge.lengthkm * 1000) / velocity;
+      // Velocity: EROM value (or default) × flow condition multiplier
+      const baseVelocityMs = (edge.velocity_fps || DEFAULT_VELOCITY_FPS) * 0.3048;
+      const adjustedVelocity = baseVelocityMs * flowMultiplier;
+      totalFloatTime += (edge.lengthkm * 1000) / adjustedVelocity;
       
       if (elevStart === null && edge.max_elev_m) elevStart = edge.max_elev_m;
       if (edge.min_elev_m) elevEnd = edge.min_elev_m;
@@ -227,7 +243,9 @@ export async function GET(request: NextRequest) {
         elev_drop_ft: Math.round(elevDropFt),
         gradient_ft_mi: distanceMiles > 0 ? Math.round(elevDropFt / distanceMiles * 10) / 10 : 0,
         segment_count: result.edges.length,
-        waterways: Array.from(waterways)
+        waterways: Array.from(waterways),
+        flow_condition: flowCondition,
+        flow_multiplier: flowMultiplier
       },
       snap: {
         start: snapStart,

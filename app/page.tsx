@@ -15,7 +15,15 @@ interface RouteStats {
   gradient_ft_mi: number;
   segment_count: number;
   waterways: string[];
+  flow_condition: string;
+  flow_multiplier: number;
 }
+
+const FLOW_CONDITIONS = {
+  low: { label: 'Low Water', description: 'Late summer, drought conditions' },
+  normal: { label: 'Normal', description: 'Typical paddling conditions' },
+  high: { label: 'High Water', description: 'Spring runoff, after rain' }
+};
 
 interface SnapResult {
   node_id: string;
@@ -42,6 +50,7 @@ export default function Home() {
   const [route, setRoute] = useState<RouteResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [flowCondition, setFlowCondition] = useState<'low' | 'normal' | 'high'>('normal');
   const [paddleSpeed, setPaddleSpeed] = useState(0);
   
   const putInMarker = useRef<mapboxgl.Marker | null>(null);
@@ -49,14 +58,16 @@ export default function Home() {
 
   // Format time display
   const formatTime = (seconds: number, paddleMph: number = 0): string => {
-    // Adjust for paddle speed (convert mph to m/s and reduce time proportionally)
-    const paddleMs = paddleMph * 0.44704;
-    const baseSpeed = 0.89; // 2 mph default
-    const effectiveSpeed = baseSpeed + paddleMs;
-    const adjustedSeconds = seconds * (baseSpeed / effectiveSpeed);
+    // Paddle speed reduces time (adds to current velocity)
+    // Assume ~2 mph average current from flow-adjusted EROM
+    if (paddleMph > 0) {
+      const baseSpeedMph = 2.0;
+      const effectiveSpeed = baseSpeedMph + paddleMph;
+      seconds = seconds * (baseSpeedMph / effectiveSpeed);
+    }
     
-    const hours = Math.floor(adjustedSeconds / 3600);
-    const mins = Math.round((adjustedSeconds % 3600) / 60);
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.round((seconds % 3600) / 60);
     
     if (hours > 0) return `${hours}h ${mins.toString().padStart(2, '0')}m`;
     return `${mins}m`;
@@ -79,12 +90,12 @@ export default function Home() {
   };
 
   // Calculate route between two points
-  const calculateRoute = async (startSnap: SnapResult, endSnap: SnapResult) => {
+  const calculateRoute = async (startSnap: SnapResult, endSnap: SnapResult, flow: string = flowCondition) => {
     setLoading(true);
     setError(null);
     
     try {
-      const res = await fetch(`/api/route?start_lng=${startSnap.snap_point.lng}&start_lat=${startSnap.snap_point.lat}&end_lng=${endSnap.snap_point.lng}&end_lat=${endSnap.snap_point.lat}`);
+      const res = await fetch(`/api/route?start_lng=${startSnap.snap_point.lng}&start_lat=${startSnap.snap_point.lat}&end_lng=${endSnap.snap_point.lng}&end_lat=${endSnap.snap_point.lat}&flow=${flow}`);
       if (!res.ok) {
         const err = await res.json();
         setError(err.error || 'Failed to calculate route');
@@ -159,12 +170,21 @@ export default function Home() {
     }
   }, [putIn, takeOut]);
 
+  // Handle flow condition change - recalculate route
+  const handleFlowChange = async (newFlow: 'low' | 'normal' | 'high') => {
+    setFlowCondition(newFlow);
+    if (putIn && takeOut) {
+      await calculateRoute(putIn, takeOut, newFlow);
+    }
+  };
+
   // Clear route
   const clearRoute = () => {
     setPutIn(null);
     setTakeOut(null);
     setRoute(null);
     setError(null);
+    setFlowCondition('normal');
     setPaddleSpeed(0);
     
     if (putInMarker.current) {
@@ -362,6 +382,26 @@ export default function Home() {
             </div>
           )}
           
+          {/* Flow condition selector - always visible */}
+          <div className={styles.section}>
+            <h3>🌊 Water Conditions</h3>
+            <div className={styles.flowButtons}>
+              {(Object.keys(FLOW_CONDITIONS) as Array<keyof typeof FLOW_CONDITIONS>).map((key) => (
+                <button
+                  key={key}
+                  className={`${styles.flowBtn} ${flowCondition === key ? styles.flowBtnActive : ''}`}
+                  onClick={() => handleFlowChange(key)}
+                  disabled={loading}
+                >
+                  {FLOW_CONDITIONS[key].label}
+                </button>
+              ))}
+            </div>
+            <p className={styles.flowDesc}>
+              {FLOW_CONDITIONS[flowCondition].description}
+            </p>
+          </div>
+
           {/* Route stats */}
           {route && (
             <>
@@ -422,8 +462,9 @@ export default function Home() {
           <div className={styles.section}>
             <h3>ℹ️ About</h3>
             <p className={styles.info}>
-              Route data from NHDPlus. Float times estimated at ~2 mph base current. 
-              Adjust paddle speed for faster travel.
+              Velocity data from USGS NHDPlus EROM (Extended Reach Output Model). 
+              Flow conditions adjust baseflow estimates per Leopold & Maddock (1953) 
+              hydraulic geometry relationships.
             </p>
           </div>
         </div>

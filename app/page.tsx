@@ -72,6 +72,12 @@ export default function Home() {
   const putInMarker = useRef<mapboxgl.Marker | null>(null);
   const takeOutMarker = useRef<mapboxgl.Marker | null>(null);
   const elevationCanvas = useRef<HTMLCanvasElement | null>(null);
+  
+  // Elevation profile interaction state
+  const [profileSelection, setProfileSelection] = useState<{ startM: number; endM: number } | null>(null);
+  const isDragging = useRef(false);
+  const dragStartX = useRef(0);
+  const profileBounds = useRef<{ maxDist: number; padLeft: number; chartW: number } | null>(null);
 
   // Classification colors
   const GRADIENT_COLORS: Record<string, string> = {
@@ -202,7 +208,43 @@ export default function Home() {
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
       ctx.fillText(`${mi} mi`, toX(d), H - pad.bottom + 15);
     }
+    
+    // Store bounds for interaction
+    profileBounds.current = { maxDist, padLeft: pad.left, chartW };
   }, []);
+
+  // Draw selection overlay on canvas
+  const drawSelectionOverlay = useCallback((startM: number, endM: number) => {
+    const canvas = elevationCanvas.current;
+    if (!canvas || !profileBounds.current || !route) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const { maxDist, padLeft, chartW } = profileBounds.current;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    const H = rect.height;
+    const pad = { top: 20, bottom: 30 };
+    const chartH = H - pad.top - pad.bottom;
+    
+    // Redraw the profile first
+    drawElevationProfile(route.stats.elevation_profile, route.stats.steep_sections || []);
+    
+    // Draw selection highlight
+    const toX = (d: number) => padLeft + (d / maxDist) * chartW;
+    const x1 = toX(Math.min(startM, endM));
+    const x2 = toX(Math.max(startM, endM));
+    
+    ctx.save();
+    ctx.scale(dpr, dpr);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.fillRect(x1, pad.top, x2 - x1, chartH);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x1, pad.top, x2 - x1, chartH);
+    ctx.restore();
+  }, [route, drawElevationProfile]);
 
   // Format time display
   const formatTime = (seconds: number, paddleMph: number = 0): string => {
@@ -334,6 +376,7 @@ export default function Home() {
     setError(null);
     setFlowCondition('normal');
     setPaddleSpeed(0);
+    setProfileSelection(null);
     
     if (putInMarker.current) {
       putInMarker.current.remove();
@@ -488,6 +531,213 @@ export default function Home() {
       ), 100);
     }
   }, [route, drawElevationProfile]);
+
+  // Convert distance to point on route
+  const getPointAtDistance = useCallback((targetDist: number): [number, number] | null => {
+    if (!route) return null;
+    
+    let accumDist = 0;
+    for (const feature of route.route.features) {
+      const coords = (feature.geometry as any).coordinates as [number, number][];
+      
+      for (let i = 1; i < coords.length; i++) {
+        const [lng1, lat1] = coords[i - 1];
+        const [lng2, lat2] = coords[i];
+        
+        // Approximate distance (good enough for this purpose)
+        const segDist = Math.sqrt(
+          Math.pow((lng2 - lng1) * 111000 * Math.cos(lat1 * Math.PI / 180), 2) +
+          Math.pow((lat2 - lat1) * 111000, 2)
+        );
+        
+        if (accumDist + segDist >= targetDist) {
+          // Interpolate point along segment
+          const ratio = segDist > 0 ? (targetDist - accumDist) / segDist : 0;
+          return [
+            lng1 + (lng2 - lng1) * ratio,
+            lat1 + (lat2 - lat1) * ratio
+          ];
+        }
+        
+        accumDist += segDist;
+      }
+    }
+    
+    // Return last point if distance exceeds route
+    const lastFeature = route.route.features[route.route.features.length - 1];
+    const lastCoords = (lastFeature.geometry as any).coordinates as [number, number][];
+    return lastCoords[lastCoords.length - 1];
+  }, [route]);
+
+  // Update map highlight when selection changes
+  useEffect(() => {
+    if (!map.current || !route) return;
+    
+    // Add highlight source if it doesn't exist
+    if (!map.current.getSource('profile-highlight')) {
+      map.current.addSource('profile-highlight', {
+        type: 'geojson',
+        data: { type: 'FeatureCollection', features: [] }
+      });
+      
+      // Highlight circle at start of selection
+      map.current.addLayer({
+        id: 'profile-highlight-start',
+        type: 'circle',
+        source: 'profile-highlight',
+        filter: ['==', ['get', 'type'], 'start'],
+        paint: {
+          'circle-radius': 10,
+          'circle-color': '#22c55e',
+          'circle-stroke-width': 3,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Highlight circle at end of selection
+      map.current.addLayer({
+        id: 'profile-highlight-end',
+        type: 'circle',
+        source: 'profile-highlight',
+        filter: ['==', ['get', 'type'], 'end'],
+        paint: {
+          'circle-radius': 10,
+          'circle-color': '#ef4444',
+          'circle-stroke-width': 3,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Line connecting the points
+      map.current.addLayer({
+        id: 'profile-highlight-line',
+        type: 'line',
+        source: 'profile-highlight',
+        filter: ['==', ['get', 'type'], 'line'],
+        paint: {
+          'line-color': '#ffffff',
+          'line-width': 4,
+          'line-dasharray': [2, 2]
+        }
+      }, 'route-line');
+    }
+    
+    const source = map.current.getSource('profile-highlight') as mapboxgl.GeoJSONSource;
+    
+    if (profileSelection) {
+      const startPoint = getPointAtDistance(Math.min(profileSelection.startM, profileSelection.endM));
+      const endPoint = getPointAtDistance(Math.max(profileSelection.startM, profileSelection.endM));
+      
+      if (startPoint && endPoint) {
+        // Build line between points following the route
+        const lineCoords: [number, number][] = [];
+        let accumDist = 0;
+        const minDist = Math.min(profileSelection.startM, profileSelection.endM);
+        const maxDist = Math.max(profileSelection.startM, profileSelection.endM);
+        let recording = false;
+        
+        for (const feature of route.route.features) {
+          const coords = (feature.geometry as any).coordinates as [number, number][];
+          for (let i = 0; i < coords.length; i++) {
+            if (i > 0) {
+              const [lng1, lat1] = coords[i - 1];
+              const [lng2, lat2] = coords[i];
+              const segDist = Math.sqrt(
+                Math.pow((lng2 - lng1) * 111000 * Math.cos(lat1 * Math.PI / 180), 2) +
+                Math.pow((lat2 - lat1) * 111000, 2)
+              );
+              
+              if (accumDist >= minDist && !recording) {
+                recording = true;
+                lineCoords.push(coords[i - 1]);
+              }
+              
+              if (recording) {
+                lineCoords.push(coords[i]);
+              }
+              
+              if (accumDist + segDist >= maxDist && recording) {
+                recording = false;
+                break;
+              }
+              
+              accumDist += segDist;
+            }
+          }
+          if (!recording && lineCoords.length > 0) break;
+        }
+        
+        source.setData({
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              properties: { type: 'start' },
+              geometry: { type: 'Point', coordinates: startPoint }
+            },
+            {
+              type: 'Feature',
+              properties: { type: 'end' },
+              geometry: { type: 'Point', coordinates: endPoint }
+            },
+            {
+              type: 'Feature',
+              properties: { type: 'line' },
+              geometry: { type: 'LineString', coordinates: lineCoords.length > 1 ? lineCoords : [startPoint, endPoint] }
+            }
+          ]
+        });
+      }
+    } else {
+      // Clear highlights
+      source.setData({ type: 'FeatureCollection', features: [] });
+    }
+  }, [profileSelection, route, getPointAtDistance]);
+
+  // Canvas mouse handlers for profile selection
+  const handleCanvasMouseDown = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!profileBounds.current) return;
+    
+    const canvas = elevationCanvas.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const { maxDist, padLeft, chartW } = profileBounds.current;
+    
+    // Convert x to distance
+    const dist = Math.max(0, Math.min(maxDist, ((x - padLeft) / chartW) * maxDist));
+    
+    isDragging.current = true;
+    dragStartX.current = dist;
+    setProfileSelection({ startM: dist, endM: dist });
+  }, []);
+
+  const handleCanvasMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDragging.current || !profileBounds.current) return;
+    
+    const canvas = elevationCanvas.current;
+    if (!canvas) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const { maxDist, padLeft, chartW } = profileBounds.current;
+    
+    const dist = Math.max(0, Math.min(maxDist, ((x - padLeft) / chartW) * maxDist));
+    
+    setProfileSelection({ startM: dragStartX.current, endM: dist });
+    drawSelectionOverlay(dragStartX.current, dist);
+  }, [drawSelectionOverlay]);
+
+  const handleCanvasMouseUp = useCallback(() => {
+    isDragging.current = false;
+  }, []);
+
+  const handleCanvasMouseLeave = useCallback(() => {
+    if (isDragging.current) {
+      isDragging.current = false;
+    }
+  }, []);
 
   return (
     <main className={styles.main}>
@@ -649,7 +899,22 @@ export default function Home() {
                   <canvas 
                     ref={elevationCanvas} 
                     className={styles.elevationChart}
+                    onMouseDown={handleCanvasMouseDown}
+                    onMouseMove={handleCanvasMouseMove}
+                    onMouseUp={handleCanvasMouseUp}
+                    onMouseLeave={handleCanvasMouseLeave}
                   />
+                  {profileSelection && Math.abs(profileSelection.endM - profileSelection.startM) > 100 && (
+                    <div className={styles.selectionInfo}>
+                      📍 Selection: {((Math.abs(profileSelection.endM - profileSelection.startM)) / 1609.34).toFixed(2)} mi
+                      <button 
+                        className={styles.clearSelectionBtn}
+                        onClick={() => setProfileSelection(null)}
+                      >
+                        Clear
+                      </button>
+                    </div>
+                  )}
                   <div className={styles.legend}>
                     <span className={styles.legendItem}>
                       <span className={styles.legendColor} style={{ background: '#60a5fa' }}></span>

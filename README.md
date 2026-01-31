@@ -231,8 +231,3 @@ updated_at      TIMESTAMP           -- NWM data timestamp
 | Real-time Velocity | NOAA NWM | Hourly |
 | Map Tiles | Mapbox | — |
 
----
-
-## License
-
-MIT

@@ -83,6 +83,7 @@ export default function Home() {
   const [flowCondition, setFlowCondition] = useState<'low' | 'normal' | 'high'>('normal');
   const [paddleSpeed, setPaddleSpeed] = useState(0);
   const [basemap, setBasemap] = useState<'outdoors' | 'satellite' | 'dark'>('outdoors');
+  const basemapRef = useRef<'outdoors' | 'satellite' | 'dark'>('outdoors');
 
   // Basemap style URLs
   const BASEMAP_STYLES = {
@@ -499,13 +500,13 @@ export default function Home() {
         }
       });
       
-      // Create arrow icon for flow direction
+      // Create arrow icon for flow direction (white for SDF coloring)
       const arrowSize = 24;
       const arrowCanvas = document.createElement('canvas');
       arrowCanvas.width = arrowSize;
       arrowCanvas.height = arrowSize;
       const ctx = arrowCanvas.getContext('2d')!;
-      ctx.fillStyle = '#1e40af';
+      ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.moveTo(arrowSize * 0.15, arrowSize * 0.25);
       ctx.lineTo(arrowSize * 0.85, arrowSize * 0.5);
@@ -513,9 +514,12 @@ export default function Home() {
       ctx.closePath();
       ctx.fill();
       
-      // Convert canvas to ImageData for Mapbox
+      // Convert canvas to ImageData for Mapbox (SDF mode for dynamic coloring)
       const imageData = ctx.getImageData(0, 0, arrowSize, arrowSize);
-      map.current!.addImage('flow-arrow', imageData, { sdf: false });
+      map.current!.addImage('flow-arrow', imageData, { sdf: true });
+      
+      // Arrow color based on basemap
+      const arrowColor = basemapRef.current === 'outdoors' ? '#1e40af' : '#ffffff';
       
       // Flow direction arrows (5 states)
       map.current!.addLayer({
@@ -540,7 +544,8 @@ export default function Home() {
           'icon-ignore-placement': false
         },
         paint: {
-          'icon-opacity': 0.8
+          'icon-opacity': 0.8,
+          'icon-color': arrowColor
         }
       });
 
@@ -669,6 +674,7 @@ export default function Home() {
   const handleBasemapChange = useCallback((newBasemap: 'outdoors' | 'satellite' | 'dark') => {
     if (!map.current || newBasemap === basemap) return;
     setBasemap(newBasemap);
+    basemapRef.current = newBasemap;
     map.current.setStyle(BASEMAP_STYLES[newBasemap]);
     
     // Re-add route data after style loads (if there's an active route)

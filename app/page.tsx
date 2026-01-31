@@ -33,12 +33,19 @@ interface RouteStats {
   flow_multiplier: number;
   elevation_profile: ElevationPoint[];
   steep_sections: SteepSection[];
-  velocity_source: {
+  live_conditions: {
     nwm_segments: number;
     erom_segments: number;
-    nwm_percent: number;
-    nwm_timestamp: string | null;
-    avg_streamflow_cms: number | null;
+    nwm_coverage_percent: number;
+    data_timestamp: string | null;
+    avg_velocity_mph: number | null;
+    avg_streamflow_cfs: number | null;
+    baseline_velocity_mph: number;
+    baseline_float_time_s: number;
+    baseline_float_time_h: number;
+    time_diff_s: number;
+    time_diff_percent: number;
+    flow_status: 'low' | 'normal' | 'high' | null;
   };
 }
 
@@ -957,25 +964,72 @@ export default function Home() {
                   </div>
                 )}
                 
-                {/* NWM Real-Time Indicator */}
-                {route.stats.velocity_source && (
-                  <div className={styles.nwmBadge}>
-                    {route.stats.velocity_source.nwm_percent > 0 ? (
-                      <>
-                        <span className={styles.nwmLive}>● LIVE</span>
-                        {route.stats.velocity_source.nwm_percent}% real-time velocities
-                        {route.stats.velocity_source.nwm_timestamp && (
-                          <span className={styles.nwmTime}>
-                            (as of {new Date(route.stats.velocity_source.nwm_timestamp).toLocaleTimeString()})
+              </div>
+              
+              {/* Live Conditions Panel */}
+              {route.stats.live_conditions && route.stats.live_conditions.nwm_coverage_percent > 0 && (
+                <div className={styles.section}>
+                  <h3><span className={styles.liveIndicator}>●</span> Live Conditions</h3>
+                  
+                  <div className={styles.liveStats}>
+                    {/* Current Flow Status */}
+                    <div className={styles.flowStatusRow}>
+                      <span className={styles.flowStatusLabel}>Flow Status</span>
+                      <span className={`${styles.flowStatusBadge} ${styles[`flow${route.stats.live_conditions.flow_status?.charAt(0).toUpperCase()}${route.stats.live_conditions.flow_status?.slice(1)}`]}`}>
+                        {route.stats.live_conditions.flow_status === 'high' ? '↑ High' : 
+                         route.stats.live_conditions.flow_status === 'low' ? '↓ Low' : '~ Normal'}
+                      </span>
+                    </div>
+                    
+                    {/* Current vs Baseline */}
+                    <div className={styles.comparisonGrid}>
+                      <div className={styles.comparisonItem}>
+                        <span className={styles.comparisonValue}>
+                          {route.stats.live_conditions.avg_velocity_mph || '—'}
+                        </span>
+                        <span className={styles.comparisonLabel}>Current mph</span>
+                      </div>
+                      <div className={styles.comparisonItem}>
+                        <span className={styles.comparisonValue}>
+                          {route.stats.live_conditions.baseline_velocity_mph}
+                        </span>
+                        <span className={styles.comparisonLabel}>Avg mph</span>
+                      </div>
+                      <div className={styles.comparisonItem}>
+                        <span className={styles.comparisonValue}>
+                          {route.stats.live_conditions.avg_streamflow_cfs 
+                            ? `${route.stats.live_conditions.avg_streamflow_cfs}` 
+                            : '—'}
+                        </span>
+                        <span className={styles.comparisonLabel}>Flow (CFS)</span>
+                      </div>
+                    </div>
+                    
+                    {/* Time Difference */}
+                    {route.stats.live_conditions.time_diff_s !== 0 && (
+                      <div className={styles.timeDiff}>
+                        {route.stats.live_conditions.time_diff_s > 0 ? (
+                          <span className={styles.timeFaster}>
+                            🎉 {Math.abs(Math.round(route.stats.live_conditions.time_diff_s / 60))} min faster than average!
+                          </span>
+                        ) : (
+                          <span className={styles.timeSlower}>
+                            ⏱️ {Math.abs(Math.round(route.stats.live_conditions.time_diff_s / 60))} min slower than average
                           </span>
                         )}
-                      </>
-                    ) : (
-                      <span className={styles.nwmFallback}>Using historical averages</span>
+                      </div>
                     )}
+                    
+                    {/* Data Source */}
+                    <div className={styles.dataSource}>
+                      <span>NOAA NWM • {route.stats.live_conditions.nwm_coverage_percent}% coverage</span>
+                      {route.stats.live_conditions.data_timestamp && (
+                        <span> • {new Date(route.stats.live_conditions.data_timestamp).toLocaleTimeString()}</span>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
               
               {/* Paddle speed */}
               <div className={styles.section}>

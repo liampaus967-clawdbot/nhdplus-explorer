@@ -258,10 +258,13 @@ export async function GET(request: NextRequest) {
     const steepSections: { start_m: number; end_m: number; gradient_ft_mi: number; classification: string }[] = [];
     let accumDist = 0;
     
-    // Track velocity source usage
+    // Track velocity source usage and comparisons
     let nwmVelocityCount = 0;
     let eromVelocityCount = 0;
     let totalStreamflow = 0;
+    let totalNwmVelocity = 0;
+    let totalEromVelocity = 0;
+    let eromOnlyFloatTime = 0;  // What time would be with historical data only
     
     for (const edge of result.edges) {
       const segmentStartDist = accumDist;
@@ -312,18 +315,25 @@ export async function GET(request: NextRequest) {
         elevEnd = edge.min_elev_m;
       }
       
-      // Velocity priority: NWM real-time > EROM > default
-      // NWM velocities are already current conditions, no flow multiplier needed
+      // Calculate both NWM and EROM velocities for comparison
+      const eromVelocityMs = (edge.velocity_fps || DEFAULT_VELOCITY_FPS) * 0.3048;
+      const nwmVelocityMs = edge.nwm_velocity_ms && edge.nwm_velocity_ms > 0.01 
+        ? edge.nwm_velocity_ms 
+        : null;
+      
+      // Track EROM baseline time (what it would be historically)
+      eromOnlyFloatTime += (edge.lengthkm * 1000) / eromVelocityMs;
+      totalEromVelocity += eromVelocityMs;
+      
+      // Use NWM if available, otherwise EROM
       let velocityMs: number;
-      if (edge.nwm_velocity_ms && edge.nwm_velocity_ms > 0.01) {
-        // Use NWM real-time velocity (already in m/s, no multiplier)
-        velocityMs = edge.nwm_velocity_ms;
+      if (nwmVelocityMs) {
+        velocityMs = nwmVelocityMs;
         nwmVelocityCount++;
+        totalNwmVelocity += nwmVelocityMs;
         if (edge.nwm_streamflow_cms) totalStreamflow += edge.nwm_streamflow_cms;
       } else {
-        // Fallback to EROM with flow condition multiplier
-        const baseVelocityMs = (edge.velocity_fps || DEFAULT_VELOCITY_FPS) * 0.3048;
-        velocityMs = baseVelocityMs * flowMultiplier;
+        velocityMs = eromVelocityMs;
         eromVelocityCount++;
       }
       
@@ -373,13 +383,39 @@ export async function GET(request: NextRequest) {
         flow_multiplier: flowMultiplier,
         elevation_profile: elevationProfile,
         steep_sections: steepSections,
-        // NWM real-time velocity info
-        velocity_source: {
+        // NWM real-time velocity info and comparisons
+        live_conditions: {
+          // Data source stats
           nwm_segments: nwmVelocityCount,
           erom_segments: eromVelocityCount,
-          nwm_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount)) * 100),
-          nwm_timestamp: nwmTimestamp,
-          avg_streamflow_cms: nwmVelocityCount > 0 ? Math.round(totalStreamflow / nwmVelocityCount * 100) / 100 : null
+          nwm_coverage_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount)) * 100),
+          data_timestamp: nwmTimestamp,
+          
+          // Current conditions
+          avg_velocity_mph: nwmVelocityCount > 0 
+            ? Math.round(totalNwmVelocity / nwmVelocityCount * 2.237 * 10) / 10 
+            : null,
+          avg_streamflow_cfs: nwmVelocityCount > 0 
+            ? Math.round(totalStreamflow / nwmVelocityCount * 35.315 * 10) / 10  // CMS to CFS
+            : null,
+          
+          // Comparison to historical
+          baseline_velocity_mph: Math.round(totalEromVelocity / result.edges.length * 2.237 * 10) / 10,
+          baseline_float_time_s: Math.round(eromOnlyFloatTime),
+          baseline_float_time_h: Math.round(eromOnlyFloatTime / 360) / 10,
+          
+          // Time difference
+          time_diff_s: Math.round(eromOnlyFloatTime - totalFloatTime),
+          time_diff_percent: Math.round(((eromOnlyFloatTime - totalFloatTime) / eromOnlyFloatTime) * 100),
+          
+          // Flow status (simple categorization)
+          flow_status: nwmVelocityCount > 0 
+            ? (totalNwmVelocity / nwmVelocityCount) > (totalEromVelocity / result.edges.length * 1.3) 
+              ? 'high' 
+              : (totalNwmVelocity / nwmVelocityCount) < (totalEromVelocity / result.edges.length * 0.7)
+                ? 'low'
+                : 'normal'
+            : null
         }
       },
       snap: {

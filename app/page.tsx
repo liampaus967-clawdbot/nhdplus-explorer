@@ -82,6 +82,14 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [flowCondition, setFlowCondition] = useState<'low' | 'normal' | 'high'>('normal');
   const [paddleSpeed, setPaddleSpeed] = useState(0);
+  const [basemap, setBasemap] = useState<'outdoors' | 'satellite' | 'dark'>('outdoors');
+
+  // Basemap style URLs
+  const BASEMAP_STYLES = {
+    outdoors: 'mapbox://styles/mapbox/outdoors-v12',
+    satellite: 'mapbox://styles/mapbox/satellite-streets-v12',
+    dark: 'mapbox://styles/mapbox/dark-v11'
+  };
   
   const putInMarker = useRef<mapboxgl.Marker | null>(null);
   const takeOutMarker = useRef<mapboxgl.Marker | null>(null);
@@ -415,7 +423,7 @@ export default function Home() {
     
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/outdoors-v12',
+      style: BASEMAP_STYLES.outdoors,
       center: [-72.70, 44.0], // Vermont
       zoom: 9,
       pitch: 0
@@ -424,7 +432,9 @@ export default function Home() {
     map.current.addControl(new mapboxgl.NavigationControl());
     map.current.addControl(new mapboxgl.FullscreenControl());
     
-    map.current.on('load', () => {
+    // Function to add all river layers (called on load and style change)
+    const addRiverLayers = () => {
+      if (!map.current) return;
       // Add Vermont rivers tileset
       map.current!.addSource('vt-rivers', {
         type: 'vector',
@@ -618,7 +628,13 @@ export default function Home() {
       
       // Click handler
       map.current!.getCanvas().style.cursor = 'crosshair';
-    });
+    };
+    
+    // Add layers on initial load
+    map.current.on('load', addRiverLayers);
+    
+    // Re-add layers after style change
+    map.current.on('style.load', addRiverLayers);
     
     return () => {
       map.current?.remove();
@@ -648,6 +664,23 @@ export default function Home() {
       ), 100);
     }
   }, [route, drawElevationProfile]);
+
+  // Handle basemap change
+  const handleBasemapChange = useCallback((newBasemap: 'outdoors' | 'satellite' | 'dark') => {
+    if (!map.current || newBasemap === basemap) return;
+    setBasemap(newBasemap);
+    map.current.setStyle(BASEMAP_STYLES[newBasemap]);
+    
+    // Re-add route data after style loads (if there's an active route)
+    if (route) {
+      map.current.once('style.load', () => {
+        const source = map.current?.getSource('route') as mapboxgl.GeoJSONSource;
+        if (source) {
+          source.setData(route.route);
+        }
+      });
+    }
+  }, [basemap, route]);
 
   // Convert distance to point on route
   const getPointAtDistance = useCallback((targetDist: number): [number, number] | null => {
@@ -867,6 +900,31 @@ export default function Home() {
         <div ref={mapContainer} className={styles.map} />
         
         <div className={styles.panel}>
+          {/* Basemap selector */}
+          <div className={styles.section}>
+            <h3>🗺️ Basemap</h3>
+            <div className={styles.basemapButtons}>
+              <button
+                className={`${styles.basemapBtn} ${basemap === 'outdoors' ? styles.basemapBtnActive : ''}`}
+                onClick={() => handleBasemapChange('outdoors')}
+              >
+                Outdoors
+              </button>
+              <button
+                className={`${styles.basemapBtn} ${basemap === 'satellite' ? styles.basemapBtnActive : ''}`}
+                onClick={() => handleBasemapChange('satellite')}
+              >
+                Satellite
+              </button>
+              <button
+                className={`${styles.basemapBtn} ${basemap === 'dark' ? styles.basemapBtnActive : ''}`}
+                onClick={() => handleBasemapChange('dark')}
+              >
+                Dark
+              </button>
+            </div>
+          </div>
+
           {/* Route points */}
           <div className={styles.section}>
             <h3>📍 Route</h3>

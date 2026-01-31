@@ -456,7 +456,7 @@ export default function Home() {
         }
       });
       
-      // River lines - 5 states (same styling)
+      // River lines - 5 states (base layer)
       map.current!.addLayer({
         id: 'test-rivers-line',
         type: 'line',
@@ -478,9 +478,48 @@ export default function Home() {
             6, 6,
             7, 8
           ],
-          'line-opacity': 0.7
+          'line-opacity': 0.5
         }
       });
+      
+      // Animated flow direction layer (5 states)
+      map.current!.addLayer({
+        id: 'test-rivers-flow',
+        type: 'line',
+        source: 'test-rivers',
+        'source-layer': 'testRiversSet-cr53z3',
+        layout: {
+          'line-cap': 'round',
+          'line-join': 'round'
+        },
+        paint: {
+          'line-color': '#93c5fd',
+          'line-width': [
+            'interpolate', ['linear'], ['get', 'stream_order'],
+            1, 1,
+            2, 1.5,
+            3, 2,
+            4, 3,
+            5, 4,
+            6, 6,
+            7, 8
+          ],
+          'line-dasharray': [0, 4, 3]
+        }
+      });
+      
+      // Animate the flow
+      let flowStep = 0;
+      const animateFlow = () => {
+        flowStep = (flowStep + 0.5) % 8;
+        map.current?.setPaintProperty('test-rivers-flow', 'line-dasharray', [
+          flowStep,
+          4,
+          3 - (flowStep * 0.3)
+        ]);
+        requestAnimationFrame(animateFlow);
+      };
+      animateFlow();
 
       // River labels (VT)
       map.current!.addLayer({

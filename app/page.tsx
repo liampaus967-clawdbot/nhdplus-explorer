@@ -508,15 +508,20 @@ export default function Home() {
         }
       });
       
-      // Animate the flow
+      // Animate the flow (slow, subtle movement)
       let flowStep = 0;
+      let frameCount = 0;
       const animateFlow = () => {
-        flowStep = (flowStep + 0.5) % 8;
-        map.current?.setPaintProperty('test-rivers-flow', 'line-dasharray', [
-          flowStep,
-          4,
-          3 - (flowStep * 0.3)
-        ]);
+        frameCount++;
+        // Only update every 10 frames (~6 updates/sec instead of 60)
+        if (frameCount % 10 === 0) {
+          flowStep = (flowStep + 0.1) % 8;
+          map.current?.setPaintProperty('test-rivers-flow', 'line-dasharray', [
+            flowStep,
+            4,
+            3
+          ]);
+        }
         requestAnimationFrame(animateFlow);
       };
       animateFlow();

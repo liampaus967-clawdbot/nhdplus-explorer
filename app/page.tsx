@@ -456,7 +456,7 @@ export default function Home() {
         }
       });
       
-      // River lines - 5 states (base layer)
+      // River lines - 5 states
       map.current!.addLayer({
         id: 'test-rivers-line',
         type: 'line',
@@ -478,53 +478,52 @@ export default function Home() {
             6, 6,
             7, 8
           ],
-          'line-opacity': 0.5
+          'line-opacity': 0.7
         }
       });
       
-      // Animated flow direction layer (5 states)
+      // Create arrow icon for flow direction
+      const arrowSize = 16;
+      const arrowCanvas = document.createElement('canvas');
+      arrowCanvas.width = arrowSize;
+      arrowCanvas.height = arrowSize;
+      const ctx = arrowCanvas.getContext('2d')!;
+      ctx.fillStyle = '#1e40af';
+      ctx.beginPath();
+      ctx.moveTo(arrowSize * 0.2, arrowSize * 0.3);
+      ctx.lineTo(arrowSize * 0.8, arrowSize * 0.5);
+      ctx.lineTo(arrowSize * 0.2, arrowSize * 0.7);
+      ctx.closePath();
+      ctx.fill();
+      
+      map.current!.addImage('flow-arrow', arrowCanvas, { sdf: false });
+      
+      // Flow direction arrows (5 states)
       map.current!.addLayer({
-        id: 'test-rivers-flow',
-        type: 'line',
+        id: 'test-rivers-arrows',
+        type: 'symbol',
         source: 'test-rivers',
         'source-layer': 'testRiversSet-cr53z3',
+        minzoom: 10,
         layout: {
-          'line-cap': 'round',
-          'line-join': 'round'
+          'symbol-placement': 'line',
+          'symbol-spacing': 150,
+          'icon-image': 'flow-arrow',
+          'icon-size': [
+            'interpolate', ['linear'], ['get', 'stream_order'],
+            1, 0.4,
+            3, 0.6,
+            5, 0.8,
+            7, 1.0
+          ],
+          'icon-rotation-alignment': 'map',
+          'icon-allow-overlap': false,
+          'icon-ignore-placement': false
         },
         paint: {
-          'line-color': '#93c5fd',
-          'line-width': [
-            'interpolate', ['linear'], ['get', 'stream_order'],
-            1, 1,
-            2, 1.5,
-            3, 2,
-            4, 3,
-            5, 4,
-            6, 6,
-            7, 8
-          ],
-          'line-dasharray': [0, 4, 3]
+          'icon-opacity': 0.8
         }
       });
-      
-      // Animate the flow (slow, subtle movement)
-      let flowStep = 0;
-      let frameCount = 0;
-      const animateFlow = () => {
-        frameCount++;
-        // Only update every 10 frames (~6 updates/sec instead of 60)
-        if (frameCount % 10 === 0) {
-          flowStep = (flowStep + 0.1) % 8;
-          map.current?.setPaintProperty('test-rivers-flow', 'line-dasharray', [
-            flowStep,
-            4,
-            3
-          ]);
-        }
-        requestAnimationFrame(animateFlow);
-      };
-      animateFlow();
 
       // River labels (VT)
       map.current!.addLayer({

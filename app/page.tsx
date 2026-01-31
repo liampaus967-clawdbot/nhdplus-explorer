@@ -1115,9 +1115,7 @@ export default function Home() {
             </p>
             <p className={styles.info}>
               <strong>Historical baseline:</strong> USGS NHDPlus EROM (Extended Reach Output Model) — 
-              mean annual velocity estimates. 
-              Flow conditions adjust baseflow estimates per Leopold & Maddock (1953) 
-              hydraulic geometry relationships.
+              mean annual velocity estimates.
             </p>
           </div>
         </div>

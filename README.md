@@ -1,57 +1,75 @@
 # 🛶 River Router
 
-A Next.js application for planning float trips on Vermont rivers. Click to set a put-in and take-out point, and get route stats including distance, float time, elevation profile, and gradient.
+A Next.js application for planning float trips on US rivers with **real-time flow data**. Click to set a put-in and take-out point, and get route stats including distance, float time, elevation profile, and live conditions.
 
 ## Features
 
-- **Interactive map** with Vermont river network (Mapbox vector tileset)
+- **Interactive map** with multiple basemap options (Outdoors, Satellite, Dark)
 - **Click-to-route** interface for planning float trips
-- **Flow condition selector** — adjust for low/normal/high water
+- **Real-time velocities** from NOAA National Water Model (NWM)
+- **Live conditions panel** — current vs historical flow comparison
 - **Route statistics** — distance, float time, elevation drop, gradient
-- **Elevation profile chart** — visualize the river's descent
+- **Elevation profile chart** with rapids/riffles detection
+- **Flow direction arrows** showing downstream direction
 - **Paddle speed slider** — calculate times with paddling effort
-- **River snapping** — clicks snap to nearest river segment
+- **Downstream-only routing** — prevents upstream route errors
 
 ## Tech Stack
 
 - **Frontend**: Next.js 14, React, Mapbox GL JS, Canvas API
 - **Backend**: Next.js API routes, PostgreSQL/PostGIS
-- **Data**: NHDPlus V2 river network, custom Mapbox tileset
+- **Data**: NHDPlus V2 (2.7M river reaches), NOAA NWM (hourly velocities)
 
 ---
 
 ## Velocity & Float Time Methodology
 
-### Data Source
-Velocity estimates come from **USGS NHDPlus EROM** (Extended Reach Output Model), a peer-reviewed hydrologic model that estimates streamflow velocity based on:
-- Channel geometry
-- Drainage area
-- Slope
-- Regional regression equations
+### Real-Time Data: NOAA National Water Model (NWM)
 
-### Flow Condition Multipliers
-EROM velocities represent **baseflow conditions** (typical low water). We apply multipliers based on Leopold & Maddock (1953) hydraulic geometry relationships:
+The primary velocity source is the **NOAA National Water Model**, which provides hourly forecasts for all 2.7 million NHDPlus reaches in the United States.
 
-| Condition | Multiplier | Description |
-|-----------|------------|-------------|
-| **Low Water** | 1.0× | Late summer, drought — EROM baseline |
-| **Normal** | 1.5× | Typical paddling conditions |
-| **High Water** | 2.0× | Spring runoff, after rain |
+| Metric | Details |
+|--------|---------|
+| **Coverage** | 2.7M river reaches (CONUS) |
+| **Update Frequency** | Hourly |
+| **Variables** | Velocity (m/s), Streamflow (CMS) |
+| **Source** | `s3://noaa-nwm-pds/` |
 
-### Velocity by Stream Order
-Average EROM velocities in the dataset:
+The NWM uses:
+- Land surface models
+- Channel routing physics
+- Data assimilation from USGS stream gages
+- Weather forecast inputs
 
-| Stream Order | Avg Velocity | Description |
-|--------------|--------------|-------------|
-| 1-2 | 0.5-0.6 mph | Headwater creeks |
-| 3-4 | 0.7-0.8 mph | Small streams |
-| 5-6 | 0.9-1.0 mph | Medium rivers |
-| 7-8 | 1.0-1.3 mph | Large rivers |
-| 9-10 | 1.9-2.4 mph | Major rivers |
+### Historical Baseline: USGS NHDPlus EROM
 
-### References
-- **NHDPlus EROM**: USGS NHDPlus Value Added Attributes documentation
-- **Flow-velocity relationships**: Leopold, L.B. & Maddock, T. (1953). *The Hydraulic Geometry of Stream Channels and Some Physiographic Implications*. USGS Professional Paper 252.
+When NWM data is unavailable, we fall back to **EROM** (Extended Reach Output Model) velocities:
+- Mean annual velocity estimates
+- Based on channel geometry, drainage area, and slope
+- Peer-reviewed USGS methodology
+
+### Live Conditions Display
+
+The app shows real-time comparisons:
+- **Flow Status**: High / Normal / Low (based on NWM vs EROM)
+- **Current velocity** vs **historical average**
+- **Time difference**: "12 min faster than average!"
+- **Streamflow** in CFS
+
+---
+
+## Elevation Profile & Rapids Detection
+
+The elevation profile chart color-codes gradient to identify potential rapids:
+
+| Color | Classification | Gradient (ft/mi) | Description |
+|-------|----------------|------------------|-------------|
+| 🔵 Blue | Pool | < 5 | Flat, calm water |
+| 🟡 Yellow | Riffle | 5-15 | Small waves, easy |
+| 🟠 Orange | Rapid I-II | 15-30 | Moderate whitewater |
+| 🔴 Red | Rapid III+ | > 30 | Significant rapids |
+
+**Interactive feature**: Click and drag on the elevation profile to highlight that section on the map.
 
 ---
 
@@ -69,20 +87,19 @@ Snap a point to the nearest river.
 {
   "node_id": "150058160",
   "comid": "6084563",
-  "gnis_name": "Spear Brook",
-  "stream_order": 1,
-  "distance_m": 868,
-  "snap_point": { "lng": -72.701, "lat": 43.992 }
+  "gnis_name": "Lamoille River",
+  "stream_order": 5,
+  "distance_m": 234,
+  "snap_point": { "lng": -72.701, "lat": 44.523 }
 }
 ```
 
 ### GET `/api/route`
-Calculate route between two points.
+Calculate route between two points using real-time NWM velocities.
 
 **Parameters:**
 - `start_lng`, `start_lat` — Start coordinates
 - `end_lng`, `end_lat` — End coordinates
-- `flow` — Flow condition: `low`, `normal`, or `high` (default: `normal`)
 
 **Response:**
 ```json
@@ -92,19 +109,22 @@ Calculate route between two points.
     "features": [...] 
   },
   "stats": {
-    "distance_mi": 4.9,
-    "float_time_h": 4.3,
-    "float_time_s": 15600,
-    "elev_drop_ft": 713,
-    "gradient_ft_mi": 146.8,
-    "waterways": ["Spear Brook", "Ayers Brook"],
-    "flow_condition": "normal",
-    "flow_multiplier": 1.5,
-    "elevation_profile": [
-      { "dist_m": 0, "elev_m": 417.8 },
-      { "dist_m": 380, "elev_m": 400.2 },
-      ...
-    ]
+    "distance_mi": 10.6,
+    "float_time_h": 8.2,
+    "elev_drop_ft": 33,
+    "gradient_ft_mi": 3.1,
+    "waterways": ["Lamoille River"],
+    "elevation_profile": [...],
+    "steep_sections": [...],
+    "live_conditions": {
+      "nwm_coverage_percent": 100,
+      "data_timestamp": "2026-01-31T04:00:00Z",
+      "avg_velocity_mph": 0.5,
+      "baseline_velocity_mph": 0.9,
+      "avg_streamflow_cfs": 453.5,
+      "time_diff_s": -1420,
+      "flow_status": "low"
+    }
   }
 }
 ```
@@ -119,15 +139,24 @@ Calculate route between two points.
 │   Tileset       │     │                  │     │   (PostGIS)     │
 │                 │     │  /api/snap       │     │                 │
 │  Visual river   │◄────│  /api/route      │────►│  river_edges    │
-│  display        │     │                  │     │  (2.7M rows)    │
+│  display        │     │                  │     │  nwm_velocity   │
 └─────────────────┘     └──────────────────┘     └─────────────────┘
+                                                         ▲
+                                                         │
+                                                ┌────────┴────────┐
+                                                │  NWM Ingest     │
+                                                │  (hourly cron)  │
+                                                │                 │
+                                                │  NOAA S3 → DB   │
+                                                └─────────────────┘
 ```
 
-### How Routing Works
-1. **Snap** — Find nearest river node to click point (PostGIS spatial index)
-2. **Load** — Query edges within bounding box of start/end points
-3. **Route** — Run Dijkstra's algorithm in-memory on the subgraph
-4. **Stats** — Calculate distance, time, elevation from route edges
+### Data Flow
+1. **NWM Ingest** — Hourly cron downloads latest NWM NetCDF from NOAA S3
+2. **Snap** — Find nearest river node using PostGIS spatial index
+3. **Route** — Dijkstra on bbox-constrained subgraph (downstream only)
+4. **Velocity** — Join with `nwm_velocity` for real-time data, fallback to EROM
+5. **Stats** — Calculate distance, time, elevation, live conditions comparison
 
 ---
 
@@ -156,11 +185,19 @@ npm run dev
 
 Open http://localhost:3000
 
+### 4. Set up NWM ingest (optional, for real-time data)
+```bash
+cd ~/river-router-api
+source venv/bin/activate
+python scripts/ingest_nwm.py  # Run once to populate
+./scripts/setup_nwm_cron.sh   # Set up hourly updates
+```
+
 ---
 
 ## Database Schema
 
-### `river_edges` table
+### `river_edges` table (2.7M rows)
 ```sql
 comid        BIGINT PRIMARY KEY  -- NHDPlus segment ID
 gnis_name    VARCHAR(255)        -- River name
@@ -168,20 +205,31 @@ from_node    BIGINT              -- Start node (graph edge)
 to_node      BIGINT              -- End node (graph edge)
 lengthkm     FLOAT               -- Segment length in km
 stream_order INT                 -- Strahler order (1-10)
-velocity_fps FLOAT               -- EROM velocity (ft/s)
+velocity_fps FLOAT               -- EROM baseline velocity (ft/s)
 min_elev_m   FLOAT               -- Downstream elevation (m)
 max_elev_m   FLOAT               -- Upstream elevation (m)
 slope        FLOAT               -- Channel slope
 geom         GEOMETRY            -- PostGIS LineString (EPSG:4326)
 ```
 
+### `nwm_velocity` table (2.4M rows, updated hourly)
+```sql
+comid           BIGINT PRIMARY KEY  -- Links to river_edges
+velocity_ms     FLOAT               -- Real-time velocity (m/s)
+streamflow_cms  FLOAT               -- Real-time streamflow (m³/s)
+updated_at      TIMESTAMP           -- NWM data timestamp
+```
+
 ---
 
 ## Data Sources
 
-- **River Network**: NHDPlus V2 (USGS)
-- **Tileset**: Vermont rivers on Mapbox (`mapbox://lman967.9hfg3bbo`)
-- **Routing**: PostGIS with bbox-constrained Dijkstra
+| Data | Source | Update Frequency |
+|------|--------|------------------|
+| River Network | USGS NHDPlus V2 | Static |
+| Baseline Velocity | NHDPlus EROM | Static |
+| Real-time Velocity | NOAA NWM | Hourly |
+| Map Tiles | Mapbox | — |
 
 ---
 

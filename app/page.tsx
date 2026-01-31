@@ -928,26 +928,6 @@ export default function Home() {
             </div>
           )}
           
-          {/* Flow condition selector - always visible */}
-          <div className={styles.section}>
-            <h3>🌊 Water Conditions</h3>
-            <div className={styles.flowButtons}>
-              {(Object.keys(FLOW_CONDITIONS) as Array<keyof typeof FLOW_CONDITIONS>).map((key) => (
-                <button
-                  key={key}
-                  className={`${styles.flowBtn} ${flowCondition === key ? styles.flowBtnActive : ''}`}
-                  onClick={() => handleFlowChange(key)}
-                  disabled={loading}
-                >
-                  {FLOW_CONDITIONS[key].label}
-                </button>
-              ))}
-            </div>
-            <p className={styles.flowDesc}>
-              {FLOW_CONDITIONS[flowCondition].description}
-            </p>
-          </div>
-
           {/* Route stats */}
           {route && (
             <>

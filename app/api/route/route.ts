@@ -391,16 +391,14 @@ export async function GET(request: NextRequest) {
           nwm_coverage_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount)) * 100),
           data_timestamp: nwmTimestamp,
           
-          // Current conditions
-          avg_velocity_mph: nwmVelocityCount > 0 
-            ? Math.round(totalNwmVelocity / nwmVelocityCount * 2.237 * 10) / 10 
-            : null,
+          // Current conditions - effective velocity (distance/time)
+          avg_velocity_mph: Math.round((totalDistance / totalFloatTime) * 2.237 * 10) / 10,
           avg_streamflow_cfs: nwmVelocityCount > 0 
             ? Math.round(totalStreamflow / nwmVelocityCount * 35.315 * 10) / 10  // CMS to CFS
             : null,
           
-          // Comparison to historical
-          baseline_velocity_mph: Math.round(totalEromVelocity / result.edges.length * 2.237 * 10) / 10,
+          // Comparison to historical - effective velocity (distance/time)
+          baseline_velocity_mph: Math.round((totalDistance / eromOnlyFloatTime) * 2.237 * 10) / 10,
           baseline_float_time_s: Math.round(eromOnlyFloatTime),
           baseline_float_time_h: Math.round(eromOnlyFloatTime / 360) / 10,
           

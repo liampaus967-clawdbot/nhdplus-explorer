@@ -483,20 +483,22 @@ export default function Home() {
       });
       
       // Create arrow icon for flow direction
-      const arrowSize = 16;
+      const arrowSize = 24;
       const arrowCanvas = document.createElement('canvas');
       arrowCanvas.width = arrowSize;
       arrowCanvas.height = arrowSize;
       const ctx = arrowCanvas.getContext('2d')!;
       ctx.fillStyle = '#1e40af';
       ctx.beginPath();
-      ctx.moveTo(arrowSize * 0.2, arrowSize * 0.3);
-      ctx.lineTo(arrowSize * 0.8, arrowSize * 0.5);
-      ctx.lineTo(arrowSize * 0.2, arrowSize * 0.7);
+      ctx.moveTo(arrowSize * 0.15, arrowSize * 0.25);
+      ctx.lineTo(arrowSize * 0.85, arrowSize * 0.5);
+      ctx.lineTo(arrowSize * 0.15, arrowSize * 0.75);
       ctx.closePath();
       ctx.fill();
       
-      map.current!.addImage('flow-arrow', arrowCanvas, { sdf: false });
+      // Convert canvas to ImageData for Mapbox
+      const imageData = ctx.getImageData(0, 0, arrowSize, arrowSize);
+      map.current!.addImage('flow-arrow', imageData, { sdf: false });
       
       // Flow direction arrows (5 states)
       map.current!.addLayer({

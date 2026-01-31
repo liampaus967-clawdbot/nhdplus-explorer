@@ -1110,7 +1110,12 @@ export default function Home() {
           <div className={styles.section}>
             <h3>ℹ️ About</h3>
             <p className={styles.info}>
-              Velocity data from USGS NHDPlus EROM (Extended Reach Output Model). 
+              <strong>Real-time data:</strong> NOAA National Water Model (NWM) — 
+              hourly velocity & streamflow forecasts for 2.7M river reaches.
+            </p>
+            <p className={styles.info}>
+              <strong>Historical baseline:</strong> USGS NHDPlus EROM (Extended Reach Output Model) — 
+              mean annual velocity estimates. 
               Flow conditions adjust baseflow estimates per Leopold & Maddock (1953) 
               hydraulic geometry relationships.
             </p>

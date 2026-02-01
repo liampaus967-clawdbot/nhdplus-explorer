@@ -1,7 +1,7 @@
 /**
  * PostgreSQL Database Connection
  */
-import { Pool, QueryResult } from 'pg';
+import { Pool, QueryResult, QueryResultRow } from 'pg';
 
 let pool: Pool | null = null;
 
@@ -25,7 +25,7 @@ function getPool(): Pool {
   return pool;
 }
 
-export async function query<T = any>(text: string, params?: any[]): Promise<QueryResult<T>> {
+export async function query<T extends QueryResultRow = QueryResultRow>(text: string, params?: any[]): Promise<QueryResult<T>> {
   const start = Date.now();
   const result = await getPool().query<T>(text, params);
   const duration = Date.now() - start;

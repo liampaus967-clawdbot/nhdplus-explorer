@@ -426,7 +426,7 @@ export default function Home() {
       container: mapContainer.current,
       style: BASEMAP_STYLES.outdoors,
       center: [-111.73, 45.35], // Ennis, Montana
-      zoom: 9,
+      zoom: 10,
       pitch: 0
     });
     

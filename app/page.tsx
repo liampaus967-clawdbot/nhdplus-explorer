@@ -425,7 +425,7 @@ export default function Home() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: BASEMAP_STYLES.outdoors,
-      center: [-72.70, 44.0], // Vermont
+      center: [-111.73, 45.35], // Ennis, Montana
       zoom: 9,
       pitch: 0
     });

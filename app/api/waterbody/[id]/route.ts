@@ -10,7 +10,7 @@ export const runtime = 'edge';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const ip = getClientIP(request);
   
@@ -31,7 +31,7 @@ export async function GET(
     );
   }
   
-  const { id } = params;
+  const { id } = await params;
   
   // Validate ID format (UUID)
   if (!validateUUID(id)) {

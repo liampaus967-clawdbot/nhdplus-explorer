@@ -425,6 +425,12 @@ export async function GET(request: NextRequest) {
     const upstreamSegmentCount = result.edges.filter(e => e.is_upstream_segment).length;
     const isUpstream = upstreamSegmentCount > result.edges.length / 2;
     
+    // Debug: log route edges
+    console.log(`Route has ${result.edges.length} edges:`);
+    result.edges.forEach((e, i) => {
+      console.log(`  ${i}: COMID ${e.comid}${e.is_virtual ? ` (virtual, orig=${e.original_comid}, frac=${e.fraction_start?.toFixed(2)}-${e.fraction_end?.toFixed(2)})` : ''} ${e.is_upstream_segment ? '[UPSTREAM]' : ''}`);
+    });
+    
     // Get geometries
     const realComids = result.edges
       .map(e => e.is_virtual ? e.original_comid : e.comid)
@@ -438,24 +444,41 @@ export async function GET(request: NextRequest) {
     
     const geomMap = new Map(geomResult.rows.map(r => [r.comid, r.geometry]));
     
-    const getClippedGeometry = async (edge: Edge) => {
-      if (!edge.is_virtual || !edge.original_comid) {
-        return geomMap.get(edge.comid);
+    const getClippedGeometry = async (edge: Edge, index: number, totalEdges: number) => {
+      // For virtual edges (first/last in route), clip the geometry
+      if (edge.is_virtual && edge.original_comid !== undefined) {
+        const fracStart = edge.fraction_start ?? 0;
+        const fracEnd = edge.fraction_end ?? 1;
+        
+        console.log(`Edge ${index}/${totalEdges}: Virtual edge on COMID ${edge.original_comid}, clipping ${(fracStart*100).toFixed(1)}% to ${(fracEnd*100).toFixed(1)}%`);
+        
+        try {
+          const clipResult = await query(`
+            SELECT ST_AsGeoJSON(
+              ST_LineSubstring(geom, $2, $3)
+            )::json as geometry
+            FROM river_edges
+            WHERE comid = $1
+          `, [edge.original_comid, fracStart, fracEnd]);
+          
+          if (clipResult.rows[0]?.geometry) {
+            return clipResult.rows[0].geometry;
+          }
+        } catch (e) {
+          console.error(`Failed to clip geometry for COMID ${edge.original_comid}:`, e);
+        }
+        
+        // Fallback to full geometry
+        return geomMap.get(edge.original_comid);
       }
       
-      const clipResult = await query(`
-        SELECT ST_AsGeoJSON(
-          ST_LineSubstring(geom, $2, $3)
-        )::json as geometry
-        FROM river_edges
-        WHERE comid = $1
-      `, [edge.original_comid, edge.fraction_start || 0, edge.fraction_end || 1]);
-      
-      return clipResult.rows[0]?.geometry;
+      // Regular edges - return full geometry
+      return geomMap.get(edge.comid);
     };
     
-    const features = await Promise.all(result.edges.map(async (edge) => {
-      const geometry = await getClippedGeometry(edge);
+    const totalEdges = result.edges.length;
+    const features = await Promise.all(result.edges.map(async (edge, index) => {
+      const geometry = await getClippedGeometry(edge, index, totalEdges);
       return {
         type: 'Feature' as const,
         geometry: geometry || { type: 'LineString', coordinates: [] },
@@ -465,7 +488,9 @@ export async function GET(request: NextRequest) {
           stream_order: edge.stream_order,
           lengthkm: edge.lengthkm,
           is_virtual: edge.is_virtual || false,
-          is_upstream: edge.is_upstream_segment || false
+          is_upstream: edge.is_upstream_segment || false,
+          fraction_start: edge.fraction_start,
+          fraction_end: edge.fraction_end
         }
       };
     }));

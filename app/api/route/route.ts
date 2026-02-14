@@ -1,22 +1,20 @@
 /**
- * River Routing API
- * Uses bbox-constrained Dijkstra for efficient routing
- * Velocity data from USGS NHDPlus EROM (Extended Reach Output Model)
+ * River Routing API v2
+ * Uses edge snapping with pseudo-nodes for accurate start/end positioning
+ * Velocity data from USGS NHDPlus EROM + real-time NWM
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '@/lib/db';
 import { checkRateLimit, getClientIP } from '@/lib/rateLimit';
 import { validateCoordinate, validateFlowCondition } from '@/lib/validation';
 
-// Flow condition multipliers based on Leopold & Maddock (1953) hydraulic geometry
-// EROM velocities represent baseflow; these adjust for actual conditions
 const FLOW_MULTIPLIERS: Record<string, number> = {
-  low: 1.0,      // Baseflow (late summer, drought) - EROM baseline
-  normal: 1.5,   // Typical paddling conditions
-  high: 2.0,     // High water (spring runoff, after rain)
+  low: 1.0,
+  normal: 1.5,
+  high: 2.0,
 };
 
-const DEFAULT_VELOCITY_FPS = 1.0; // ~0.68 mph fallback if no EROM data
+const DEFAULT_VELOCITY_FPS = 1.0;
 
 interface Edge {
   comid: number;
@@ -28,54 +26,216 @@ interface Edge {
   velocity_fps: number | null;
   min_elev_m: number | null;
   max_elev_m: number | null;
-  nwm_velocity_ms: number | null;  // Real-time NWM velocity
-  nwm_streamflow_cms: number | null;  // Real-time NWM streamflow
+  nwm_velocity_ms: number | null;
+  nwm_streamflow_cms: number | null;
+  // For virtual edges
+  is_virtual?: boolean;
+  original_comid?: number;
+  fraction_start?: number;
+  fraction_end?: number;
+}
+
+interface SnapResult {
+  edge_comid: number;
+  from_node: string;
+  to_node: string;
+  fraction: number;  // 0-1 position along edge
+  snap_lng: number;
+  snap_lat: number;
+  gnis_name: string | null;
+  lengthkm: number;
+  velocity_fps: number | null;
+  min_elev_m: number | null;
+  max_elev_m: number | null;
+  stream_order: number;
+  dist_m: number;
 }
 
 interface GraphNode {
   edges: { target: string; edge: Edge }[];
 }
 
-// Build adjacency graph from edges (downstream only)
-function buildGraph(edges: Edge[], downstreamOnly: boolean = true): Map<string, GraphNode> {
+/**
+ * Snap point to nearest edge and return edge info + fraction
+ */
+async function snapToEdge(lng: number, lat: number): Promise<SnapResult | null> {
+  const result = await query(`
+    SELECT 
+      comid as edge_comid,
+      from_node::text as from_node,
+      to_node::text as to_node,
+      ST_LineLocatePoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) as fraction,
+      ST_X(ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326))) as snap_lng,
+      ST_Y(ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326))) as snap_lat,
+      gnis_name,
+      lengthkm,
+      velocity_fps,
+      min_elev_m,
+      max_elev_m,
+      stream_order,
+      ST_Distance(geom::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) as dist_m
+    FROM river_edges
+    WHERE from_node IS NOT NULL AND to_node IS NOT NULL
+    ORDER BY geom <-> ST_SetSRID(ST_MakePoint($1, $2), 4326)
+    LIMIT 1
+  `, [lng, lat]);
+  
+  if (result.rows.length === 0 || result.rows[0].dist_m > 5000) {
+    return null;
+  }
+  
+  return result.rows[0];
+}
+
+/**
+ * Build graph with virtual start/end nodes for edge snapping
+ */
+function buildGraphWithVirtualNodes(
+  edges: Edge[], 
+  startSnap: SnapResult, 
+  endSnap: SnapResult
+): Map<string, GraphNode> {
   const graph = new Map<string, GraphNode>();
+  const VIRTUAL_START = 'virtual_start';
+  const VIRTUAL_END = 'virtual_end';
+  
+  // Track which edges need to be split
+  const startEdgeComid = startSnap.edge_comid;
+  const endEdgeComid = endSnap.edge_comid;
   
   for (const edge of edges) {
     const from = edge.from_node;
     const to = edge.to_node;
     
-    // NHDPlus convention: from_node → to_node is downstream direction
-    // We verify with elevation: max_elev (upstream) > min_elev (downstream)
-    const isDownstream = !edge.max_elev_m || !edge.min_elev_m || edge.max_elev_m >= edge.min_elev_m;
-    
-    // Forward direction (downstream: from → to)
+    // Initialize nodes if needed
     if (!graph.has(from)) graph.set(from, { edges: [] });
-    graph.get(from)!.edges.push({ target: to, edge });
+    if (!graph.has(to)) graph.set(to, { edges: [] });
     
-    // Reverse direction only if not downstream-only mode
-    if (!downstreamOnly) {
-      if (!graph.has(to)) graph.set(to, { edges: [] });
-      graph.get(to)!.edges.push({ target: from, edge });
+    // Check if this edge needs virtual node insertion
+    if (edge.comid === startEdgeComid && edge.comid === endEdgeComid) {
+      // SPECIAL CASE: Start and end on same edge
+      // Create: from → virtual_start → virtual_end → to
+      // But we only need virtual_start → virtual_end for routing
+      
+      if (!graph.has(VIRTUAL_START)) graph.set(VIRTUAL_START, { edges: [] });
+      if (!graph.has(VIRTUAL_END)) graph.set(VIRTUAL_END, { edges: [] });
+      
+      const startFrac = startSnap.fraction;
+      const endFrac = endSnap.fraction;
+      
+      if (startFrac < endFrac) {
+        // Downstream: start is upstream of end
+        const segmentFraction = endFrac - startFrac;
+        const segmentLength = edge.lengthkm * segmentFraction;
+        
+        // Interpolate elevation
+        const elevDrop = (edge.max_elev_m && edge.min_elev_m) 
+          ? (edge.max_elev_m - edge.min_elev_m) * segmentFraction 
+          : null;
+        const startElev = edge.max_elev_m 
+          ? edge.max_elev_m - (edge.max_elev_m - (edge.min_elev_m || edge.max_elev_m)) * startFrac
+          : null;
+        const endElev = startElev && elevDrop ? startElev - elevDrop : null;
+        
+        const virtualEdge: Edge = {
+          ...edge,
+          is_virtual: true,
+          original_comid: edge.comid,
+          from_node: VIRTUAL_START,
+          to_node: VIRTUAL_END,
+          lengthkm: segmentLength,
+          max_elev_m: startElev,
+          min_elev_m: endElev,
+          fraction_start: startFrac,
+          fraction_end: endFrac,
+        };
+        
+        graph.get(VIRTUAL_START)!.edges.push({ target: VIRTUAL_END, edge: virtualEdge });
+      }
+      // If endFrac < startFrac, it's upstream (no route in downstream-only mode)
+      
+    } else if (edge.comid === startEdgeComid) {
+      // Start point on this edge - create virtual_start → to_node
+      if (!graph.has(VIRTUAL_START)) graph.set(VIRTUAL_START, { edges: [] });
+      
+      const remainingFraction = 1 - startSnap.fraction;
+      const remainingLength = edge.lengthkm * remainingFraction;
+      
+      // Interpolate elevation from snap point to end
+      const startElev = edge.max_elev_m 
+        ? edge.max_elev_m - (edge.max_elev_m - (edge.min_elev_m || edge.max_elev_m)) * startSnap.fraction
+        : null;
+      
+      const virtualEdge: Edge = {
+        ...edge,
+        is_virtual: true,
+        original_comid: edge.comid,
+        from_node: VIRTUAL_START,
+        lengthkm: remainingLength,
+        max_elev_m: startElev,
+        fraction_start: startSnap.fraction,
+        fraction_end: 1,
+      };
+      
+      graph.get(VIRTUAL_START)!.edges.push({ target: to, edge: virtualEdge });
+      
+      // Also add the original edge for other routing paths
+      graph.get(from)!.edges.push({ target: to, edge });
+      
+    } else if (edge.comid === endEdgeComid) {
+      // End point on this edge - create from_node → virtual_end
+      if (!graph.has(VIRTUAL_END)) graph.set(VIRTUAL_END, { edges: [] });
+      
+      const usedFraction = endSnap.fraction;
+      const usedLength = edge.lengthkm * usedFraction;
+      
+      // Interpolate elevation from start to snap point
+      const endElev = edge.max_elev_m 
+        ? edge.max_elev_m - (edge.max_elev_m - (edge.min_elev_m || edge.max_elev_m)) * endSnap.fraction
+        : null;
+      
+      const virtualEdge: Edge = {
+        ...edge,
+        is_virtual: true,
+        original_comid: edge.comid,
+        to_node: VIRTUAL_END,
+        lengthkm: usedLength,
+        min_elev_m: endElev,
+        fraction_start: 0,
+        fraction_end: endSnap.fraction,
+      };
+      
+      graph.get(from)!.edges.push({ target: VIRTUAL_END, edge: virtualEdge });
+      
+      // Also add the original edge for other routing paths
+      graph.get(from)!.edges.push({ target: to, edge });
+      
+    } else {
+      // Normal edge - add as-is (downstream only: from → to)
+      graph.get(from)!.edges.push({ target: to, edge });
     }
   }
   
   return graph;
 }
 
-// Dijkstra's algorithm
-function dijkstra(graph: Map<string, GraphNode>, start: string, end: string): { path: string[]; edges: Edge[] } | null {
+/**
+ * Dijkstra's algorithm
+ */
+function dijkstra(
+  graph: Map<string, GraphNode>, 
+  start: string, 
+  end: string
+): { path: string[]; edges: Edge[] } | null {
   const dist = new Map<string, number>();
   const prev = new Map<string, { node: string; edge: Edge }>();
   const visited = new Set<string>();
-  
-  // Priority queue (simple sorted array for now)
   const queue: { node: string; dist: number }[] = [];
   
   dist.set(start, 0);
   queue.push({ node: start, dist: 0 });
   
   while (queue.length > 0) {
-    // Get minimum distance node
     queue.sort((a, b) => a.dist - b.dist);
     const { node: u } = queue.shift()!;
     
@@ -103,7 +263,6 @@ function dijkstra(graph: Map<string, GraphNode>, start: string, end: string): { 
   
   if (!prev.has(end) && start !== end) return null;
   
-  // Reconstruct path
   const path: string[] = [];
   const edges: Edge[] = [];
   let current = end;
@@ -121,20 +280,13 @@ function dijkstra(graph: Map<string, GraphNode>, start: string, end: string): { 
 }
 
 export async function GET(request: NextRequest) {
-  // Rate limiting
   const ip = getClientIP(request);
   const rateLimit = checkRateLimit(ip);
   
   if (!rateLimit.allowed) {
     return NextResponse.json(
       { error: 'Rate limit exceeded. Try again later.' },
-      { 
-        status: 429,
-        headers: {
-          'Retry-After': Math.ceil(rateLimit.resetIn / 1000).toString(),
-          'X-RateLimit-Remaining': '0'
-        }
-      }
+      { status: 429, headers: { 'Retry-After': Math.ceil(rateLimit.resetIn / 1000).toString() } }
     );
   }
 
@@ -146,7 +298,6 @@ export async function GET(request: NextRequest) {
   const endLat = parseFloat(searchParams.get('end_lat') || '');
   const flowCondition = validateFlowCondition(searchParams.get('flow'));
   
-  // Validate all coordinates
   const startCheck = validateCoordinate(startLng, startLat);
   const endCheck = validateCoordinate(endLng, endLat);
   
@@ -160,25 +311,25 @@ export async function GET(request: NextRequest) {
   const flowMultiplier = FLOW_MULTIPLIERS[flowCondition] || FLOW_MULTIPLIERS.normal;
   
   try {
-    // Calculate bbox that encompasses both points with buffer
-    const buffer = 0.5; // ~50km buffer
+    // Snap to edges (not nodes)
+    const startSnap = await snapToEdge(startLng, startLat);
+    const endSnap = await snapToEdge(endLng, endLat);
+    
+    if (!startSnap) {
+      return NextResponse.json({ error: 'Start point too far from river network' }, { status: 400 });
+    }
+    if (!endSnap) {
+      return NextResponse.json({ error: 'End point too far from river network' }, { status: 400 });
+    }
+    
+    // Calculate bbox
+    const buffer = 0.5;
     const minLng = Math.min(startLng, endLng) - buffer;
     const maxLng = Math.max(startLng, endLng) + buffer;
     const minLat = Math.min(startLat, endLat) - buffer;
     const maxLat = Math.max(startLat, endLat) + buffer;
     
-    // Snap points to nearest nodes
-    const snapStart = await snapToNode(startLng, startLat);
-    const snapEnd = await snapToNode(endLng, endLat);
-    
-    if (!snapStart) {
-      return NextResponse.json({ error: 'Start point too far from river network' }, { status: 400 });
-    }
-    if (!snapEnd) {
-      return NextResponse.json({ error: 'End point too far from river network' }, { status: 400 });
-    }
-    
-    // Load edges within bounding box, joined with NWM real-time velocities
+    // Load edges
     const edgesResult = await query<Edge>(`
       SELECT 
         r.comid,
@@ -203,44 +354,80 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'No rivers found in area' }, { status: 404 });
     }
     
-    console.log(`Loaded ${edgesResult.rows.length} edges for routing`);
+    console.log(`Loaded ${edgesResult.rows.length} edges, snapped start to edge ${startSnap.edge_comid} @ ${(startSnap.fraction * 100).toFixed(1)}%, end to edge ${endSnap.edge_comid} @ ${(endSnap.fraction * 100).toFixed(1)}%`);
     
-    // Build downstream-only graph and run Dijkstra
-    const graph = buildGraph(edgesResult.rows, true);
-    let result = dijkstra(graph, snapStart.node_id, snapEnd.node_id);
+    // Build graph with virtual nodes for edge snapping
+    const graph = buildGraphWithVirtualNodes(edgesResult.rows, startSnap, endSnap);
+    
+    // Route from virtual_start to virtual_end
+    let result = dijkstra(graph, 'virtual_start', 'virtual_end');
     
     if (!result) {
-      // Check if reverse route exists (user clicked upstream → downstream)
-      const reverseResult = dijkstra(graph, snapEnd.node_id, snapStart.node_id);
+      // Check reverse direction
+      const reverseGraph = buildGraphWithVirtualNodes(edgesResult.rows, endSnap, startSnap);
+      const reverseResult = dijkstra(reverseGraph, 'virtual_start', 'virtual_end');
       
       if (reverseResult) {
-        return NextResponse.json(
-          { 
-            error: 'Upstream routing not available. Try swapping your put-in and take-out — your take-out appears to be upstream of your put-in.',
-            suggestion: 'swap_points'
-          },
-          { status: 400 }
-        );
+        return NextResponse.json({
+          error: 'Upstream routing not available. Your take-out appears to be upstream of your put-in.',
+          suggestion: 'swap_points'
+        }, { status: 400 });
       }
       
       return NextResponse.json(
-        { error: 'No route found between these points. They may not be connected on the river network.' },
+        { error: 'No route found between these points. They may not be connected.' },
         { status: 404 }
       );
     }
     
-    // Get geometries for the route edges
-    const comids = result.edges.map(e => e.comid);
+    // Get geometries - need to handle virtual edges specially
+    const realComids = result.edges
+      .map(e => e.is_virtual ? e.original_comid : e.comid)
+      .filter((c): c is number => c !== undefined);
+    
     const geomResult = await query(`
-      SELECT comid, ST_AsGeoJSON(geom)::json as geometry
+      SELECT comid, ST_AsGeoJSON(geom)::json as geometry, geom
       FROM river_edges
       WHERE comid = ANY($1::bigint[])
-    `, [comids]);
+    `, [realComids]);
     
     const geomMap = new Map(geomResult.rows.map(r => [r.comid, r.geometry]));
     
-    // Gradient classifications (ft/mi)
-    // Pool: < 5, Riffle: 5-15, Class I-II: 15-30, Class III+: > 30
+    // For virtual edges, we need to clip the geometry
+    const getClippedGeometry = async (edge: Edge) => {
+      if (!edge.is_virtual || !edge.original_comid) {
+        return geomMap.get(edge.comid);
+      }
+      
+      // Get clipped geometry using ST_LineSubstring
+      const clipResult = await query(`
+        SELECT ST_AsGeoJSON(
+          ST_LineSubstring(geom, $2, $3)
+        )::json as geometry
+        FROM river_edges
+        WHERE comid = $1
+      `, [edge.original_comid, edge.fraction_start || 0, edge.fraction_end || 1]);
+      
+      return clipResult.rows[0]?.geometry;
+    };
+    
+    // Build route geometry with clipped virtual edges
+    const features = await Promise.all(result.edges.map(async (edge) => {
+      const geometry = await getClippedGeometry(edge);
+      return {
+        type: 'Feature' as const,
+        geometry: geometry || { type: 'LineString', coordinates: [] },
+        properties: {
+          comid: edge.is_virtual ? edge.original_comid : edge.comid,
+          gnis_name: edge.gnis_name,
+          stream_order: edge.stream_order,
+          lengthkm: edge.lengthkm,
+          is_virtual: edge.is_virtual || false
+        }
+      };
+    }));
+    
+    // Calculate stats
     const classifyGradient = (ftPerMi: number): string => {
       if (ftPerMi < 5) return 'pool';
       if (ftPerMi < 15) return 'riffle';
@@ -248,28 +435,21 @@ export async function GET(request: NextRequest) {
       return 'rapid_steep';
     };
 
-    // Calculate stats and build elevation profile with gradient data
     let totalDistance = 0;
     let totalFloatTime = 0;
     let elevStart: number | null = null;
     let elevEnd: number | null = null;
     const waterways = new Set<string>();
-    const elevationProfile: { dist_m: number; elev_m: number; gradient_ft_mi?: number; classification?: string }[] = [];
-    const steepSections: { start_m: number; end_m: number; gradient_ft_mi: number; classification: string }[] = [];
+    const elevationProfile: any[] = [];
+    const steepSections: any[] = [];
     let accumDist = 0;
-    
-    // Track velocity source usage and comparisons
     let nwmVelocityCount = 0;
     let eromVelocityCount = 0;
-    let totalStreamflow = 0;
-    let totalNwmVelocity = 0;
-    let totalEromVelocity = 0;
-    let eromOnlyFloatTime = 0;  // What time would be with historical data only
+    let eromOnlyFloatTime = 0;
     
     for (const edge of result.edges) {
       const segmentStartDist = accumDist;
       
-      // Calculate segment gradient
       let segmentGradient = 0;
       let classification = 'pool';
       if (edge.max_elev_m !== null && edge.min_elev_m !== null && edge.lengthkm > 0) {
@@ -279,8 +459,7 @@ export async function GET(request: NextRequest) {
         segmentGradient = lengthMi > 0 ? dropFt / lengthMi : 0;
         classification = classifyGradient(segmentGradient);
         
-        // Track steep sections for highlighting
-        if (classification === 'riffle' || classification === 'rapid_mild' || classification === 'rapid_steep') {
+        if (classification !== 'pool') {
           steepSections.push({
             start_m: segmentStartDist,
             end_m: segmentStartDist + edge.lengthkm * 1000,
@@ -290,80 +469,40 @@ export async function GET(request: NextRequest) {
         }
       }
       
-      // Add elevation point at start of segment
       if (edge.max_elev_m !== null) {
-        elevationProfile.push({ 
-          dist_m: accumDist, 
-          elev_m: edge.max_elev_m,
-          gradient_ft_mi: Math.round(segmentGradient * 10) / 10,
-          classification
-        });
+        elevationProfile.push({ dist_m: accumDist, elev_m: edge.max_elev_m, gradient_ft_mi: Math.round(segmentGradient * 10) / 10, classification });
         if (elevStart === null) elevStart = edge.max_elev_m;
       }
       
       accumDist += edge.lengthkm * 1000;
       totalDistance += edge.lengthkm * 1000;
       
-      // Add elevation point at end of segment
       if (edge.min_elev_m !== null) {
-        elevationProfile.push({ 
-          dist_m: accumDist, 
-          elev_m: edge.min_elev_m,
-          gradient_ft_mi: Math.round(segmentGradient * 10) / 10,
-          classification
-        });
+        elevationProfile.push({ dist_m: accumDist, elev_m: edge.min_elev_m, gradient_ft_mi: Math.round(segmentGradient * 10) / 10, classification });
         elevEnd = edge.min_elev_m;
       }
       
-      // Calculate both NWM and EROM velocities for comparison
       const eromVelocityMs = (edge.velocity_fps || DEFAULT_VELOCITY_FPS) * 0.3048;
-      const nwmVelocityMs = edge.nwm_velocity_ms && edge.nwm_velocity_ms > 0.01 
-        ? edge.nwm_velocity_ms 
-        : null;
+      const nwmVelocityMs = edge.nwm_velocity_ms && edge.nwm_velocity_ms > 0.01 ? edge.nwm_velocity_ms : null;
       
-      // Track EROM baseline time (what it would be historically)
       eromOnlyFloatTime += (edge.lengthkm * 1000) / eromVelocityMs;
-      totalEromVelocity += eromVelocityMs;
       
-      // Use NWM if available, otherwise EROM
-      let velocityMs: number;
-      if (nwmVelocityMs) {
-        velocityMs = nwmVelocityMs;
-        nwmVelocityCount++;
-        totalNwmVelocity += nwmVelocityMs;
-        if (edge.nwm_streamflow_cms) totalStreamflow += edge.nwm_streamflow_cms;
-      } else {
-        velocityMs = eromVelocityMs;
-        eromVelocityCount++;
-      }
+      const velocityMs = nwmVelocityMs || eromVelocityMs;
+      if (nwmVelocityMs) nwmVelocityCount++; else eromVelocityCount++;
       
       totalFloatTime += (edge.lengthkm * 1000) / velocityMs;
-      
       if (edge.gnis_name) waterways.add(edge.gnis_name);
     }
     
     const distanceMiles = totalDistance / 1609.34;
     const elevDropFt = (elevStart && elevEnd) ? (elevStart - elevEnd) * 3.28084 : 0;
     
-    // Get NWM data freshness
-    const nwmFreshnessResult = await query(`
-      SELECT updated_at FROM nwm_velocity LIMIT 1
-    `);
+    const nwmFreshnessResult = await query(`SELECT updated_at FROM nwm_velocity LIMIT 1`);
     const nwmTimestamp = nwmFreshnessResult.rows[0]?.updated_at || null;
     
-    // Build GeoJSON
     const geojson = {
       type: 'FeatureCollection' as const,
-      features: result.edges.map(edge => ({
-        type: 'Feature' as const,
-        geometry: geomMap.get(edge.comid) || { type: 'LineString', coordinates: [] },
-        properties: {
-          comid: edge.comid,
-          gnis_name: edge.gnis_name,
-          stream_order: edge.stream_order,
-          lengthkm: edge.lengthkm
-        }
-      }))
+      features
     };
     
     return NextResponse.json({
@@ -380,45 +519,35 @@ export async function GET(request: NextRequest) {
         segment_count: result.edges.length,
         waterways: Array.from(waterways),
         flow_condition: flowCondition,
-        flow_multiplier: flowMultiplier,
         elevation_profile: elevationProfile,
         steep_sections: steepSections,
-        // NWM real-time velocity info and comparisons
         live_conditions: {
-          // Data source stats
           nwm_segments: nwmVelocityCount,
           erom_segments: eromVelocityCount,
-          nwm_coverage_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount)) * 100),
+          nwm_coverage_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount || 1)) * 100),
           data_timestamp: nwmTimestamp,
-          
-          // Current conditions - effective velocity (distance/time)
           avg_velocity_mph: Math.round((totalDistance / totalFloatTime) * 2.237 * 10) / 10,
-          avg_streamflow_cfs: nwmVelocityCount > 0 
-            ? Math.round(totalStreamflow / nwmVelocityCount * 35.315 * 10) / 10  // CMS to CFS
-            : null,
-          
-          // Comparison to historical - effective velocity (distance/time)
-          baseline_velocity_mph: Math.round((totalDistance / eromOnlyFloatTime) * 2.237 * 10) / 10,
-          baseline_float_time_s: Math.round(eromOnlyFloatTime),
           baseline_float_time_h: Math.round(eromOnlyFloatTime / 360) / 10,
-          
-          // Time difference
-          time_diff_s: Math.round(eromOnlyFloatTime - totalFloatTime),
           time_diff_percent: Math.round(((eromOnlyFloatTime - totalFloatTime) / eromOnlyFloatTime) * 100),
-          
-          // Flow status (simple categorization)
-          flow_status: nwmVelocityCount > 0 
-            ? (totalNwmVelocity / nwmVelocityCount) > (totalEromVelocity / result.edges.length * 1.3) 
-              ? 'high' 
-              : (totalNwmVelocity / nwmVelocityCount) < (totalEromVelocity / result.edges.length * 0.7)
-                ? 'low'
-                : 'normal'
-            : null
         }
       },
       snap: {
-        start: snapStart,
-        end: snapEnd
+        start: {
+          edge_comid: startSnap.edge_comid,
+          fraction: startSnap.fraction,
+          snap_lng: startSnap.snap_lng,
+          snap_lat: startSnap.snap_lat,
+          gnis_name: startSnap.gnis_name,
+          distance_m: Math.round(startSnap.dist_m)
+        },
+        end: {
+          edge_comid: endSnap.edge_comid,
+          fraction: endSnap.fraction,
+          snap_lng: endSnap.snap_lng,
+          snap_lat: endSnap.snap_lat,
+          gnis_name: endSnap.gnis_name,
+          distance_m: Math.round(endSnap.dist_m)
+        }
       }
     });
     
@@ -429,33 +558,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-async function snapToNode(lng: number, lat: number): Promise<{ node_id: string; snap_lng: number; snap_lat: number; gnis_name: string | null } | null> {
-  const result = await query(`
-    SELECT 
-      CASE 
-        WHEN ST_LineLocatePoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) < 0.5 
-        THEN from_node::text 
-        ELSE to_node::text 
-      END as node_id,
-      ST_X(ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326))) as snap_lng,
-      ST_Y(ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326))) as snap_lat,
-      gnis_name,
-      ST_Distance(geom::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) as dist_m
-    FROM river_edges
-    ORDER BY geom <-> ST_SetSRID(ST_MakePoint($1, $2), 4326)
-    LIMIT 1
-  `, [lng, lat]);
-  
-  if (result.rows.length === 0 || result.rows[0].dist_m > 5000) {
-    return null;
-  }
-  
-  return {
-    node_id: result.rows[0].node_id,
-    snap_lng: result.rows[0].snap_lng,
-    snap_lat: result.rows[0].snap_lat,
-    gnis_name: result.rows[0].gnis_name
-  };
 }

@@ -26,6 +26,7 @@ interface RouteStats {
   elev_start_m: number | null;
   elev_end_m: number | null;
   elev_drop_ft: number;
+  elev_gain_ft?: number;
   gradient_ft_mi: number;
   segment_count: number;
   waterways: string[];
@@ -33,6 +34,13 @@ interface RouteStats {
   flow_multiplier: number;
   elevation_profile: ElevationPoint[];
   steep_sections: SteepSection[];
+  direction?: {
+    is_upstream: boolean;
+    upstream_segments: number;
+    impossible_segments: number;
+    paddle_speed_mph: number;
+    paddle_speed_ms: number;
+  };
   live_conditions: {
     nwm_segments: number;
     erom_segments: number;
@@ -68,6 +76,7 @@ interface SnapResult {
 interface RouteResult {
   route: GeoJSON.FeatureCollection;
   stats: RouteStats;
+  warnings?: string[];
   path: { nodes: string[]; comids: number[] };
 }
 
@@ -81,7 +90,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [flowCondition, setFlowCondition] = useState<'low' | 'normal' | 'high'>('normal');
-  const [paddleSpeed, setPaddleSpeed] = useState(0);
+  const [paddleSpeed, setPaddleSpeed] = useState(3); // Default 3 mph
   const [basemap, setBasemap] = useState<'outdoors' | 'satellite' | 'dark'>('outdoors');
   const basemapRef = useRef<'outdoors' | 'satellite' | 'dark'>('outdoors');
 
@@ -303,12 +312,12 @@ export default function Home() {
   };
 
   // Calculate route between two points
-  const calculateRoute = async (startSnap: SnapResult, endSnap: SnapResult, flow: string = flowCondition) => {
+  const calculateRoute = async (startSnap: SnapResult, endSnap: SnapResult, flow: string = flowCondition, speed: number = paddleSpeed) => {
     setLoading(true);
     setError(null);
     
     try {
-      const res = await fetch(`/api/route?start_lng=${startSnap.snap_point.lng}&start_lat=${startSnap.snap_point.lat}&end_lng=${endSnap.snap_point.lng}&end_lat=${endSnap.snap_point.lat}&flow=${flow}`);
+      const res = await fetch(`/api/route?start_lng=${startSnap.snap_point.lng}&start_lat=${startSnap.snap_point.lat}&end_lng=${endSnap.snap_point.lng}&end_lat=${endSnap.snap_point.lat}&flow=${flow}&paddle_speed=${speed}`);
       if (!res.ok) {
         const err = await res.json();
         setError(err.error || 'Failed to calculate route');
@@ -377,17 +386,17 @@ export default function Home() {
           .addTo(map.current!);
         
         // Calculate route
-        await calculateRoute(putIn, snap);
+        await calculateRoute(putIn, snap, flowCondition, paddleSpeed);
       }
       setLoading(false);
     }
-  }, [putIn, takeOut]);
+  }, [putIn, takeOut, flowCondition, paddleSpeed]);
 
   // Handle flow condition change - recalculate route
   const handleFlowChange = async (newFlow: 'low' | 'normal' | 'high') => {
     setFlowCondition(newFlow);
     if (putIn && takeOut) {
-      await calculateRoute(putIn, takeOut, newFlow);
+      await calculateRoute(putIn, takeOut, newFlow, paddleSpeed);
     }
   };
 
@@ -989,7 +998,7 @@ export default function Home() {
                       }
                       
                       // Recalculate with swapped points
-                      calculateRoute(takeOut, temp);
+                      calculateRoute(takeOut, temp, flowCondition, paddleSpeed);
                     }
                   }}
                 >
@@ -999,11 +1008,22 @@ export default function Home() {
             </div>
           )}
           
+          {/* Upstream warnings */}
+          {route?.warnings && route.warnings.length > 0 && (
+            <div className={styles.section}>
+              <div className={styles.upstreamWarning}>
+                {route.warnings.map((warning, i) => (
+                  <div key={i} className={styles.warningItem}>{warning}</div>
+                ))}
+              </div>
+            </div>
+          )}
+          
           {/* Route stats */}
           {route && (
             <>
               <div className={styles.section}>
-                <h3>📊 Trip Stats</h3>
+                <h3>📊 Trip Stats {route.stats.direction?.is_upstream && <span className={styles.upstreamBadge}>⬆️ UPSTREAM</span>}</h3>
                 <div className={styles.statGrid}>
                   <div className={styles.stat}>
                     <span className={styles.statValue}>{route.stats.distance_mi}</span>
@@ -1011,11 +1031,17 @@ export default function Home() {
                   </div>
                   <div className={styles.stat}>
                     <span className={styles.statValue}>{formatTime(route.stats.float_time_s, 0)}</span>
-                    <span className={styles.statLabel}>float time</span>
+                    <span className={styles.statLabel}>{route.stats.direction?.is_upstream ? 'paddle time' : 'float time'}</span>
                   </div>
                   <div className={styles.stat}>
-                    <span className={styles.statValue}>{route.stats.elev_drop_ft}</span>
-                    <span className={styles.statLabel}>ft drop</span>
+                    <span className={styles.statValue}>
+                      {route.stats.direction?.is_upstream 
+                        ? `+${route.stats.elev_gain_ft || 0}` 
+                        : route.stats.elev_drop_ft}
+                    </span>
+                    <span className={styles.statLabel}>
+                      {route.stats.direction?.is_upstream ? 'ft gain ⬆️' : 'ft drop'}
+                    </span>
                   </div>
                   <div className={styles.stat}>
                     <span className={styles.statValue}>{route.stats.gradient_ft_mi}</span>
@@ -1097,26 +1123,40 @@ export default function Home() {
               
               {/* Paddle speed */}
               <div className={styles.section}>
-                <h3>🏋️ Paddle Speed</h3>
+                <h3>🚣 Paddle Speed</h3>
                 <div className={styles.sliderContainer}>
                   <input 
                     type="range" 
-                    min="0" 
-                    max="5" 
+                    min="1" 
+                    max="6" 
                     step="0.5"
                     value={paddleSpeed}
-                    onChange={(e) => setPaddleSpeed(parseFloat(e.target.value))}
+                    onChange={(e) => {
+                      const newSpeed = parseFloat(e.target.value);
+                      setPaddleSpeed(newSpeed);
+                      // Recalculate route with new paddle speed
+                      if (putIn && takeOut) {
+                        calculateRoute(putIn, takeOut, flowCondition, newSpeed);
+                      }
+                    }}
                     className={styles.slider}
                   />
                   <div className={styles.sliderLabels}>
-                    <span>Float</span>
-                    <span>+{paddleSpeed} mph</span>
-                    <span>+5 mph</span>
+                    <span>1 mph</span>
+                    <span><strong>{paddleSpeed} mph</strong></span>
+                    <span>6 mph</span>
                   </div>
                 </div>
-                <div className={styles.paddleTime}>
-                  Paddle time: <strong>{formatTime(route.stats.float_time_s, paddleSpeed)}</strong>
-                </div>
+                {route.stats.direction?.is_upstream && (
+                  <div className={styles.upstreamInfo}>
+                    ⬆️ Paddling upstream at {paddleSpeed} mph against {route.stats.live_conditions?.avg_velocity_mph || '~0.5'} mph current
+                  </div>
+                )}
+                {route.stats.direction?.impossible_segments && route.stats.direction.impossible_segments > 0 && (
+                  <div className={styles.impossibleWarning}>
+                    ⚠️ {route.stats.direction.impossible_segments} segments have currents faster than your paddle speed!
+                  </div>
+                )}
               </div>
 
               {/* Elevation profile */}

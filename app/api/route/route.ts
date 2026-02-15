@@ -16,7 +16,6 @@ const FLOW_MULTIPLIERS: Record<string, number> = {
 };
 
 const DEFAULT_VELOCITY_FPS = 1.0;
-const DEFAULT_PADDLE_SPEED_MS = 1.34; // ~3 mph
 
 interface Edge {
   comid: number;
@@ -365,7 +364,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: `End point: ${endCheck.error}` }, { status: 400 });
   }
   
-  const flowMultiplier = FLOW_MULTIPLIERS[flowCondition] || FLOW_MULTIPLIERS.normal;
+  // flowMultiplier reserved for future use (seasonal flow adjustments)
+  // const flowMultiplier = FLOW_MULTIPLIERS[flowCondition] || FLOW_MULTIPLIERS.normal;
   
   try {
     const startSnap = await snapToEdge(startLng, startLat);
@@ -513,8 +513,6 @@ export async function GET(request: NextRequest) {
     let accumDist = 0;
     let nwmVelocityCount = 0;
     let eromVelocityCount = 0;
-    let totalStreamflow = 0;
-    let totalNwmVelocity = 0;
     let eromOnlyFloatTime = 0;
     let waterOnlyFloatTime = 0;  // Pure water velocity (NWM or EROM), no paddle
     let impossibleSegments = 0;
@@ -565,8 +563,6 @@ export async function GET(request: NextRequest) {
       let streamVelocityMs = nwmVelocityMs || eromVelocityMs;
       if (nwmVelocityMs) {
         nwmVelocityCount++;
-        totalNwmVelocity += nwmVelocityMs;
-        if (edge.nwm_streamflow_cms) totalStreamflow += edge.nwm_streamflow_cms;
       } else {
         eromVelocityCount++;
       }
@@ -649,18 +645,24 @@ export async function GET(request: NextRequest) {
           nwm_coverage_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount || 1)) * 100),
           data_timestamp: nwmTimestamp,
           // Water speed (actual velocity from NWM or EROM, independent of paddle speed)
-          avg_velocity_mph: Math.round((totalDistance / waterOnlyFloatTime) * 2.237 * 10) / 10,
+          avg_velocity_mph: waterOnlyFloatTime > 0 
+            ? Math.round((totalDistance / waterOnlyFloatTime) * 2.237 * 10) / 10 
+            : 0,
           // Average streamflow (CMS to CFS: multiply by 35.3147)
           avg_streamflow_cfs: streamflowCount > 0 
             ? Math.round((totalStreamflowCms / streamflowCount) * 35.3147 * 10) / 10 
             : null,
           // Baseline from EROM only
-          baseline_velocity_mph: Math.round((totalDistance / eromOnlyFloatTime) * 2.237 * 10) / 10,
+          baseline_velocity_mph: eromOnlyFloatTime > 0
+            ? Math.round((totalDistance / eromOnlyFloatTime) * 2.237 * 10) / 10
+            : 0,
           baseline_float_time_s: Math.round(eromOnlyFloatTime),
           baseline_float_time_h: Math.round(eromOnlyFloatTime / 360) / 10,
           // Time difference: water-only current vs water-only baseline (positive = faster than baseline)
           time_diff_s: Math.round(eromOnlyFloatTime - waterOnlyFloatTime),
-          time_diff_percent: Math.round(((eromOnlyFloatTime - waterOnlyFloatTime) / eromOnlyFloatTime) * 100),
+          time_diff_percent: eromOnlyFloatTime > 0 
+            ? Math.round(((eromOnlyFloatTime - waterOnlyFloatTime) / eromOnlyFloatTime) * 100)
+            : 0,
           // Flow status based on water-only comparison (not affected by paddle speed)
           flow_status: waterOnlyFloatTime < eromOnlyFloatTime * 0.85 ? 'high' as const : 
                        waterOnlyFloatTime > eromOnlyFloatTime * 1.15 ? 'low' as const : 'normal' as const,

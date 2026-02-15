@@ -245,8 +245,9 @@ function buildGraphWithVirtualNodes(
           from_node: to,
           to_node: VIRTUAL_END,
           lengthkm: upstreamArrivalLength,
-          max_elev_m: edge.min_elev_m,
-          min_elev_m: endElev,
+          // For upstream: we enter at min_elev (downstream end) and exit at endElev (snapped point)
+          min_elev_m: edge.min_elev_m,
+          max_elev_m: endElev,
           fraction_start: endSnap.fraction,
           fraction_end: 1,
           is_upstream_segment: true,
@@ -541,17 +542,22 @@ export async function GET(request: NextRequest) {
         }
       }
       
-      if (edge.max_elev_m !== null) {
-        elevationProfile.push({ dist_m: accumDist, elev_m: edge.max_elev_m, gradient_ft_mi: Math.round(segmentGradient * 10) / 10, classification });
-        if (elevStart === null) elevStart = edge.max_elev_m;
+      // For upstream segments, we traverse from min_elev to max_elev
+      // For downstream segments, we traverse from max_elev to min_elev
+      const segStartElev = edge.is_upstream_segment ? edge.min_elev_m : edge.max_elev_m;
+      const segEndElev = edge.is_upstream_segment ? edge.max_elev_m : edge.min_elev_m;
+      
+      if (segStartElev !== null) {
+        elevationProfile.push({ dist_m: accumDist, elev_m: segStartElev, gradient_ft_mi: Math.round(segmentGradient * 10) / 10, classification });
+        if (elevStart === null) elevStart = segStartElev;
       }
       
       accumDist += edge.lengthkm * 1000;
       totalDistance += edge.lengthkm * 1000;
       
-      if (edge.min_elev_m !== null) {
-        elevationProfile.push({ dist_m: accumDist, elev_m: edge.min_elev_m, gradient_ft_mi: Math.round(segmentGradient * 10) / 10, classification });
-        elevEnd = edge.min_elev_m;
+      if (segEndElev !== null) {
+        elevationProfile.push({ dist_m: accumDist, elev_m: segEndElev, gradient_ft_mi: Math.round(segmentGradient * 10) / 10, classification });
+        elevEnd = segEndElev;
       }
       
       // Calculate velocities

@@ -653,12 +653,12 @@ export async function GET(request: NextRequest) {
           baseline_velocity_mph: Math.round((totalDistance / eromOnlyFloatTime) * 2.237 * 10) / 10,
           baseline_float_time_s: Math.round(eromOnlyFloatTime),
           baseline_float_time_h: Math.round(eromOnlyFloatTime / 360) / 10,
-          // Time difference (positive = faster than baseline)
-          time_diff_s: Math.round(eromOnlyFloatTime - totalFloatTime),
-          time_diff_percent: Math.round(((eromOnlyFloatTime - totalFloatTime) / eromOnlyFloatTime) * 100),
-          // Flow status based on velocity comparison
-          flow_status: totalFloatTime < eromOnlyFloatTime * 0.85 ? 'high' as const : 
-                       totalFloatTime > eromOnlyFloatTime * 1.15 ? 'low' as const : 'normal' as const,
+          // Time difference: water-only current vs water-only baseline (positive = faster than baseline)
+          time_diff_s: Math.round(eromOnlyFloatTime - waterOnlyFloatTime),
+          time_diff_percent: Math.round(((eromOnlyFloatTime - waterOnlyFloatTime) / eromOnlyFloatTime) * 100),
+          // Flow status based on water-only comparison (not affected by paddle speed)
+          flow_status: waterOnlyFloatTime < eromOnlyFloatTime * 0.85 ? 'high' as const : 
+                       waterOnlyFloatTime > eromOnlyFloatTime * 1.15 ? 'low' as const : 'normal' as const,
         }
       },
       warnings,

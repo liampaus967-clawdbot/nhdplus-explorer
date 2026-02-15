@@ -621,9 +621,11 @@ export async function GET(request: NextRequest) {
       stats: {
         distance_m: Math.round(totalDistance),
         distance_mi: Math.round(distanceMiles * 10) / 10,
-        // If any upstream segments are impossible (paddle < current), time is infinite
-        float_time_h: impossibleSegments > 0 ? null : Math.round(totalFloatTime / 360) / 10,
-        float_time_s: impossibleSegments > 0 ? null : Math.round(totalFloatTime),
+        // Show calculated time (may be partial if some segments impossible)
+        float_time_h: Math.round(totalFloatTime / 360) / 10,
+        float_time_s: Math.round(totalFloatTime),
+        // Flag if route has impossible segments (paddle speed < current)
+        has_impossible_segments: impossibleSegments > 0,
         elev_start_m: elevStart,
         elev_end_m: elevEnd,
         elev_drop_ft: Math.round(elevDropFt),

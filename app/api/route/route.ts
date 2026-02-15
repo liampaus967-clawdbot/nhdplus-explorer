@@ -516,6 +516,7 @@ export async function GET(request: NextRequest) {
     let totalStreamflow = 0;
     let totalNwmVelocity = 0;
     let eromOnlyFloatTime = 0;
+    let waterOnlyFloatTime = 0;  // Pure water velocity (NWM or EROM), no paddle
     let impossibleSegments = 0;
     let totalStreamflowCms = 0;
     let streamflowCount = 0;
@@ -569,6 +570,9 @@ export async function GET(request: NextRequest) {
       } else {
         eromVelocityCount++;
       }
+      
+      // Track pure water-only float time (no paddle speed)
+      waterOnlyFloatTime += (edge.lengthkm * 1000) / streamVelocityMs;
       
       // Track streamflow (NWM provides in cms)
       if (edge.nwm_streamflow_cms && edge.nwm_streamflow_cms > 0) {
@@ -639,8 +643,8 @@ export async function GET(request: NextRequest) {
           erom_segments: eromVelocityCount,
           nwm_coverage_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount || 1)) * 100),
           data_timestamp: nwmTimestamp,
-          // Water speed (actual velocity from NWM or EROM)
-          avg_velocity_mph: Math.round((totalDistance / totalFloatTime) * 2.237 * 10) / 10,
+          // Water speed (actual velocity from NWM or EROM, independent of paddle speed)
+          avg_velocity_mph: Math.round((totalDistance / waterOnlyFloatTime) * 2.237 * 10) / 10,
           // Average streamflow (CMS to CFS: multiply by 35.3147)
           avg_streamflow_cfs: streamflowCount > 0 
             ? Math.round((totalStreamflowCms / streamflowCount) * 35.3147 * 10) / 10 

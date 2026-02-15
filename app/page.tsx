@@ -1071,19 +1071,19 @@ export default function Home() {
                       </span>
                     </div>
                     
-                    {/* Current vs Baseline */}
+                    {/* Water Speed & Flow */}
                     <div className={styles.comparisonGrid}>
                       <div className={styles.comparisonItem}>
                         <span className={styles.comparisonValue}>
                           {route.stats.live_conditions.avg_velocity_mph || '—'}
                         </span>
-                        <span className={styles.comparisonLabel}>Current mph</span>
+                        <span className={styles.comparisonLabel}>Water Speed</span>
                       </div>
                       <div className={styles.comparisonItem}>
                         <span className={styles.comparisonValue}>
-                          {route.stats.live_conditions.baseline_velocity_mph}
+                          {route.stats.live_conditions.baseline_velocity_mph || '—'}
                         </span>
-                        <span className={styles.comparisonLabel}>Avg mph</span>
+                        <span className={styles.comparisonLabel}>Avg (EROM)</span>
                       </div>
                       <div className={styles.comparisonItem}>
                         <span className={styles.comparisonValue}>

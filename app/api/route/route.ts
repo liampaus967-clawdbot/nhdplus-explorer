@@ -517,6 +517,8 @@ export async function GET(request: NextRequest) {
     let totalNwmVelocity = 0;
     let eromOnlyFloatTime = 0;
     let impossibleSegments = 0;
+    let totalStreamflowCms = 0;
+    let streamflowCount = 0;
     
     for (const edge of result.edges) {
       const segmentStartDist = accumDist;
@@ -566,6 +568,12 @@ export async function GET(request: NextRequest) {
         if (edge.nwm_streamflow_cms) totalStreamflow += edge.nwm_streamflow_cms;
       } else {
         eromVelocityCount++;
+      }
+      
+      // Track streamflow (NWM provides in cms)
+      if (edge.nwm_streamflow_cms && edge.nwm_streamflow_cms > 0) {
+        totalStreamflowCms += edge.nwm_streamflow_cms;
+        streamflowCount++;
       }
       
       // Calculate effective speed based on direction
@@ -631,12 +639,22 @@ export async function GET(request: NextRequest) {
           erom_segments: eromVelocityCount,
           nwm_coverage_percent: Math.round((nwmVelocityCount / (nwmVelocityCount + eromVelocityCount || 1)) * 100),
           data_timestamp: nwmTimestamp,
+          // Water speed (actual velocity from NWM or EROM)
           avg_velocity_mph: Math.round((totalDistance / totalFloatTime) * 2.237 * 10) / 10,
-          avg_streamflow_cfs: nwmVelocityCount > 0 
-            ? Math.round(totalStreamflow / nwmVelocityCount * 35.315 * 10) / 10
+          // Average streamflow (CMS to CFS: multiply by 35.3147)
+          avg_streamflow_cfs: streamflowCount > 0 
+            ? Math.round((totalStreamflowCms / streamflowCount) * 35.3147 * 10) / 10 
             : null,
+          // Baseline from EROM only
+          baseline_velocity_mph: Math.round((totalDistance / eromOnlyFloatTime) * 2.237 * 10) / 10,
+          baseline_float_time_s: Math.round(eromOnlyFloatTime),
           baseline_float_time_h: Math.round(eromOnlyFloatTime / 360) / 10,
+          // Time difference (positive = faster than baseline)
+          time_diff_s: Math.round(eromOnlyFloatTime - totalFloatTime),
           time_diff_percent: Math.round(((eromOnlyFloatTime - totalFloatTime) / eromOnlyFloatTime) * 100),
+          // Flow status based on velocity comparison
+          flow_status: totalFloatTime < eromOnlyFloatTime * 0.85 ? 'high' as const : 
+                       totalFloatTime > eromOnlyFloatTime * 1.15 ? 'low' as const : 'normal' as const,
         }
       },
       warnings,

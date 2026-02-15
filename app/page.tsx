@@ -21,8 +21,8 @@ interface SteepSection {
 interface RouteStats {
   distance_m: number;
   distance_mi: number;
-  float_time_h: number;
-  float_time_s: number;
+  float_time_h: number | null;
+  float_time_s: number | null;
   elev_start_m: number | null;
   elev_end_m: number | null;
   elev_drop_ft: number;
@@ -1030,8 +1030,15 @@ export default function Home() {
                     <span className={styles.statLabel}>miles</span>
                   </div>
                   <div className={styles.stat}>
-                    <span className={styles.statValue}>{formatTime(route.stats.float_time_s, 0)}</span>
-                    <span className={styles.statLabel}>{route.stats.direction?.is_upstream ? 'paddle time' : 'float time'}</span>
+                    <span className={styles.statValue}>
+                      {route.stats.float_time_s === null 
+                        ? '∞' 
+                        : formatTime(route.stats.float_time_s, 0)}
+                    </span>
+                    <span className={styles.statLabel}>
+                      {route.stats.direction?.is_upstream ? 'paddle time' : 'float time'}
+                      {route.stats.direction?.impossible_segments ? ' ⚠️' : ''}
+                    </span>
                   </div>
                   <div className={styles.stat}>
                     <span className={styles.statValue}>

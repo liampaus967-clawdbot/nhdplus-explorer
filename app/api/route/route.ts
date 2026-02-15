@@ -585,14 +585,16 @@ export async function GET(request: NextRequest) {
       if (edge.is_upstream_segment) {
         effectiveSpeedMs = paddleSpeedMs - streamVelocityMs;
         if (effectiveSpeedMs <= 0) {
-          effectiveSpeedMs = 0.1; // Minimum to avoid div by zero
+          // Paddle speed not enough to overcome current - mark as impossible
           impossibleSegments++;
+          // Don't add to float time - it will be shown as impossible
+        } else {
+          totalFloatTime += (edge.lengthkm * 1000) / effectiveSpeedMs;
         }
       } else {
         effectiveSpeedMs = paddleSpeedMs + streamVelocityMs;
+        totalFloatTime += (edge.lengthkm * 1000) / effectiveSpeedMs;
       }
-      
-      totalFloatTime += (edge.lengthkm * 1000) / effectiveSpeedMs;
       if (edge.gnis_name) waterways.add(edge.gnis_name);
     }
     
@@ -619,8 +621,9 @@ export async function GET(request: NextRequest) {
       stats: {
         distance_m: Math.round(totalDistance),
         distance_mi: Math.round(distanceMiles * 10) / 10,
-        float_time_h: Math.round(totalFloatTime / 360) / 10,
-        float_time_s: Math.round(totalFloatTime),
+        // If any upstream segments are impossible (paddle < current), time is infinite
+        float_time_h: impossibleSegments > 0 ? null : Math.round(totalFloatTime / 360) / 10,
+        float_time_s: impossibleSegments > 0 ? null : Math.round(totalFloatTime),
         elev_start_m: elevStart,
         elev_end_m: elevEnd,
         elev_drop_ft: Math.round(elevDropFt),

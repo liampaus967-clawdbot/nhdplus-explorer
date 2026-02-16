@@ -435,7 +435,7 @@ export default function Home() {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: BASEMAP_STYLES.outdoors,
-      center: [-111.73, 45.35], // Ennis, Montana
+      center: [-72.617, 44.594], // Hyde Park, Vermont
       zoom: 10,
       pitch: 0
     });

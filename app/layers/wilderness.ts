@@ -24,6 +24,7 @@ export function addWildernessFill(map: mapboxgl.Map) {
     type: 'fill',
     source: 'wilderness',
     'source-layer': SOURCE_LAYERS.wilderness,
+    minzoom: 0,
     paint: {
       'fill-color': COLORS.wilderness,
       'fill-opacity': 0.3,
@@ -42,6 +43,7 @@ export function addWildernessOutline(map: mapboxgl.Map) {
     type: 'line',
     source: 'wilderness',
     'source-layer': SOURCE_LAYERS.wilderness,
+    minzoom: 0,
     paint: {
       'line-color': COLORS.wilderness,
       'line-width': 1.5,

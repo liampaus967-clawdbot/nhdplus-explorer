@@ -29,6 +29,26 @@ export function addWaterfallsLayers(map: mapboxgl.Map) {
     },
   });
 
+  // Circle backdrop at zoom 6+
+  map.addLayer({
+    id: 'waterfalls-backdrop',
+    type: 'circle',
+    source: 'waterfalls',
+    'source-layer': SOURCE_LAYERS.waterfalls,
+    minzoom: 6,
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        6, 8,
+        10, 12,
+        14, 18,
+      ],
+      'circle-color': '#ffffff',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': COLORS.waterfall,
+    },
+  });
+
   // Waterfall icon at zoom 6+
   map.addLayer({
     id: 'waterfalls-layer',

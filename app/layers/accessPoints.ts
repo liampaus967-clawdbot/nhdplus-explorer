@@ -29,6 +29,26 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
     },
   });
 
+  // Circle backdrop at zoom 6+
+  map.addLayer({
+    id: 'access-points-backdrop',
+    type: 'circle',
+    source: 'access-points',
+    'source-layer': SOURCE_LAYERS.accessPoints,
+    minzoom: 6,
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        6, 8,
+        10, 12,
+        14, 18,
+      ],
+      'circle-color': '#ffffff',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': COLORS.accessPoint,
+    },
+  });
+
   // Pitch icon at zoom 6+
   map.addLayer({
     id: 'access-points-layer',

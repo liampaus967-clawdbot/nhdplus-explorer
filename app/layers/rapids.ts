@@ -29,7 +29,27 @@ export function addRapidsLayers(map: mapboxgl.Map) {
     },
   });
 
-  // Racetrack-boat icon at zoom 6+
+  // Circle backdrop at zoom 6+
+  map.addLayer({
+    id: 'rapids-backdrop',
+    type: 'circle',
+    source: 'rapids',
+    'source-layer': SOURCE_LAYERS.rapids,
+    minzoom: 6,
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        6, 8,
+        10, 12,
+        14, 18,
+      ],
+      'circle-color': '#ffffff',
+      'circle-stroke-width': 2,
+      'circle-stroke-color': COLORS.rapid,
+    },
+  });
+
+  // Danger icon at zoom 6+
   map.addLayer({
     id: 'rapids-symbols',
     type: 'symbol',

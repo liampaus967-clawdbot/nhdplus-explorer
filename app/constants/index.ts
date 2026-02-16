@@ -1,4 +1,6 @@
+import mapboxgl from 'mapbox-gl';
 import { BasemapStyle } from '../types';
+import onWaterTopoLight from '../styles/onwater-topo-light.json';
 
 // Map configuration
 export const MAP_CONFIG = {
@@ -8,8 +10,9 @@ export const MAP_CONFIG = {
 };
 
 // Basemap styles
-export const BASEMAP_STYLES: Record<BasemapStyle, string> = {
-  outdoors: 'mapbox://styles/mapbox/outdoors-v12',
+// Using custom onWater Topo Light for outdoors (terrain, hillshade, public lands)
+export const BASEMAP_STYLES: Record<BasemapStyle, string | mapboxgl.StyleSpecification> = {
+  outdoors: onWaterTopoLight as mapboxgl.StyleSpecification,
   satellite: 'mapbox://styles/mapbox/satellite-streets-v12',
   dark: 'mapbox://styles/mapbox/dark-v11',
 };

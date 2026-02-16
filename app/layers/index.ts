@@ -4,14 +4,14 @@ import { addAccessPointsSource, addAccessPointsBackdrop, addAccessPointsSymbols 
 import { addCampgroundsSource, addCampgroundsBackdrop, addCampgroundsSymbols } from './campgrounds';
 import { addRapidsSource, addRapidsBackdrop, addRapidsSymbols } from './rapids';
 import { addWaterfallsSource, addWaterfallsBackdrop, addWaterfallsSymbols } from './waterfalls';
-import { addRouteSource, addRouteLayers } from './route';
+import { addRouteSource, addRouteLayers } from './routeLayer';
 
 export * from './rivers';
 export * from './accessPoints';
 export * from './campgrounds';
 export * from './rapids';
 export * from './waterfalls';
-export * from './route';
+export * from './routeLayer';
 
 /**
  * Custom SDF icons - these can be colored with icon-color

@@ -18,9 +18,8 @@ import {
   LiveConditions,
   PaddleSpeedSlider,
   ElevationProfile,
-  LayerControl,
-  LayerVisibility,
 } from './components/Panel';
+import { MapLayerControl, LayerVisibility } from './components/Map';
 
 // Layers
 import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight } from './layers';
@@ -308,15 +307,13 @@ export default function Home() {
       </div>
 
       <div className={styles.container}>
-        <div ref={mapContainer} className={styles.map} />
+        <div className={styles.mapWrapper}>
+          <div ref={mapContainer} className={styles.map} />
+          <MapLayerControl layers={layerVisibility} onChange={handleLayerVisibilityChange} />
+        </div>
 
         <div className={styles.panel}>
           <BasemapSelector basemap={basemap} onChange={handleBasemapChange} />
-
-          <div className={styles.section}>
-            <h3>🗂️ Map Layers</h3>
-            <LayerControl layers={layerVisibility} onChange={handleLayerVisibilityChange} />
-          </div>
 
           <RouteSection
             putIn={putIn}

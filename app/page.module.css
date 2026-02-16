@@ -28,10 +28,16 @@
   min-height: 500px;
 }
 
-.map {
+.mapWrapper {
+  position: relative;
   border-radius: 12px;
   border: 1px solid #334155;
   overflow: hidden;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
 }
 
 .panel {

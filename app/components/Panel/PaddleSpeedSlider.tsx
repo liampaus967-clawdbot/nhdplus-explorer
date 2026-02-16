@@ -21,7 +21,7 @@ export function PaddleSpeedSlider({ speed, onChange, stats }: PaddleSpeedSliderP
           type="range"
           min="0"
           max="6"
-          step="0.5"
+          step="0.1"
           value={speed}
           onChange={(e) => onChange(parseFloat(e.target.value))}
           className={styles.slider}

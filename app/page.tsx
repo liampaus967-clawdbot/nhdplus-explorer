@@ -18,6 +18,8 @@ import {
   LiveConditions,
   PaddleSpeedSlider,
   ElevationProfile,
+  LayerControl,
+  LayerVisibility,
 } from './components/Panel';
 
 // Layers
@@ -39,6 +41,15 @@ export default function Home() {
   // State
   const [basemap, setBasemap] = useState<BasemapStyle>('outdoors');
   const basemapRef = useRef<BasemapStyle>('outdoors');
+  const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
+    blmLands: true,
+    wilderness: true,
+    rivers: true,
+    accessPoints: true,
+    campgrounds: true,
+    rapids: true,
+    waterfalls: true,
+  });
 
   // Custom hooks
   const {
@@ -155,6 +166,31 @@ export default function Home() {
     },
     [basemap]
   );
+
+  // Handle layer visibility change
+  const handleLayerVisibilityChange = useCallback((newVisibility: LayerVisibility) => {
+    setLayerVisibility(newVisibility);
+    if (!map.current) return;
+
+    const layerMapping: Record<keyof LayerVisibility, string[]> = {
+      blmLands: ['blm-lands-fill', 'blm-lands-outline'],
+      wilderness: ['wilderness-fill', 'wilderness-outline'],
+      rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
+      accessPoints: ['access-points-backdrop', 'access-points-symbols'],
+      campgrounds: ['campgrounds-backdrop', 'campgrounds-symbols'],
+      rapids: ['rapids-backdrop', 'rapids-symbols'],
+      waterfalls: ['waterfalls-backdrop', 'waterfalls-symbols'],
+    };
+
+    Object.entries(newVisibility).forEach(([key, visible]) => {
+      const layers = layerMapping[key as keyof LayerVisibility];
+      layers?.forEach((layerId) => {
+        if (map.current?.getLayer(layerId)) {
+          map.current.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+        }
+      });
+    });
+  }, []);
 
   // Initialize map
   useEffect(() => {
@@ -276,6 +312,11 @@ export default function Home() {
 
         <div className={styles.panel}>
           <BasemapSelector basemap={basemap} onChange={handleBasemapChange} />
+
+          <div className={styles.section}>
+            <h3>🗂️ Map Layers</h3>
+            <LayerControl layers={layerVisibility} onChange={handleLayerVisibilityChange} />
+          </div>
 
           <RouteSection
             putIn={putIn}

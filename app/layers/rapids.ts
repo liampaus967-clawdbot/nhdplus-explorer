@@ -10,6 +10,7 @@ export function addRapidsSource(map: mapboxgl.Map) {
 }
 
 export function addRapidsBackdrop(map: mapboxgl.Map) {
+  if (map.getLayer('rapids-backdrop')) return;
   map.addLayer({
     id: 'rapids-backdrop',
     type: 'circle',

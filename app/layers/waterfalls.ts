@@ -10,6 +10,7 @@ export function addWaterfallsSource(map: mapboxgl.Map) {
 }
 
 export function addWaterfallsBackdrop(map: mapboxgl.Map) {
+  if (map.getLayer('waterfalls-backdrop')) return;
   map.addLayer({
     id: 'waterfalls-backdrop',
     type: 'circle',

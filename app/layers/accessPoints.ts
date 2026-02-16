@@ -10,6 +10,7 @@ export function addAccessPointsSource(map: mapboxgl.Map) {
 }
 
 export function addAccessPointsBackdrop(map: mapboxgl.Map) {
+  if (map.getLayer('access-points-backdrop')) return;
   map.addLayer({
     id: 'access-points-backdrop',
     type: 'circle',

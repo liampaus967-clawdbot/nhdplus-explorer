@@ -10,6 +10,7 @@ export function addCampgroundsSource(map: mapboxgl.Map) {
 }
 
 export function addCampgroundsBackdrop(map: mapboxgl.Map) {
+  if (map.getLayer('campgrounds-backdrop')) return;
   map.addLayer({
     id: 'campgrounds-backdrop',
     type: 'circle',

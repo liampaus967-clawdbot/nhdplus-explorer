@@ -455,7 +455,7 @@ export default function Home() {
       // Add 5-state rivers tileset (PA, UT, MT, WA, NC)
       map.current!.addSource('test-rivers', {
         type: 'vector',
-        url: 'mapbox://lman967.d0g758s3'
+        url: 'mapbox://lman967.east-coast-rivers'
       });
       
       // River lines - styled by stream order (VT)
@@ -489,7 +489,7 @@ export default function Home() {
         id: 'test-rivers-line',
         type: 'line',
         source: 'test-rivers',
-        'source-layer': 'testRiversSet-cr53z3',
+        'source-layer': 'eastCoastRivers',
         layout: {
           'line-cap': 'round',
           'line-join': 'round'
@@ -536,7 +536,7 @@ export default function Home() {
         id: 'test-rivers-arrows',
         type: 'symbol',
         source: 'test-rivers',
-        'source-layer': 'testRiversSet-cr53z3',
+        'source-layer': 'eastCoastRivers',
         minzoom: 10,
         layout: {
           'symbol-placement': 'line',
@@ -586,7 +586,7 @@ export default function Home() {
         id: 'test-rivers-labels',
         type: 'symbol',
         source: 'test-rivers',
-        'source-layer': 'testRiversSet-cr53z3',
+        'source-layer': 'eastCoastRivers',
         filter: ['!=', ['get', 'gnis_name'], null],
         layout: {
           'symbol-placement': 'line-center',

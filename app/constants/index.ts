@@ -51,7 +51,7 @@ export const SOURCE_LAYERS = {
   rapids: 'rapids',
   waterfalls: 'waterfalls',
   blmLands: 'blm_polygons',
-  wilderness: 'wilderness_areas',
+  wilderness: 'Wilderness Areas',
 };
 
 // Colors

@@ -603,6 +603,82 @@ export default function Home() {
         }
       });
       
+      // Access points layer
+      map.current!.addSource('access-points', {
+        type: 'vector',
+        url: 'mapbox://lman967.access-points-clean'
+      });
+      
+      // Access points symbols with icons by type
+      map.current!.addLayer({
+        id: 'access-points-layer',
+        type: 'symbol',
+        source: 'access-points',
+        'source-layer': 'access_points_clean',
+        minzoom: 6,
+        layout: {
+          'icon-image': [
+            'match',
+            ['get', 'access_type'],
+            // Boat ramps and slipways
+            'slipway', 'harbor',
+            'boat_ramp', 'harbor',
+            'boat_launch', 'harbor',
+            // Canoe/kayak access  
+            'canoe_access', 'pitch',
+            'paddle_access', 'pitch',
+            'canoe_kayak', 'pitch',
+            // Marinas
+            'marina', 'harbor',
+            // Piers and docks
+            'pier', 'ferry',
+            'dock', 'ferry',
+            'fishing_jetty', 'ferry',
+            // Fishing spots
+            'fishing', 'marker',
+            // Boat rental
+            'boat_rental', 'shop',
+            // Default
+            'marker'
+          ],
+          'icon-size': [
+            'interpolate', ['linear'], ['zoom'],
+            6, 0.6,
+            10, 0.9,
+            14, 1.2
+          ],
+          'icon-allow-overlap': false,
+          'icon-ignore-placement': false,
+          'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
+          'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+          'text-size': 11,
+          'text-offset': [0, 1.2],
+          'text-anchor': 'top',
+          'text-optional': true
+        },
+        paint: {
+          'icon-color': [
+            'match',
+            ['get', 'access_type'],
+            'slipway', '#3b82f6',
+            'boat_ramp', '#3b82f6',
+            'boat_launch', '#3b82f6',
+            'canoe_access', '#22c55e',
+            'paddle_access', '#22c55e',
+            'canoe_kayak', '#22c55e',
+            'marina', '#8b5cf6',
+            'pier', '#06b6d4',
+            'dock', '#06b6d4',
+            'fishing_jetty', '#06b6d4',
+            'fishing', '#f59e0b',
+            '#6b7280'
+          ],
+          'text-color': '#1f2937',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1.5
+        }
+      });
+      
       // Route layer (empty initially)
       map.current!.addSource('route', {
         type: 'geojson',

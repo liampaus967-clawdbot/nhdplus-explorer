@@ -446,49 +446,17 @@ export default function Home() {
     // Function to add all river layers (called on load and style change)
     const addRiverLayers = () => {
       if (!map.current) return;
-      // Add Vermont rivers tileset
-      map.current!.addSource('vt-rivers', {
-        type: 'vector',
-        url: 'mapbox://lman967.9hfg3bbo'
-      });
-      
-      // Add 5-state rivers tileset (PA, UT, MT, WA, NC)
-      map.current!.addSource('test-rivers', {
+      // Add East Coast rivers tileset (VT, ME, NH, NY, NC, SC)
+      map.current!.addSource('rivers', {
         type: 'vector',
         url: 'mapbox://lman967.east-coast-rivers'
       });
       
-      // River lines - styled by stream order (VT)
+      // River lines - styled by stream order
       map.current!.addLayer({
         id: 'rivers-line',
         type: 'line',
-        source: 'vt-rivers',
-        'source-layer': 'vtRivers-3bijjc',
-        layout: {
-          'line-cap': 'round',
-          'line-join': 'round'
-        },
-        paint: {
-          'line-color': '#3b82f6',
-          'line-width': [
-            'interpolate', ['linear'], ['get', 'stream_order'],
-            1, 1,
-            2, 1.5,
-            3, 2,
-            4, 3,
-            5, 4,
-            6, 6,
-            7, 8
-          ],
-          'line-opacity': 0.7
-        }
-      });
-      
-      // River lines - 5 states
-      map.current!.addLayer({
-        id: 'test-rivers-line',
-        type: 'line',
-        source: 'test-rivers',
+        source: 'rivers',
         'source-layer': 'eastCoastRivers',
         layout: {
           'line-cap': 'round',
@@ -531,11 +499,11 @@ export default function Home() {
       // Arrow color based on basemap
       const arrowColor = basemapRef.current === 'outdoors' ? '#1e40af' : '#ffffff';
       
-      // Flow direction arrows (5 states)
+      // Flow direction arrows
       map.current!.addLayer({
-        id: 'test-rivers-arrows',
+        id: 'rivers-arrows',
         type: 'symbol',
-        source: 'test-rivers',
+        source: 'rivers',
         'source-layer': 'eastCoastRivers',
         minzoom: 10,
         layout: {
@@ -559,33 +527,11 @@ export default function Home() {
         }
       });
 
-      // River labels (VT)
+      // River labels
       map.current!.addLayer({
         id: 'rivers-labels',
         type: 'symbol',
-        source: 'vt-rivers',
-        'source-layer': 'vtRivers-3bijjc',
-        filter: ['!=', ['get', 'gnis_name'], null],
-        layout: {
-          'symbol-placement': 'line-center',
-          'text-field': ['get', 'gnis_name'],
-          'text-font': ['DIN Pro Italic', 'Arial Unicode MS Regular'],
-          'text-size': 11,
-          'text-allow-overlap': false,
-          'text-optional': true
-        },
-        paint: {
-          'text-color': '#1e40af',
-          'text-halo-color': 'rgba(255, 255, 255, 0.9)',
-          'text-halo-width': 1.5
-        }
-      });
-      
-      // River labels (5 states)
-      map.current!.addLayer({
-        id: 'test-rivers-labels',
-        type: 'symbol',
-        source: 'test-rivers',
+        source: 'rivers',
         'source-layer': 'eastCoastRivers',
         filter: ['!=', ['get', 'gnis_name'], null],
         layout: {

@@ -9,83 +9,35 @@ export function addWaterfallsSource(map: mapboxgl.Map) {
 }
 
 export function addWaterfallsBackdrop(map: mapboxgl.Map) {
-  // Light blue circles at low zoom
-  map.addLayer({
-    id: 'waterfalls-circles',
-    type: 'circle',
-    source: 'waterfalls',
-    'source-layer': SOURCE_LAYERS.waterfalls,
-    maxzoom: 6,
-    paint: {
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        0, 1,
-        4, 2,
-        6, 2,
-      ],
-      'circle-color': COLORS.waterfall,
-      'circle-stroke-width': .2,
-      'circle-stroke-color': '#000000',
-    },
-  });
-
-  // Circle backdrop at zoom 6+
   map.addLayer({
     id: 'waterfalls-backdrop',
     type: 'circle',
     source: 'waterfalls',
     'source-layer': SOURCE_LAYERS.waterfalls,
-    minzoom: 6,
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        6, 6,
-        10, 10,
-        14, 24,
+        0, 1,
+        6, 3,
+        10, 6,
+        14, 10,
       ],
       'circle-color': COLORS.waterfall,
-      'circle-stroke-width': .5,
-      'circle-stroke-color': 'black',
-    },
-  });
-}
-
-export function addWaterfallsSymbols(map: mapboxgl.Map) {
-  // Waterfall icon at zoom 6+
-  map.addLayer({
-    id: 'waterfalls-layer',
-    type: 'symbol',
-    source: 'waterfalls',
-    'source-layer': SOURCE_LAYERS.waterfalls,
-    minzoom: 6,
-    layout: {
-      'icon-image': 'waterfall-sdf',  // Custom SDF icon - edit /public/icons/waterfall.svg to customize
-      'icon-size': [
+      'circle-stroke-width': [
         'interpolate', ['linear'], ['zoom'],
-        6, 0.8,
-        10, 1.0,
-        14, 1.2,
+        0, 0.2,
+        10, 1,
       ],
-      'icon-allow-overlap': false,
-      'icon-ignore-placement': false,
-      'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
-      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
-      'text-size': 11,
-      'text-offset': [0, 1.2],
-      'text-anchor': 'top',
-      'text-optional': true,
-    },
-    paint: {
-      'icon-color': 'black',
-      'text-color': '#1f2937',
-      'text-halo-color': '#ffffff',
-      'text-halo-width': 1.5,
+      'circle-stroke-color': '#ffffff',
     },
   });
 }
 
-// Legacy function for backwards compatibility
+// No symbols - just circles
+export function addWaterfallsSymbols(_map: mapboxgl.Map) {
+  // Removed - using circles only
+}
+
 export function addWaterfallsLayers(map: mapboxgl.Map) {
   addWaterfallsBackdrop(map);
-  addWaterfallsSymbols(map);
 }

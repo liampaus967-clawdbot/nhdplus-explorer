@@ -9,83 +9,35 @@ export function addAccessPointsSource(map: mapboxgl.Map) {
 }
 
 export function addAccessPointsBackdrop(map: mapboxgl.Map) {
-  // Circles at low zoom (below 6)
-  map.addLayer({
-    id: 'access-points-circles-low',
-    type: 'circle',
-    source: 'access-points',
-    'source-layer': SOURCE_LAYERS.accessPoints,
-    maxzoom: 6,
-    paint: {
-      'circle-radius': [
-        'interpolate', ['linear'], ['zoom'],
-        0, 1,
-        4, 2,
-        6, 2,
-      ],
-      'circle-color': COLORS.accessPoint,
-      'circle-stroke-width': .2,
-      'circle-stroke-color': '#000000',
-    },
-  });
-
-  // Circle backdrop at zoom 6+
   map.addLayer({
     id: 'access-points-backdrop',
     type: 'circle',
     source: 'access-points',
     'source-layer': SOURCE_LAYERS.accessPoints,
-    minzoom: 6,
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        6, 6,
-        10, 10,
-        14, 24,
+        0, 1,
+        6, 3,
+        10, 6,
+        14, 10,
       ],
       'circle-color': COLORS.accessPoint,
-      'circle-stroke-width': .5,
-      'circle-stroke-color': 'black',
-    },
-  });
-}
-
-export function addAccessPointsSymbols(map: mapboxgl.Map) {
-  // Pitch icon at zoom 6+
-  map.addLayer({
-    id: 'access-points-layer',
-    type: 'symbol',
-    source: 'access-points',
-    'source-layer': SOURCE_LAYERS.accessPoints,
-    minzoom: 6,
-    layout: {
-      'icon-image': 'pitch-sdf',  // Custom SDF icon - edit /public/icons/pitch.svg to customize
-      'icon-size': [
+      'circle-stroke-width': [
         'interpolate', ['linear'], ['zoom'],
-        6, 0.6,
+        0, 0.2,
         10, 1,
-        14, 2.0,
       ],
-      'icon-allow-overlap': true,
-      'icon-ignore-placement': false,
-      'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
-      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
-      'text-size': 11,
-      'text-offset': [0, 1.5],
-      'text-anchor': 'top',
-      'text-optional': true,
-    },
-    paint: {
-      'icon-color': 'black',
-      'text-color': '#1f2937',
-      'text-halo-color': '#ffffff',
-      'text-halo-width': 1.5,
+      'circle-stroke-color': '#ffffff',
     },
   });
 }
 
-// Legacy function for backwards compatibility
+// No symbols - just circles
+export function addAccessPointsSymbols(_map: mapboxgl.Map) {
+  // Removed - using circles only
+}
+
 export function addAccessPointsLayers(map: mapboxgl.Map) {
   addAccessPointsBackdrop(map);
-  addAccessPointsSymbols(map);
 }

@@ -175,10 +175,10 @@ export default function Home() {
       blmLands: ['blm-lands-fill', 'blm-lands-outline'],
       wilderness: ['wilderness-fill', 'wilderness-outline'],
       rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
-      accessPoints: ['access-points-backdrop', 'access-points-symbols'],
-      campgrounds: ['campgrounds-backdrop', 'campgrounds-symbols'],
-      rapids: ['rapids-backdrop', 'rapids-symbols'],
-      waterfalls: ['waterfalls-backdrop', 'waterfalls-symbols'],
+      accessPoints: ['access-points-backdrop'],
+      campgrounds: ['campgrounds-backdrop'],
+      rapids: ['rapids-backdrop'],
+      waterfalls: ['waterfalls-backdrop'],
     };
 
     Object.entries(newVisibility).forEach(([key, visible]) => {

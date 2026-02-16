@@ -701,7 +701,7 @@ export default function Home() {
         'source-layer': 'rapids',
         minzoom: 6,
         layout: {
-          'icon-image': 'danger',
+          'icon-image': 'mountain',
           'icon-size': [
             'interpolate', ['linear'], ['zoom'],
             6, 0.8,

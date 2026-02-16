@@ -40,6 +40,11 @@ export function LiveConditions({ conditions }: LiveConditionsProps) {
               {conditions.avg_velocity_mph || '—'}
             </span>
             <span className={styles.comparisonLabel}>Water Speed</span>
+            {conditions.min_velocity_mph !== undefined && conditions.max_velocity_mph !== undefined && (
+              <span className={styles.velocityRange}>
+                ({conditions.min_velocity_mph}–{conditions.max_velocity_mph})
+              </span>
+            )}
           </div>
           <div className={styles.comparisonItem}>
             <span className={styles.comparisonValue}>

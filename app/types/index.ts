@@ -28,6 +28,8 @@ export interface LiveConditions {
   nwm_coverage_percent: number;
   data_timestamp: string | null;
   avg_velocity_mph: number | null;
+  min_velocity_mph?: number;
+  max_velocity_mph?: number;
   avg_streamflow_cfs: number | null;
   baseline_velocity_mph: number;
   baseline_float_time_s: number;

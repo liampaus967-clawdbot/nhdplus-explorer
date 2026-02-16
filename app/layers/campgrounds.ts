@@ -39,13 +39,13 @@ export function addCampgroundsLayers(map: mapboxgl.Map) {
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        6, 8,
-        10, 12,
-        14, 18,
+        6, 6,
+        10, 8,
+        14, 14,
       ],
-      'circle-color': '#ffffff',
+      'circle-color': COLORS.campground,
       'circle-stroke-width': 2,
-      'circle-stroke-color': COLORS.campground,
+      'circle-stroke-color': 'black',
     },
   });
 
@@ -74,7 +74,7 @@ export function addCampgroundsLayers(map: mapboxgl.Map) {
       'text-optional': true,
     },
     paint: {
-      'icon-color': COLORS.campground,
+      'icon-color': 'black',
       'text-color': '#1f2937',
       'text-halo-color': '#ffffff',
       'text-halo-width': 1.5,

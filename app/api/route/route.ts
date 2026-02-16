@@ -352,7 +352,7 @@ export async function GET(request: NextRequest) {
   const endLng = parseFloat(searchParams.get('end_lng') || '');
   const endLat = parseFloat(searchParams.get('end_lat') || '');
   const flowCondition = validateFlowCondition(searchParams.get('flow'));
-  const paddleSpeedMph = parseFloat(searchParams.get('paddle_speed') || '3');
+  const paddleSpeedMph = parseFloat(searchParams.get('paddle_speed') ?? '0');
   const paddleSpeedMs = paddleSpeedMph * 0.44704;
   
   const startCheck = validateCoordinate(startLng, startLat);

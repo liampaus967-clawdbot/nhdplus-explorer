@@ -28,7 +28,7 @@ export function useRoute(): UseRouteReturn {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [flowCondition, setFlowCondition] = useState<FlowCondition>('normal');
-  const [paddleSpeed, setPaddleSpeed] = useState(3);
+  const [paddleSpeed, setPaddleSpeed] = useState(0);  // Default to pure float
 
   const snapToRiver = useCallback(async (lng: number, lat: number): Promise<SnapResult | null> => {
     try {
@@ -83,7 +83,7 @@ export function useRoute(): UseRouteReturn {
     setRoute(null);
     setError(null);
     setFlowCondition('normal');
-    setPaddleSpeed(3);
+    setPaddleSpeed(0);  // Reset to pure float
   }, []);
 
   const swapPoints = useCallback(() => {

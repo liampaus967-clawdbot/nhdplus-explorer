@@ -609,7 +609,27 @@ export default function Home() {
         url: 'mapbox://lman967.access-points-clean'
       });
       
-      // Access points symbols with icons by type
+      // Access points - circles at low zoom (below 6)
+      map.current!.addLayer({
+        id: 'access-points-circles',
+        type: 'circle',
+        source: 'access-points',
+        'source-layer': 'access_points_clean',
+        maxzoom: 6,
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            0, 2,
+            4, 3,
+            6, 4
+          ],
+          'circle-color': '#3b82f6',
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Access points - symbols at zoom 6+
       map.current!.addLayer({
         id: 'access-points-layer',
         type: 'symbol',
@@ -617,30 +637,7 @@ export default function Home() {
         'source-layer': 'access_points_clean',
         minzoom: 6,
         layout: {
-          'icon-image': [
-            'match',
-            ['get', 'access_type'],
-            // Boat ramps and slipways
-            'slipway', 'harbor',
-            'boat_ramp', 'harbor',
-            'boat_launch', 'harbor',
-            // Canoe/kayak access  
-            'canoe_access', 'pitch',
-            'paddle_access', 'pitch',
-            'canoe_kayak', 'pitch',
-            // Marinas
-            'marina', 'harbor',
-            // Piers and docks
-            'pier', 'ferry',
-            'dock', 'ferry',
-            'fishing_jetty', 'ferry',
-            // Fishing spots
-            'fishing', 'marker',
-            // Boat rental
-            'boat_rental', 'shop',
-            // Default
-            'marker'
-          ],
+          'icon-image': 'harbor',
           'icon-size': [
             'interpolate', ['linear'], ['zoom'],
             6, 0.6,
@@ -657,22 +654,7 @@ export default function Home() {
           'text-optional': true
         },
         paint: {
-          'icon-color': [
-            'match',
-            ['get', 'access_type'],
-            'slipway', '#3b82f6',
-            'boat_ramp', '#3b82f6',
-            'boat_launch', '#3b82f6',
-            'canoe_access', '#22c55e',
-            'paddle_access', '#22c55e',
-            'canoe_kayak', '#22c55e',
-            'marina', '#8b5cf6',
-            'pier', '#06b6d4',
-            'dock', '#06b6d4',
-            'fishing_jetty', '#06b6d4',
-            'fishing', '#f59e0b',
-            '#6b7280'
-          ],
+          'icon-color': '#3b82f6',
           'text-color': '#1f2937',
           'text-halo-color': '#ffffff',
           'text-halo-width': 1.5

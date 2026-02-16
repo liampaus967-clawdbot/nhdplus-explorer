@@ -37,7 +37,7 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
     'source-layer': SOURCE_LAYERS.accessPoints,
     minzoom: 6,
     layout: {
-      'icon-image': 'pitch',
+      'icon-image': 'pitch-sdf',  // Custom SDF icon - edit /public/icons/pitch.svg to customize
       'icon-size': [
         'interpolate', ['linear'], ['zoom'],
         6, 0.6,

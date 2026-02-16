@@ -37,7 +37,7 @@ export function addCampgroundsLayers(map: mapboxgl.Map) {
     'source-layer': SOURCE_LAYERS.campgrounds,
     minzoom: 6,
     layout: {
-      'icon-image': 'campsite',
+      'icon-image': 'campsite-sdf',  // Custom SDF icon - edit /public/icons/campsite.svg to customize
       'icon-size': [
         'interpolate', ['linear'], ['zoom'],
         6, 0.8,

@@ -37,7 +37,7 @@ export function addRapidsLayers(map: mapboxgl.Map) {
     'source-layer': SOURCE_LAYERS.rapids,
     minzoom: 6,
     layout: {
-      'icon-image': 'racetrack-boat-15',
+      'icon-image': 'danger-sdf',  // Custom SDF icon - edit /public/icons/danger.svg to customize
       'icon-size': [
         'interpolate', ['linear'], ['zoom'],
         6, 0.8,

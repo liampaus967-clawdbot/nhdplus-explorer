@@ -37,7 +37,7 @@ export function addWaterfallsLayers(map: mapboxgl.Map) {
     'source-layer': SOURCE_LAYERS.waterfalls,
     minzoom: 6,
     layout: {
-      'icon-image': 'waterfall',
+      'icon-image': 'waterfall-sdf',  // Custom SDF icon - edit /public/icons/waterfall.svg to customize
       'icon-size': [
         'interpolate', ['linear'], ['zoom'],
         6, 0.8,

@@ -611,7 +611,7 @@ export default function Home() {
       
       // Access points - circles at low zoom (below 6)
       map.current!.addLayer({
-        id: 'access-points-circles',
+        id: 'access-points-circles-low',
         type: 'circle',
         source: 'access-points',
         'source-layer': 'access_points_clean',
@@ -629,7 +629,27 @@ export default function Home() {
         }
       });
       
-      // Access points - symbols at zoom 6+
+      // Access points - blue circle background at zoom 6+
+      map.current!.addLayer({
+        id: 'access-points-circles',
+        type: 'circle',
+        source: 'access-points',
+        'source-layer': 'access_points_clean',
+        minzoom: 6,
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            6, 10,
+            10, 12,
+            14, 14
+          ],
+          'circle-color': '#3b82f6',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Access points - pitch icon on top of circle at zoom 6+
       map.current!.addLayer({
         id: 'access-points-layer',
         type: 'symbol',
@@ -637,24 +657,24 @@ export default function Home() {
         'source-layer': 'access_points_clean',
         minzoom: 6,
         layout: {
-          'icon-image': 'harbor',
+          'icon-image': 'pitch',
           'icon-size': [
             'interpolate', ['linear'], ['zoom'],
             6, 0.6,
-            10, 0.9,
-            14, 1.2
+            10, 0.8,
+            14, 1.0
           ],
           'icon-allow-overlap': false,
           'icon-ignore-placement': false,
           'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
           'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
           'text-size': 11,
-          'text-offset': [0, 1.2],
+          'text-offset': [0, 1.5],
           'text-anchor': 'top',
           'text-optional': true
         },
         paint: {
-          'icon-color': '#3b82f6',
+          'icon-color': '#ffffff',
           'text-color': '#1f2937',
           'text-halo-color': '#ffffff',
           'text-halo-width': 1.5

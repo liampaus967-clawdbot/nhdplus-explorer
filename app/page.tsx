@@ -609,6 +609,32 @@ export default function Home() {
         url: 'mapbox://lman967.access-points-clean'
       });
       
+      // Rapids layer
+      map.current!.addSource('rapids', {
+        type: 'vector',
+        url: 'mapbox://lman967.rapids'
+      });
+      
+      // Rapids - red circles
+      map.current!.addLayer({
+        id: 'rapids-layer',
+        type: 'circle',
+        source: 'rapids',
+        'source-layer': 'rapids',
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            0, 2,
+            6, 4,
+            10, 6,
+            14, 8
+          ],
+          'circle-color': '#ef4444',
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
       // Campgrounds near water layer
       map.current!.addSource('campgrounds', {
         type: 'vector',

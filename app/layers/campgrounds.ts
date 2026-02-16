@@ -23,12 +23,8 @@ export function addCampgroundsBackdrop(map: mapboxgl.Map) {
         14, 10,
       ],
       'circle-color': COLORS.campground,
-      'circle-stroke-width': [
-        'interpolate', ['linear'], ['zoom'],
-        0, 0.2,
-        10, 1,
-      ],
-      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 0.5,
+      'circle-stroke-color': '#000000',
     },
   });
 }

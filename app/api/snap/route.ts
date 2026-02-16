@@ -40,25 +40,22 @@ export async function GET(request: NextRequest) {
   }
   
   try {
-    // Find nearest point on any river edge within 10km, then get its node
-    // Using ST_DWithin for initial filter (uses spatial index efficiently)
+    // Find nearest river edge using KNN with bounding box pre-filter
+    // The && operator uses the GIST index for fast bbox filtering
     const result = await query(`
-      WITH click_point AS (
-        SELECT ST_SetSRID(ST_MakePoint($1, $2), 4326) as pt
-      ),
-      nearby_edges AS (
+      WITH nearest AS (
         SELECT 
-          e.comid,
-          e.gnis_name,
-          e.from_node,
-          e.to_node,
-          e.stream_order,
-          e.lengthkm,
-          e.geom,
-          ST_Distance(e.geom::geography, cp.pt::geography) as dist_m
-        FROM river_edges e, click_point cp
-        WHERE ST_DWithin(e.geom::geography, cp.pt::geography, 10000)
-        ORDER BY e.geom <-> cp.pt
+          comid,
+          gnis_name,
+          from_node,
+          to_node,
+          stream_order,
+          lengthkm,
+          geom,
+          ST_Distance(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) * 111139 as dist_m
+        FROM river_edges
+        WHERE geom && ST_Expand(ST_SetSRID(ST_MakePoint($1, $2), 4326), 0.1)
+        ORDER BY geom <-> ST_SetSRID(ST_MakePoint($1, $2), 4326)
         LIMIT 1
       )
       SELECT 
@@ -67,16 +64,16 @@ export async function GET(request: NextRequest) {
         stream_order,
         lengthkm,
         dist_m,
-        ST_LineLocatePoint(geom, (SELECT pt FROM click_point)) as line_position,
+        ST_LineLocatePoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) as line_position,
         CASE 
-          WHEN ST_LineLocatePoint(geom, (SELECT pt FROM click_point)) < 0.5 THEN from_node 
+          WHEN ST_LineLocatePoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) < 0.5 THEN from_node 
           ELSE to_node 
         END as node_id,
-        ST_X(ST_ClosestPoint(geom, (SELECT pt FROM click_point))) as snap_lng,
-        ST_Y(ST_ClosestPoint(geom, (SELECT pt FROM click_point))) as snap_lat,
-        ST_X(CASE WHEN ST_LineLocatePoint(geom, (SELECT pt FROM click_point)) < 0.5 THEN ST_StartPoint(geom) ELSE ST_EndPoint(geom) END) as node_lng,
-        ST_Y(CASE WHEN ST_LineLocatePoint(geom, (SELECT pt FROM click_point)) < 0.5 THEN ST_StartPoint(geom) ELSE ST_EndPoint(geom) END) as node_lat
-      FROM nearby_edges
+        ST_X(ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326))) as snap_lng,
+        ST_Y(ST_ClosestPoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326))) as snap_lat,
+        ST_X(CASE WHEN ST_LineLocatePoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) < 0.5 THEN ST_StartPoint(geom) ELSE ST_EndPoint(geom) END) as node_lng,
+        ST_Y(CASE WHEN ST_LineLocatePoint(geom, ST_SetSRID(ST_MakePoint($1, $2), 4326)) < 0.5 THEN ST_StartPoint(geom) ELSE ST_EndPoint(geom) END) as node_lat
+      FROM nearest
     `, [lng, lat]);
     
     if (result.rows.length === 0) {

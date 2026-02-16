@@ -39,12 +39,12 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        6, 8,
-        10, 12,
-        14, 18,
+        6, 4,
+        10, 6,
+        14, 20,
       ],
       'circle-color': COLORS.accessPoint,
-      'circle-stroke-width': 2,
+      'circle-stroke-width': .5,
       'circle-stroke-color': 'black',
     },
   });

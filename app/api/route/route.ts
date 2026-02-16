@@ -519,6 +519,8 @@ export async function GET(request: NextRequest) {
     let impossibleSegments = 0;
     let totalStreamflowCms = 0;
     let streamflowCount = 0;
+    let minWaterSpeedMph = Infinity;
+    let maxWaterSpeedMph = 0;
     
     for (const edge of result.edges) {
       const segmentStartDist = accumDist;
@@ -582,28 +584,25 @@ export async function GET(request: NextRequest) {
         streamflowCount++;
       }
       
+      // Track min/max water speeds for UX
+      const streamVelocityMph = streamVelocityMs * 2.237;
+      if (streamVelocityMph < minWaterSpeedMph) minWaterSpeedMph = streamVelocityMph;
+      if (streamVelocityMph > maxWaterSpeedMph) maxWaterSpeedMph = streamVelocityMph;
+      
       // Calculate effective speed based on direction
       let effectiveSpeedMs: number;
-      const segmentLengthM = edge.lengthkm * 1000;
-      const streamVelocityMph = streamVelocityMs * 2.237;
-      
       if (edge.is_upstream_segment) {
         effectiveSpeedMs = paddleSpeedMs - streamVelocityMs;
         if (effectiveSpeedMs <= 0) {
           // Paddle speed not enough to overcome current - mark as impossible
           impossibleSegments++;
           // Don't add to float time - it will be shown as impossible
-          console.log(`  Segment ${edge.comid}: ${segmentLengthM.toFixed(0)}m, water=${streamVelocityMph.toFixed(2)}mph, paddle=${paddleSpeedMph}mph [UPSTREAM IMPOSSIBLE]`);
         } else {
-          const segTime = segmentLengthM / effectiveSpeedMs;
-          totalFloatTime += segTime;
-          console.log(`  Segment ${edge.comid}: ${segmentLengthM.toFixed(0)}m, water=${streamVelocityMph.toFixed(2)}mph, paddle=${paddleSpeedMph}mph, effective=${(effectiveSpeedMs*2.237).toFixed(2)}mph, time=${(segTime/60).toFixed(1)}min [UPSTREAM]`);
+          totalFloatTime += (edge.lengthkm * 1000) / effectiveSpeedMs;
         }
       } else {
         effectiveSpeedMs = paddleSpeedMs + streamVelocityMs;
-        const segTime = segmentLengthM / effectiveSpeedMs;
-        totalFloatTime += segTime;
-        console.log(`  Segment ${edge.comid}: ${segmentLengthM.toFixed(0)}m, water=${streamVelocityMph.toFixed(2)}mph, paddle=${paddleSpeedMph}mph, effective=${(effectiveSpeedMs*2.237).toFixed(2)}mph, time=${(segTime/60).toFixed(1)}min`);
+        totalFloatTime += (edge.lengthkm * 1000) / effectiveSpeedMs;
       }
       if (edge.gnis_name) waterways.add(edge.gnis_name);
     }
@@ -611,19 +610,6 @@ export async function GET(request: NextRequest) {
     const distanceMiles = totalDistance / 1609.34;
     const elevDropFt = (elevStart && elevEnd) ? (elevStart - elevEnd) * 3.28084 : 0;
     const elevGainFt = elevDropFt < 0 ? Math.abs(elevDropFt) : 0;
-    
-    // Debug summary
-    const avgWaterSpeedMph = waterOnlyFloatTime > 0 ? (totalDistance / waterOnlyFloatTime) * 2.237 : 0;
-    const avgEffectiveSpeedMph = totalFloatTime > 0 ? (totalDistance / totalFloatTime) * 2.237 : 0;
-    console.log(`\n=== FLOAT TIME SUMMARY ===`);
-    console.log(`Distance: ${distanceMiles.toFixed(2)} miles (${totalDistance.toFixed(0)}m)`);
-    console.log(`Paddle speed: ${paddleSpeedMph} mph`);
-    console.log(`Avg water speed: ${avgWaterSpeedMph.toFixed(2)} mph`);
-    console.log(`Avg effective speed: ${avgEffectiveSpeedMph.toFixed(2)} mph`);
-    console.log(`Expected effective (paddle+water): ${(paddleSpeedMph + avgWaterSpeedMph).toFixed(2)} mph`);
-    console.log(`Water-only time: ${(waterOnlyFloatTime/3600).toFixed(2)}h`);
-    console.log(`With-paddle time: ${(totalFloatTime/3600).toFixed(2)}h`);
-    console.log(`========================\n`);
     
     const nwmFreshnessResult = await query(`SELECT updated_at FROM nwm_velocity LIMIT 1`);
     const nwmTimestamp = nwmFreshnessResult.rows[0]?.updated_at || null;
@@ -675,6 +661,9 @@ export async function GET(request: NextRequest) {
           avg_velocity_mph: waterOnlyFloatTime > 0 
             ? Math.round((totalDistance / waterOnlyFloatTime) * 2.237 * 10) / 10 
             : 0,
+          // Min/max helps explain why paddle speed has non-linear impact
+          min_velocity_mph: minWaterSpeedMph === Infinity ? 0 : Math.round(minWaterSpeedMph * 10) / 10,
+          max_velocity_mph: Math.round(maxWaterSpeedMph * 10) / 10,
           // Average streamflow (CMS to CFS: multiply by 35.3147)
           avg_streamflow_cfs: streamflowCount > 0 
             ? Math.round((totalStreamflowCms / streamflowCount) * 35.3147 * 10) / 10 

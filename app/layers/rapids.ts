@@ -1,0 +1,63 @@
+import mapboxgl from 'mapbox-gl';
+import { TILESETS, SOURCE_LAYERS, COLORS } from '../constants';
+
+export function addRapidsSource(map: mapboxgl.Map) {
+  map.addSource('rapids', {
+    type: 'vector',
+    url: TILESETS.rapids,
+  });
+}
+
+export function addRapidsLayers(map: mapboxgl.Map) {
+  // Red circles at low zoom
+  map.addLayer({
+    id: 'rapids-circles',
+    type: 'circle',
+    source: 'rapids',
+    'source-layer': SOURCE_LAYERS.rapids,
+    maxzoom: 6,
+    paint: {
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        0, 2,
+        4, 3,
+        6, 4,
+      ],
+      'circle-color': COLORS.rapid,
+      'circle-stroke-width': 1,
+      'circle-stroke-color': '#000000',
+    },
+  });
+
+  // Racetrack-boat icon at zoom 6+
+  map.addLayer({
+    id: 'rapids-symbols',
+    type: 'symbol',
+    source: 'rapids',
+    'source-layer': SOURCE_LAYERS.rapids,
+    minzoom: 6,
+    layout: {
+      'icon-image': 'racetrack-boat-15',
+      'icon-size': [
+        'interpolate', ['linear'], ['zoom'],
+        6, 0.8,
+        10, 1.0,
+        14, 1.2,
+      ],
+      'icon-allow-overlap': false,
+      'icon-ignore-placement': false,
+      'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
+      'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+      'text-size': 11,
+      'text-offset': [0, 1.2],
+      'text-anchor': 'top',
+      'text-optional': true,
+    },
+    paint: {
+      'icon-color': COLORS.rapid,
+      'text-color': '#1f2937',
+      'text-halo-color': '#ffffff',
+      'text-halo-width': 1.5,
+    },
+  });
+}

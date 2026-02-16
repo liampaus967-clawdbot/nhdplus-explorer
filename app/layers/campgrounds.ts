@@ -8,7 +8,7 @@ export function addCampgroundsSource(map: mapboxgl.Map) {
   });
 }
 
-export function addCampgroundsLayers(map: mapboxgl.Map) {
+export function addCampgroundsBackdrop(map: mapboxgl.Map) {
   // Circles at low zoom (below 6)
   map.addLayer({
     id: 'campgrounds-circles',
@@ -48,7 +48,9 @@ export function addCampgroundsLayers(map: mapboxgl.Map) {
       'circle-stroke-color': 'black',
     },
   });
+}
 
+export function addCampgroundsSymbols(map: mapboxgl.Map) {
   // Campsite icon at zoom 6+
   map.addLayer({
     id: 'campgrounds-layer',
@@ -80,4 +82,10 @@ export function addCampgroundsLayers(map: mapboxgl.Map) {
       'text-halo-width': 1.5,
     },
   });
+}
+
+// Legacy function for backwards compatibility
+export function addCampgroundsLayers(map: mapboxgl.Map) {
+  addCampgroundsBackdrop(map);
+  addCampgroundsSymbols(map);
 }

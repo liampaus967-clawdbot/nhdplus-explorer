@@ -8,7 +8,7 @@ export function addWaterfallsSource(map: mapboxgl.Map) {
   });
 }
 
-export function addWaterfallsLayers(map: mapboxgl.Map) {
+export function addWaterfallsBackdrop(map: mapboxgl.Map) {
   // Light blue circles at low zoom
   map.addLayer({
     id: 'waterfalls-circles',
@@ -48,7 +48,9 @@ export function addWaterfallsLayers(map: mapboxgl.Map) {
       'circle-stroke-color': 'black',
     },
   });
+}
 
+export function addWaterfallsSymbols(map: mapboxgl.Map) {
   // Waterfall icon at zoom 6+
   map.addLayer({
     id: 'waterfalls-layer',
@@ -80,4 +82,10 @@ export function addWaterfallsLayers(map: mapboxgl.Map) {
       'text-halo-width': 1.5,
     },
   });
+}
+
+// Legacy function for backwards compatibility
+export function addWaterfallsLayers(map: mapboxgl.Map) {
+  addWaterfallsBackdrop(map);
+  addWaterfallsSymbols(map);
 }

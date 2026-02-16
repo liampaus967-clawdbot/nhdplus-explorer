@@ -8,7 +8,7 @@ export function addAccessPointsSource(map: mapboxgl.Map) {
   });
 }
 
-export function addAccessPointsLayers(map: mapboxgl.Map) {
+export function addAccessPointsBackdrop(map: mapboxgl.Map) {
   // Circles at low zoom (below 6)
   map.addLayer({
     id: 'access-points-circles-low',
@@ -48,7 +48,9 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
       'circle-stroke-color': 'black',
     },
   });
+}
 
+export function addAccessPointsSymbols(map: mapboxgl.Map) {
   // Pitch icon at zoom 6+
   map.addLayer({
     id: 'access-points-layer',
@@ -80,4 +82,10 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
       'text-halo-width': 1.5,
     },
   });
+}
+
+// Legacy function for backwards compatibility
+export function addAccessPointsLayers(map: mapboxgl.Map) {
+  addAccessPointsBackdrop(map);
+  addAccessPointsSymbols(map);
 }

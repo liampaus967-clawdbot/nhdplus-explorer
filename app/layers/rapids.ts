@@ -8,7 +8,7 @@ export function addRapidsSource(map: mapboxgl.Map) {
   });
 }
 
-export function addRapidsLayers(map: mapboxgl.Map) {
+export function addRapidsBackdrop(map: mapboxgl.Map) {
   // Red circles at low zoom
   map.addLayer({
     id: 'rapids-circles',
@@ -48,7 +48,9 @@ export function addRapidsLayers(map: mapboxgl.Map) {
       'circle-stroke-color': 'black',
     },
   });
+}
 
+export function addRapidsSymbols(map: mapboxgl.Map) {
   // Danger icon at zoom 6+
   map.addLayer({
     id: 'rapids-symbols',
@@ -80,4 +82,10 @@ export function addRapidsLayers(map: mapboxgl.Map) {
       'text-halo-width': 1.5,
     },
   });
+}
+
+// Legacy function for backwards compatibility
+export function addRapidsLayers(map: mapboxgl.Map) {
+  addRapidsBackdrop(map);
+  addRapidsSymbols(map);
 }

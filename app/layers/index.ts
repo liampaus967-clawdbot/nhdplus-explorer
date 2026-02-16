@@ -1,9 +1,9 @@
 import mapboxgl from 'mapbox-gl';
 import { addRiversSource, addRiversLayers } from './rivers';
-import { addAccessPointsSource, addAccessPointsLayers } from './accessPoints';
-import { addCampgroundsSource, addCampgroundsLayers } from './campgrounds';
-import { addRapidsSource, addRapidsLayers } from './rapids';
-import { addWaterfallsSource, addWaterfallsLayers } from './waterfalls';
+import { addAccessPointsSource, addAccessPointsBackdrop, addAccessPointsSymbols } from './accessPoints';
+import { addCampgroundsSource, addCampgroundsBackdrop, addCampgroundsSymbols } from './campgrounds';
+import { addRapidsSource, addRapidsBackdrop, addRapidsSymbols } from './rapids';
+import { addWaterfallsSource, addWaterfallsBackdrop, addWaterfallsSymbols } from './waterfalls';
 import { addRouteSource, addRouteLayers } from './route';
 
 export * from './rivers';
@@ -70,9 +70,18 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
 
   // Add layers in order (bottom to top)
   addRiversLayers(map, basemap);
-  addWaterfallsLayers(map);
-  addRapidsLayers(map);
-  addCampgroundsLayers(map);
-  addAccessPointsLayers(map);
+  
+  // Add all POI backdrops first (circles)
+  addWaterfallsBackdrop(map);
+  addRapidsBackdrop(map);
+  addCampgroundsBackdrop(map);
+  addAccessPointsBackdrop(map);
+  
+  // Then add all POI symbols on top
+  addWaterfallsSymbols(map);
+  addRapidsSymbols(map);
+  addCampgroundsSymbols(map);
+  addAccessPointsSymbols(map);
+  
   addRouteLayers(map);
 }

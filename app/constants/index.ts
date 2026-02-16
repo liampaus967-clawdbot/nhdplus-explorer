@@ -39,6 +39,8 @@ export const TILESETS = {
   campgrounds: 'mapbox://lman967.campgrounds-near-water',
   rapids: 'mapbox://lman967.rapids',
   waterfalls: 'mapbox://lman967.waterfalls',
+  blmLands: 'mapbox://lman967.blm_polygons',
+  wilderness: 'mapbox://lman967.wilderness_areas',
 };
 
 // Source layer names
@@ -48,6 +50,8 @@ export const SOURCE_LAYERS = {
   campgrounds: 'campgrounds',
   rapids: 'rapids',
   waterfalls: 'waterfalls',
+  blmLands: 'blm_polygons',
+  wilderness: 'wilderness_areas',
 };
 
 // Colors
@@ -62,4 +66,6 @@ export const COLORS = {
   routeGlow: '#fbbf24',
   putIn: '#22c55e',
   takeOut: '#ef4444',
+  blmLands: '#c9a227', // Yellow/tan for BLM lands
+  wilderness: '#1a5d1a', // Deep green for wilderness areas
 };

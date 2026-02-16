@@ -5,6 +5,8 @@ import { addCampgroundsSource, addCampgroundsBackdrop, addCampgroundsSymbols } f
 import { addRapidsSource, addRapidsBackdrop, addRapidsSymbols } from './rapids';
 import { addWaterfallsSource, addWaterfallsBackdrop, addWaterfallsSymbols } from './waterfalls';
 import { addRouteSource, addRouteLayers } from './routeLayer';
+import { addBlmLandsSource, addBlmLandsLayers } from './blmLands';
+import { addWildernessSource, addWildernessLayers } from './wilderness';
 
 export * from './rivers';
 export * from './accessPoints';
@@ -12,6 +14,8 @@ export * from './campgrounds';
 export * from './rapids';
 export * from './waterfalls';
 export * from './routeLayer';
+export * from './blmLands';
+export * from './wilderness';
 
 /**
  * Custom SDF icons - these can be colored with icon-color
@@ -61,6 +65,8 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   await loadCustomIcons(map);
 
   // Add sources
+  addBlmLandsSource(map);
+  addWildernessSource(map);
   addRiversSource(map);
   addAccessPointsSource(map);
   addWaterfallsSource(map);
@@ -69,6 +75,10 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   addRouteSource(map);
 
   // Add layers in order (bottom to top)
+  // Land layers first (below everything)
+  addBlmLandsLayers(map);
+  addWildernessLayers(map);
+  // Then rivers
   addRiversLayers(map, basemap);
   
   // Add all POI backdrops first (circles)

@@ -673,19 +673,19 @@ export default function Home() {
         url: 'mapbox://lman967.rapids'
       });
       
-      // Rapids - red circles at low zoom
+      // Rapids - red circles at all zooms
       map.current!.addLayer({
         id: 'rapids-circles',
         type: 'circle',
         source: 'rapids',
         'source-layer': 'rapids',
-        maxzoom: 6,
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
             0, 2,
-            4, 3,
-            6, 4
+            6, 4,
+            10, 6,
+            14, 8
           ],
           'circle-color': '#ef4444',
           'circle-stroke-width': 1,
@@ -693,32 +693,22 @@ export default function Home() {
         }
       });
       
-      // Rapids - danger icon at zoom 6+
+      // Rapids - labels at zoom 10+
       map.current!.addLayer({
-        id: 'rapids-layer',
+        id: 'rapids-labels',
         type: 'symbol',
         source: 'rapids',
         'source-layer': 'rapids',
-        minzoom: 6,
+        minzoom: 10,
         layout: {
-          'icon-image': 'mountain',
-          'icon-size': [
-            'interpolate', ['linear'], ['zoom'],
-            6, 0.8,
-            10, 1.0,
-            14, 1.2
-          ],
-          'icon-allow-overlap': false,
-          'icon-ignore-placement': false,
-          'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
+          'text-field': ['get', 'name'],
           'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
           'text-size': 11,
-          'text-offset': [0, 1.2],
+          'text-offset': [0, 1],
           'text-anchor': 'top',
           'text-optional': true
         },
         paint: {
-          'icon-color': '#ef4444',
           'text-color': '#1f2937',
           'text-halo-color': '#ffffff',
           'text-halo-width': 1.5

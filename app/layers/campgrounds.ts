@@ -19,12 +19,12 @@ export function addCampgroundsLayers(map: mapboxgl.Map) {
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        0, 2,
-        4, 3,
-        6, 4,
+        0, 1,
+        4, 2,
+        6, 2,
       ],
       'circle-color': COLORS.campground,
-      'circle-stroke-width': 1,
+      'circle-stroke-width': .2,
       'circle-stroke-color': '#000000',
     },
   });

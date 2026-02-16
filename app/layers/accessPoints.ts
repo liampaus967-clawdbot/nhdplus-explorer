@@ -19,12 +19,12 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        0, 2,
-        4, 3,
-        6, 4,
+        0, 1,
+        4, 2,
+        6, 2,
       ],
       'circle-color': COLORS.accessPoint,
-      'circle-stroke-width': 1,
+      'circle-stroke-width': .2,
       'circle-stroke-color': '#000000',
     },
   });
@@ -41,10 +41,10 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
       'icon-size': [
         'interpolate', ['linear'], ['zoom'],
         6, 0.6,
-        10, 0.8,
-        14, 1.0,
+        10, 1,
+        14, 2.0,
       ],
-      'icon-allow-overlap': false,
+      'icon-allow-overlap': true,
       'icon-ignore-placement': false,
       'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
       'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],

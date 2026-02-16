@@ -31,7 +31,12 @@ export function addRiversLayers(map: mapboxgl.Map, basemap: string) {
         6, 6,
         7, 8,
       ],
-      'line-opacity': 0.7,
+      'line-opacity': ['interpolate', ['linear'], ['zoom'],
+        6, 0,
+        7, 0.7,
+        10, 0.7,
+        14, 0.7,
+      ],
     },
   });
 

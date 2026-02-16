@@ -39,9 +39,9 @@ export function addCampgroundsLayers(map: mapboxgl.Map) {
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        6, 4,
-        10, 6,
-        14, 20,
+        6, 6,
+        10, 10,
+        14, 24,
       ],
       'circle-color': COLORS.campground,
       'circle-stroke-width': .5,

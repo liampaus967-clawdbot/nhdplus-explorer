@@ -19,7 +19,7 @@ export function PaddleSpeedSlider({ speed, onChange, stats }: PaddleSpeedSliderP
       <div className={styles.sliderContainer}>
         <input
           type="range"
-          min="1"
+          min="0"
           max="6"
           step="0.5"
           value={speed}
@@ -27,7 +27,7 @@ export function PaddleSpeedSlider({ speed, onChange, stats }: PaddleSpeedSliderP
           className={styles.slider}
         />
         <div className={styles.sliderLabels}>
-          <span>1 mph</span>
+          <span>0 mph</span>
           <span>
             <strong>{speed} mph</strong>
           </span>

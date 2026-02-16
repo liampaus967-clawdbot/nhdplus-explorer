@@ -631,7 +631,7 @@ export default function Home() {
           ],
           'circle-color': '#67e8f9',
           'circle-stroke-width': 1,
-          'circle-stroke-color': '#ffffff'
+          'circle-stroke-color': '#000000'
         }
       });
       
@@ -673,23 +673,55 @@ export default function Home() {
         url: 'mapbox://lman967.rapids'
       });
       
-      // Rapids - red circles
+      // Rapids - red circles at low zoom
       map.current!.addLayer({
-        id: 'rapids-layer',
+        id: 'rapids-circles',
         type: 'circle',
         source: 'rapids',
         'source-layer': 'rapids',
+        maxzoom: 6,
         paint: {
           'circle-radius': [
             'interpolate', ['linear'], ['zoom'],
             0, 2,
-            6, 4,
-            10, 6,
-            14, 8
+            4, 3,
+            6, 4
           ],
           'circle-color': '#ef4444',
           'circle-stroke-width': 1,
-          'circle-stroke-color': '#ffffff'
+          'circle-stroke-color': '#000000'
+        }
+      });
+      
+      // Rapids - danger icon at zoom 6+
+      map.current!.addLayer({
+        id: 'rapids-layer',
+        type: 'symbol',
+        source: 'rapids',
+        'source-layer': 'rapids',
+        minzoom: 6,
+        layout: {
+          'icon-image': 'danger',
+          'icon-size': [
+            'interpolate', ['linear'], ['zoom'],
+            6, 0.8,
+            10, 1.0,
+            14, 1.2
+          ],
+          'icon-allow-overlap': false,
+          'icon-ignore-placement': false,
+          'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
+          'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+          'text-size': 11,
+          'text-offset': [0, 1.2],
+          'text-anchor': 'top',
+          'text-optional': true
+        },
+        paint: {
+          'icon-color': '#ef4444',
+          'text-color': '#1f2937',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1.5
         }
       });
       
@@ -715,7 +747,7 @@ export default function Home() {
           ],
           'circle-color': '#22c55e',
           'circle-stroke-width': 1,
-          'circle-stroke-color': '#ffffff'
+          'circle-stroke-color': '#000000'
         }
       });
       
@@ -767,7 +799,7 @@ export default function Home() {
           ],
           'circle-color': '#3b82f6',
           'circle-stroke-width': 1,
-          'circle-stroke-color': '#ffffff'
+          'circle-stroke-color': '#000000'
         }
       });
       
@@ -956,7 +988,7 @@ export default function Home() {
           'circle-radius': 10,
           'circle-color': '#22c55e',
           'circle-stroke-width': 3,
-          'circle-stroke-color': '#ffffff'
+          'circle-stroke-color': '#000000'
         }
       });
       
@@ -970,7 +1002,7 @@ export default function Home() {
           'circle-radius': 10,
           'circle-color': '#ef4444',
           'circle-stroke-width': 3,
-          'circle-stroke-color': '#ffffff'
+          'circle-stroke-color': '#000000'
         }
       });
       

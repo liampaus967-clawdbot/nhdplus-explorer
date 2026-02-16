@@ -647,7 +647,7 @@ export default function Home() {
         'source-layer': 'rapids',
         minzoom: 6,
         layout: {
-          'icon-image': 'racetrack-boat',
+          'icon-image': 'racetrack-boat-15',
           'icon-size': [
             'interpolate', ['linear'], ['zoom'],
             6, 0.8,

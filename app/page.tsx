@@ -609,6 +609,64 @@ export default function Home() {
         url: 'mapbox://lman967.access-points-clean'
       });
       
+      // Waterfalls layer
+      map.current!.addSource('waterfalls', {
+        type: 'vector',
+        url: 'mapbox://lman967.waterfalls'
+      });
+      
+      // Waterfalls - light blue circles at low zoom
+      map.current!.addLayer({
+        id: 'waterfalls-circles',
+        type: 'circle',
+        source: 'waterfalls',
+        'source-layer': 'waterfalls',
+        maxzoom: 6,
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            0, 2,
+            4, 3,
+            6, 4
+          ],
+          'circle-color': '#67e8f9',
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Waterfalls - symbol layer at zoom 6+
+      map.current!.addLayer({
+        id: 'waterfalls-layer',
+        type: 'symbol',
+        source: 'waterfalls',
+        'source-layer': 'waterfalls',
+        minzoom: 6,
+        layout: {
+          'icon-image': 'waterfall',
+          'icon-size': [
+            'interpolate', ['linear'], ['zoom'],
+            6, 0.8,
+            10, 1.0,
+            14, 1.2
+          ],
+          'icon-allow-overlap': false,
+          'icon-ignore-placement': false,
+          'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
+          'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+          'text-size': 11,
+          'text-offset': [0, 1.2],
+          'text-anchor': 'top',
+          'text-optional': true
+        },
+        paint: {
+          'icon-color': '#67e8f9',
+          'text-color': '#1f2937',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1.5
+        }
+      });
+      
       // Rapids layer
       map.current!.addSource('rapids', {
         type: 'vector',

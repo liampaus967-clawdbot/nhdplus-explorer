@@ -609,6 +609,64 @@ export default function Home() {
         url: 'mapbox://lman967.access-points-clean'
       });
       
+      // Campgrounds near water layer
+      map.current!.addSource('campgrounds', {
+        type: 'vector',
+        url: 'mapbox://lman967.campgrounds-near-water'
+      });
+      
+      // Campgrounds - circles at low zoom (below 6)
+      map.current!.addLayer({
+        id: 'campgrounds-circles',
+        type: 'circle',
+        source: 'campgrounds',
+        'source-layer': 'campgrounds',
+        maxzoom: 6,
+        paint: {
+          'circle-radius': [
+            'interpolate', ['linear'], ['zoom'],
+            0, 2,
+            4, 3,
+            6, 4
+          ],
+          'circle-color': '#22c55e',
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#ffffff'
+        }
+      });
+      
+      // Campgrounds - symbol layer at zoom 6+
+      map.current!.addLayer({
+        id: 'campgrounds-layer',
+        type: 'symbol',
+        source: 'campgrounds',
+        'source-layer': 'campgrounds',
+        minzoom: 6,
+        layout: {
+          'icon-image': 'campsite',
+          'icon-size': [
+            'interpolate', ['linear'], ['zoom'],
+            6, 0.8,
+            10, 1.0,
+            14, 1.2
+          ],
+          'icon-allow-overlap': false,
+          'icon-ignore-placement': false,
+          'text-field': ['step', ['zoom'], '', 10, ['get', 'name']],
+          'text-font': ['DIN Pro Medium', 'Arial Unicode MS Regular'],
+          'text-size': 11,
+          'text-offset': [0, 1.2],
+          'text-anchor': 'top',
+          'text-optional': true
+        },
+        paint: {
+          'icon-color': '#22c55e',
+          'text-color': '#1f2937',
+          'text-halo-color': '#ffffff',
+          'text-halo-width': 1.5
+        }
+      });
+      
       // Access points - circles at low zoom (below 6)
       map.current!.addLayer({
         id: 'access-points-circles-low',

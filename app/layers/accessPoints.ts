@@ -43,9 +43,9 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
         10, 12,
         14, 18,
       ],
-      'circle-color': '#ffffff',
+      'circle-color': COLORS.accessPoint,
       'circle-stroke-width': 2,
-      'circle-stroke-color': COLORS.accessPoint,
+      'circle-stroke-color': 'black',
     },
   });
 
@@ -74,7 +74,7 @@ export function addAccessPointsLayers(map: mapboxgl.Map) {
       'text-optional': true,
     },
     paint: {
-      'icon-color': COLORS.accessPoint,
+      'icon-color': 'black',
       'text-color': '#1f2937',
       'text-halo-color': '#ffffff',
       'text-halo-width': 1.5,

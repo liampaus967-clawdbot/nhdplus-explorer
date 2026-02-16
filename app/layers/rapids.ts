@@ -43,9 +43,9 @@ export function addRapidsLayers(map: mapboxgl.Map) {
         10, 12,
         14, 18,
       ],
-      'circle-color': '#ffffff',
+      'circle-color': COLORS.rapid,
       'circle-stroke-width': 2,
-      'circle-stroke-color': COLORS.rapid,
+      'circle-stroke-color': 'black',
     },
   });
 
@@ -74,7 +74,7 @@ export function addRapidsLayers(map: mapboxgl.Map) {
       'text-optional': true,
     },
     paint: {
-      'icon-color': COLORS.rapid,
+      'icon-color': 'black',
       'text-color': '#1f2937',
       'text-halo-color': '#ffffff',
       'text-halo-width': 1.5,

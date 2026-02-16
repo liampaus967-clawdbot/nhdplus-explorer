@@ -43,9 +43,9 @@ export function addWaterfallsLayers(map: mapboxgl.Map) {
         10, 12,
         14, 18,
       ],
-      'circle-color': '#ffffff',
+      'circle-color': COLORS.waterfall,
       'circle-stroke-width': 2,
-      'circle-stroke-color': COLORS.waterfall,
+      'circle-stroke-color': 'black',
     },
   });
 
@@ -74,7 +74,7 @@ export function addWaterfallsLayers(map: mapboxgl.Map) {
       'text-optional': true,
     },
     paint: {
-      'icon-color': COLORS.waterfall,
+      'icon-color': 'black',
       'text-color': '#1f2937',
       'text-halo-color': '#ffffff',
       'text-halo-width': 1.5,

@@ -2,6 +2,7 @@ import mapboxgl from 'mapbox-gl';
 import { TILESETS, SOURCE_LAYERS, COLORS } from '../constants';
 
 export function addAccessPointsSource(map: mapboxgl.Map) {
+  if (map.getSource('access-points')) return;
   map.addSource('access-points', {
     type: 'vector',
     url: TILESETS.accessPoints,

@@ -2,6 +2,7 @@ import mapboxgl from 'mapbox-gl';
 import { TILESETS, SOURCE_LAYERS, COLORS } from '../constants';
 
 export function addRiversSource(map: mapboxgl.Map) {
+  if (map.getSource('rivers')) return;
   map.addSource('rivers', {
     type: 'vector',
     url: TILESETS.rivers,
@@ -9,6 +10,8 @@ export function addRiversSource(map: mapboxgl.Map) {
 }
 
 export function addRiversLayers(map: mapboxgl.Map, basemap: string) {
+  if (map.getLayer('rivers-line')) return;
+  
   // River lines - styled by stream order
   map.addLayer({
     id: 'rivers-line',

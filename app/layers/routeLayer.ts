@@ -2,18 +2,24 @@ import mapboxgl from 'mapbox-gl';
 import { COLORS } from '../constants';
 
 export function addRouteSource(map: mapboxgl.Map) {
-  map.addSource('route', {
-    type: 'geojson',
-    data: { type: 'FeatureCollection', features: [] },
-  });
+  if (!map.getSource('route')) {
+    map.addSource('route', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
+    });
+  }
 
-  map.addSource('profile-highlight', {
-    type: 'geojson',
-    data: { type: 'FeatureCollection', features: [] },
-  });
+  if (!map.getSource('profile-highlight')) {
+    map.addSource('profile-highlight', {
+      type: 'geojson',
+      data: { type: 'FeatureCollection', features: [] },
+    });
+  }
 }
 
 export function addRouteLayers(map: mapboxgl.Map) {
+  if (map.getLayer('route-glow')) return;
+  
   // Route glow
   map.addLayer({
     id: 'route-glow',

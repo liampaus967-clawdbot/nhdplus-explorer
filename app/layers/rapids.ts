@@ -2,6 +2,7 @@ import mapboxgl from 'mapbox-gl';
 import { TILESETS, SOURCE_LAYERS, COLORS } from '../constants';
 
 export function addRapidsSource(map: mapboxgl.Map) {
+  if (map.getSource('rapids')) return;
   map.addSource('rapids', {
     type: 'vector',
     url: TILESETS.rapids,

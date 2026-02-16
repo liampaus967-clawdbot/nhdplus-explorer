@@ -2,6 +2,7 @@ import mapboxgl from 'mapbox-gl';
 import { TILESETS, SOURCE_LAYERS, COLORS } from '../constants';
 
 export function addCampgroundsSource(map: mapboxgl.Map) {
+  if (map.getSource('campgrounds')) return;
   map.addSource('campgrounds', {
     type: 'vector',
     url: TILESETS.campgrounds,

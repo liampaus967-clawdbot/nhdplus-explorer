@@ -687,27 +687,7 @@ export default function Home() {
         }
       });
       
-      // Access points - blue circle background at zoom 6+
-      map.current!.addLayer({
-        id: 'access-points-circles',
-        type: 'circle',
-        source: 'access-points',
-        'source-layer': 'access_points_clean',
-        minzoom: 6,
-        paint: {
-          'circle-radius': [
-            'interpolate', ['linear'], ['zoom'],
-            6, 10,
-            10, 12,
-            14, 14
-          ],
-          'circle-color': '#3b82f6',
-          'circle-stroke-width': 2,
-          'circle-stroke-color': '#ffffff'
-        }
-      });
-      
-      // Access points - pitch icon on top of circle at zoom 6+
+      // Access points - pitch icon at zoom 6+
       map.current!.addLayer({
         id: 'access-points-layer',
         type: 'symbol',
@@ -732,7 +712,7 @@ export default function Home() {
           'text-optional': true
         },
         paint: {
-          'icon-color': '#ffffff',
+          'icon-color': '#3b82f6',
           'text-color': '#1f2937',
           'text-halo-color': '#ffffff',
           'text-halo-width': 1.5

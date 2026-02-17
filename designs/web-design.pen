@@ -62,6 +62,131 @@
               ]
             },
             {
+              "type": "frame",
+              "id": "personaSel",
+              "name": "Persona Selector",
+              "gap": 4,
+              "padding": [
+                4
+              ],
+              "fill": "$--bg-secondary",
+              "cornerRadius": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "btnWhitewater",
+                  "name": "Whitewater Button",
+                  "padding": [
+                    8,
+                    16
+                  ],
+                  "gap": 8,
+                  "cornerRadius": 6,
+                  "fill": "transparent",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wwIcon",
+                      "name": "Whitewater Icon",
+                      "content": "\ud83c\udf0a",
+                      "fontSize": 16
+                    },
+                    {
+                      "type": "text",
+                      "id": "wwLabel",
+                      "name": "Whitewater Label",
+                      "content": "Whitewater",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 13,
+                      "fontWeight": "500",
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "btnExplorer",
+                  "name": "Explorer Button (Selected)",
+                  "padding": [
+                    8,
+                    16
+                  ],
+                  "gap": 8,
+                  "cornerRadius": 6,
+                  "fill": "$--bg",
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "alignItems": "center",
+                  "effects": [
+                    {
+                      "type": "shadow",
+                      "x": 0,
+                      "y": 1,
+                      "blur": 2,
+                      "spread": 0,
+                      "fill": "rgba(0,0,0,0.05)"
+                    }
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "expIcon",
+                      "name": "Explorer Icon",
+                      "content": "\ud83d\udef6",
+                      "fontSize": 16
+                    },
+                    {
+                      "type": "text",
+                      "id": "expLabel",
+                      "name": "Explorer Label",
+                      "content": "Explorer",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 13,
+                      "fontWeight": "600",
+                      "fill": "$--text"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "btnFloater",
+                  "name": "Floater Button",
+                  "padding": [
+                    8,
+                    16
+                  ],
+                  "gap": 8,
+                  "cornerRadius": 6,
+                  "fill": "transparent",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "floatIcon",
+                      "name": "Floater Icon",
+                      "content": "\ud83c\udf7a",
+                      "fontSize": 16
+                    },
+                    {
+                      "type": "text",
+                      "id": "floatLabel",
+                      "name": "Floater Label",
+                      "content": "Floater",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 13,
+                      "fontWeight": "500",
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "type": "text",
               "id": "bC264",
               "name": "subtitleText",
@@ -951,7 +1076,7 @@
                               "id": "0HtRb",
                               "name": "putInCoords",
                               "fill": "$--text-dim",
-                              "content": "39.0968°N, 108.5631°W",
+                              "content": "39.0968\u00b0N, 108.5631\u00b0W",
                               "fontFamily": "JetBrains Mono",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -999,7 +1124,7 @@
                               "id": "BNhC9",
                               "name": "takeOutCoords",
                               "fill": "$--text-dim",
-                              "content": "38.9847°N, 108.4521°W",
+                              "content": "38.9847\u00b0N, 108.4521\u00b0W",
                               "fontFamily": "JetBrains Mono",
                               "fontSize": 11,
                               "fontWeight": "normal"

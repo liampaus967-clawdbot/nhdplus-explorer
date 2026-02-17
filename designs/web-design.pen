@@ -987,8 +987,16 @@
           "id": "wwHeader",
           "name": "Header",
           "width": "fill_container",
+          "fill": "$--bg",
+          "cornerRadius": 12,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
           "layout": "vertical",
-          "gap": 16,
+          "gap": 12,
+          "padding": 16,
           "children": [
             {
               "type": "frame",

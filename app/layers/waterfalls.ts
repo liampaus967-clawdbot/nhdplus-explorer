@@ -23,6 +23,8 @@ export function addWaterfallsBackdrop(map: mapboxgl.Map) {
         6, 3,
         10, 6,
         14, 10,
+        18, 16,
+        22, 24,
       ],
       'circle-color': COLORS.waterfall,
       'circle-stroke-width': 0.5,

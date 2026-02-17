@@ -2039,6 +2039,1305 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "sidebarWW",
+      "name": "Sidebar - Whitewater Mode",
+      "x": 1500,
+      "y": 0,
+      "width": 320,
+      "height": 900,
+      "fill": "$--bg",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$--border"
+      },
+      "padding": [
+        20
+      ],
+      "layout": "vertical",
+      "gap": 20,
+      "children": [
+        {
+          "type": "frame",
+          "id": "wwModeTag",
+          "name": "Mode Tag",
+          "padding": [
+            6,
+            12
+          ],
+          "cornerRadius": 6,
+          "fill": "$--cyan",
+          "alignItems": "center",
+          "gap": 8,
+          "children": [
+            {
+              "type": "text",
+              "id": "wwModeIcon",
+              "content": "\ud83c\udf0a",
+              "fontSize": 14
+            },
+            {
+              "type": "text",
+              "id": "wwModeLabel",
+              "content": "WHITEWATER MODE",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "700",
+              "fill": "#ffffff",
+              "letterSpacing": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wwRoute",
+          "name": "Route Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "children": [
+            {
+              "type": "text",
+              "id": "wwRouteLabel",
+              "content": "Route",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "fill": "$--text-muted",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "wwPutIn",
+              "name": "Put-in",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "wwPutDot",
+                  "width": 12,
+                  "height": 12,
+                  "fill": "$--success"
+                },
+                {
+                  "type": "frame",
+                  "id": "wwPutInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wwPutName",
+                      "content": "Pillow Rock",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 14,
+                      "fontWeight": "600",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wwPutCoords",
+                      "content": "Class IV+ Put-in",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 11,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "wwTakeOut",
+              "name": "Take-out",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "wwTakeDot",
+                  "width": 12,
+                  "height": 12,
+                  "fill": "$--danger"
+                },
+                {
+                  "type": "frame",
+                  "id": "wwTakeInfo",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "wwTakeName",
+                      "content": "Sweet Falls",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 14,
+                      "fontWeight": "600",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "id": "wwTakeCoords",
+                      "content": "Class V Take-out",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 11,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wwRapids",
+          "name": "Rapids Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "children": [
+            {
+              "type": "text",
+              "id": "wwRapidsLabel",
+              "content": "Rapids on Route",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "fill": "$--text-muted",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "wwRapidsList",
+              "layout": "vertical",
+              "gap": 8,
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "rapid1",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "justifyContent": "space_between",
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "Insignificant",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 13,
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "frame",
+                      "padding": [
+                        4,
+                        8
+                      ],
+                      "cornerRadius": 4,
+                      "fill": "$--warning",
+                      "children": [
+                        {
+                          "type": "text",
+                          "content": "IV",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fontWeight": "700",
+                          "fill": "#000"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "rapid2",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "justifyContent": "space_between",
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "Pillow Rock",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 13,
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "frame",
+                      "padding": [
+                        4,
+                        8
+                      ],
+                      "cornerRadius": 4,
+                      "fill": "$--danger",
+                      "children": [
+                        {
+                          "type": "text",
+                          "content": "IV+",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fontWeight": "700",
+                          "fill": "#fff"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "rapid3",
+                  "gap": 8,
+                  "alignItems": "center",
+                  "justifyContent": "space_between",
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "Sweet Falls",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 13,
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "frame",
+                      "padding": [
+                        4,
+                        8
+                      ],
+                      "cornerRadius": 4,
+                      "fill": "$--danger",
+                      "children": [
+                        {
+                          "type": "text",
+                          "content": "V",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fontWeight": "700",
+                          "fill": "#fff"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wwGauge",
+          "name": "Flow Gauge",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            16
+          ],
+          "fill": "$--bg-secondary",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "type": "frame",
+              "id": "wwGaugeHeader",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "text",
+                  "content": "Summersville Gauge",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 13,
+                  "fontWeight": "600",
+                  "fill": "$--text"
+                },
+                {
+                  "type": "frame",
+                  "padding": [
+                    4,
+                    8
+                  ],
+                  "cornerRadius": 4,
+                  "fill": "$--success",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "OPTIMAL",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 10,
+                      "fontWeight": "700",
+                      "fill": "#fff"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "wwGaugeValue",
+              "alignItems": "baseline",
+              "gap": 4,
+              "children": [
+                {
+                  "type": "text",
+                  "content": "2,450",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 32,
+                  "fontWeight": "700",
+                  "fill": "$--text"
+                },
+                {
+                  "type": "text",
+                  "content": "cfs",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 14,
+                  "fill": "$--text-muted"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "wwGaugeRange",
+              "layout": "vertical",
+              "gap": 4,
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "text",
+                  "content": "Optimal: 2,000 - 3,000 cfs",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 11,
+                  "fill": "$--success"
+                },
+                {
+                  "type": "text",
+                  "content": "Updated 15 min ago",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 10,
+                  "fill": "$--text-dim"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wwDifficulty",
+          "name": "Difficulty Summary",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 8,
+          "children": [
+            {
+              "type": "text",
+              "content": "Difficulty Summary",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "fill": "$--text-muted",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "wwDiffGrid",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "diffMax",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    12
+                  ],
+                  "fill": "$--bg-secondary",
+                  "cornerRadius": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "V",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 20,
+                      "fontWeight": "700",
+                      "fill": "$--danger"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Max Class",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 10,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "diffAvg",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    12
+                  ],
+                  "fill": "$--bg-secondary",
+                  "cornerRadius": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "IV",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 20,
+                      "fontWeight": "700",
+                      "fill": "$--warning"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Avg Class",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 10,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "diffCount",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    12
+                  ],
+                  "fill": "$--bg-secondary",
+                  "cornerRadius": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "12",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 20,
+                      "fontWeight": "700",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Rapids",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 10,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "sidebarExp",
+      "name": "Sidebar - Explorer Mode",
+      "x": 1850,
+      "y": 0,
+      "width": 320,
+      "height": 900,
+      "fill": "$--bg",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$--border"
+      },
+      "padding": [
+        20
+      ],
+      "layout": "vertical",
+      "gap": 20,
+      "children": [
+        {
+          "type": "frame",
+          "id": "expModeTag",
+          "name": "Mode Tag",
+          "padding": [
+            6,
+            12
+          ],
+          "cornerRadius": 6,
+          "fill": "$--accent",
+          "alignItems": "center",
+          "gap": 8,
+          "children": [
+            {
+              "type": "text",
+              "id": "expModeIcon",
+              "content": "\ud83d\udef6",
+              "fontSize": 14
+            },
+            {
+              "type": "text",
+              "id": "expModeLabel",
+              "content": "EXPLORER MODE",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "700",
+              "fill": "#ffffff",
+              "letterSpacing": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "expRoute",
+          "name": "Route Section",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "children": [
+            {
+              "type": "text",
+              "content": "Your Route",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "fill": "$--text-muted",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "expPutIn",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "width": 12,
+                  "height": 12,
+                  "fill": "$--success"
+                },
+                {
+                  "type": "frame",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "Rivanna River Access",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 14,
+                      "fontWeight": "600",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Boat ramp, parking available",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 11,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "expTakeOut",
+              "gap": 10,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "width": 12,
+                  "height": 12,
+                  "fill": "$--danger"
+                },
+                {
+                  "type": "frame",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "Palmyra Landing",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 14,
+                      "fontWeight": "600",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Canoe launch, restrooms",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 11,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "expStats",
+          "name": "Trip Stats",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "children": [
+            {
+              "type": "text",
+              "content": "Trip Stats",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "fill": "$--text-muted",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "expStatsGrid",
+              "gap": 8,
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "frame",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    12
+                  ],
+                  "fill": "$--bg-secondary",
+                  "cornerRadius": 6,
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "12.4 mi",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 18,
+                      "fontWeight": "700",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Distance",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 10,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "padding": [
+                    12
+                  ],
+                  "fill": "$--bg-secondary",
+                  "cornerRadius": 6,
+                  "width": "fill_container",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "4-5 hrs",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 18,
+                      "fontWeight": "700",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Est. Time",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 10,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "expPOI",
+          "name": "Points of Interest",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "children": [
+            {
+              "type": "text",
+              "content": "Along Your Route",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "fill": "$--text-muted",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "layout": "vertical",
+              "gap": 8,
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "frame",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "\ud83c\udfd5\ufe0f",
+                      "fontSize": 16
+                    },
+                    {
+                      "type": "frame",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "content": "3 Campsites",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 13,
+                          "fontWeight": "500",
+                          "fill": "$--text"
+                        },
+                        {
+                          "type": "text",
+                          "content": "Riverside camping available",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fill": "$--text-muted"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "\ud83c\udf32",
+                      "fontSize": 16
+                    },
+                    {
+                      "type": "frame",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "content": "National Forest",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 13,
+                          "fontWeight": "500",
+                          "fill": "$--text"
+                        },
+                        {
+                          "type": "text",
+                          "content": "Miles 4-8 through public land",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fill": "$--text-muted"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "\ud83d\udcf8",
+                      "fontSize": 16
+                    },
+                    {
+                      "type": "frame",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "content": "2 Scenic Overlooks",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 13,
+                          "fontWeight": "500",
+                          "fill": "$--text"
+                        },
+                        {
+                          "type": "text",
+                          "content": "Great photo opportunities",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fill": "$--text-muted"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "gap": 10,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "\u26a0\ufe0f",
+                      "fontSize": 16
+                    },
+                    {
+                      "type": "frame",
+                      "layout": "vertical",
+                      "gap": 2,
+                      "children": [
+                        {
+                          "type": "text",
+                          "content": "1 Portage Required",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 13,
+                          "fontWeight": "500",
+                          "fill": "$--warning"
+                        },
+                        {
+                          "type": "text",
+                          "content": "Low-head dam at mile 6.2",
+                          "fontFamily": "$--font-primary",
+                          "fontSize": 11,
+                          "fill": "$--text-muted"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "expConditions",
+          "name": "Conditions",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": [
+            12
+          ],
+          "fill": "$--bg-secondary",
+          "cornerRadius": 8,
+          "children": [
+            {
+              "type": "frame",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "width": "fill_container",
+              "children": [
+                {
+                  "type": "text",
+                  "content": "Current Conditions",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 12,
+                  "fontWeight": "600",
+                  "fill": "$--text"
+                },
+                {
+                  "type": "frame",
+                  "padding": [
+                    4,
+                    8
+                  ],
+                  "cornerRadius": 4,
+                  "fill": "$--success",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "GOOD",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 10,
+                      "fontWeight": "700",
+                      "fill": "#fff"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Water level normal \u2022 68\u00b0F \u2022 Clear skies",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fill": "$--text-muted"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "sidebarFloat",
+      "name": "Sidebar - Floater Mode",
+      "x": 2200,
+      "y": 0,
+      "width": 320,
+      "height": 900,
+      "fill": "$--bg",
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$--border"
+      },
+      "padding": [
+        20
+      ],
+      "layout": "vertical",
+      "gap": 24,
+      "children": [
+        {
+          "type": "frame",
+          "id": "floatModeTag",
+          "name": "Mode Tag",
+          "padding": [
+            6,
+            12
+          ],
+          "cornerRadius": 6,
+          "fill": "$--warning",
+          "alignItems": "center",
+          "gap": 8,
+          "children": [
+            {
+              "type": "text",
+              "content": "\ud83c\udf7a",
+              "fontSize": 14
+            },
+            {
+              "type": "text",
+              "content": "FLOATER MODE",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fontWeight": "700",
+              "fill": "#000",
+              "letterSpacing": 1
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "floatTimeDisplay",
+          "name": "Float Time Display",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 8,
+          "padding": [
+            24
+          ],
+          "fill": "$--bg-secondary",
+          "cornerRadius": 12,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "content": "Your Float Time",
+              "fontFamily": "$--font-primary",
+              "fontSize": 12,
+              "fill": "$--text-muted"
+            },
+            {
+              "type": "frame",
+              "alignItems": "baseline",
+              "gap": 4,
+              "children": [
+                {
+                  "type": "text",
+                  "content": "2",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 64,
+                  "fontWeight": "700",
+                  "fill": "$--text"
+                },
+                {
+                  "type": "text",
+                  "content": "hrs",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 24,
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "content": "45",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 64,
+                  "fontWeight": "700",
+                  "fill": "$--text"
+                },
+                {
+                  "type": "text",
+                  "content": "min",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 24,
+                  "fill": "$--text-muted"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "content": "at current water levels",
+              "fontFamily": "$--font-primary",
+              "fontSize": 11,
+              "fill": "$--text-dim"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "floatRoute",
+          "name": "Route",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "frame",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "width": 32,
+                  "height": 32,
+                  "cornerRadius": 16,
+                  "fill": "$--success",
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "A",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 14,
+                      "fontWeight": "700",
+                      "fill": "#fff"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "Start: Hatton Ferry",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 14,
+                      "fontWeight": "600",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Free parking, porta-potty",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 12,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "gap": 12,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "width": 32,
+                  "height": 32,
+                  "cornerRadius": 16,
+                  "fill": "$--danger",
+                  "alignItems": "center",
+                  "justifyContent": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "B",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 14,
+                      "fontWeight": "700",
+                      "fill": "#fff"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "layout": "vertical",
+                  "gap": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "content": "End: Scottsville",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 14,
+                      "fontWeight": "600",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "content": "Parking $5, restrooms, food nearby",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 12,
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "floatDist",
+          "name": "Distance",
+          "width": "fill_container",
+          "padding": [
+            16
+          ],
+          "fill": "$--bg-secondary",
+          "cornerRadius": 8,
+          "justifyContent": "space_between",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "content": "Distance",
+              "fontFamily": "$--font-primary",
+              "fontSize": 14,
+              "fill": "$--text-muted"
+            },
+            {
+              "type": "text",
+              "content": "8.2 miles",
+              "fontFamily": "$--font-primary",
+              "fontSize": 18,
+              "fontWeight": "600",
+              "fill": "$--text"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "floatSafety",
+          "name": "Safety Status",
+          "width": "fill_container",
+          "layout": "vertical",
+          "gap": 12,
+          "padding": [
+            16
+          ],
+          "fill": "rgba(34, 197, 94, 0.1)",
+          "cornerRadius": 8,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--success"
+          },
+          "children": [
+            {
+              "type": "frame",
+              "gap": 8,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "content": "\u2713",
+                  "fontSize": 20,
+                  "fill": "$--success"
+                },
+                {
+                  "type": "text",
+                  "content": "Good conditions for tubing!",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 14,
+                  "fontWeight": "600",
+                  "fill": "$--success"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "layout": "vertical",
+              "gap": 4,
+              "children": [
+                {
+                  "type": "text",
+                  "content": "\u2022 Water level is normal",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 12,
+                  "fill": "$--text"
+                },
+                {
+                  "type": "text",
+                  "content": "\u2022 No hazard warnings",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 12,
+                  "fill": "$--text"
+                },
+                {
+                  "type": "text",
+                  "content": "\u2022 Beginner friendly",
+                  "fontFamily": "$--font-primary",
+                  "fontSize": 12,
+                  "fill": "$--text"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "floatTip",
+          "name": "Pro Tip",
+          "width": "fill_container",
+          "padding": [
+            12
+          ],
+          "fill": "$--bg-tertiary",
+          "cornerRadius": 8,
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "content": "\ud83d\udca1",
+              "fontSize": 16
+            },
+            {
+              "type": "text",
+              "content": "Bring a dry bag for your phone and keys!",
+              "fontFamily": "$--font-primary",
+              "fontSize": 12,
+              "fill": "$--text-muted"
+            }
+          ]
+        }
+      ]
     }
   ],
   "variables": {

@@ -226,7 +226,10 @@ export function ExplorerSidebar({
       </div>
 
       {/* Weather */}
-      <WeatherConditions />
+      <WeatherConditions 
+        lat={putIn?.snap_point.lat ?? null} 
+        lng={putIn?.snap_point.lng ?? null} 
+      />
     </div>
   );
 }

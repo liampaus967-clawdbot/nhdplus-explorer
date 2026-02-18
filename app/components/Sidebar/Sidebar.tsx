@@ -52,6 +52,7 @@ export function Sidebar({
       return (
         <WhitewaterSidebar
           route={route}
+          putInCoords={putIn ? { lat: putIn.snap_point.lat, lng: putIn.snap_point.lng } : null}
           canvasRef={canvasRef}
           drawProfile={drawProfile}
           profileSelection={profileSelection}

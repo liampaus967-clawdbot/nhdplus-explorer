@@ -140,7 +140,10 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
       </div>
 
       {/* Weather */}
-      <WeatherConditions />
+      <WeatherConditions 
+        lat={putIn?.snap_point.lat ?? null} 
+        lng={putIn?.snap_point.lng ?? null} 
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import sharedStyles from './shared/shared.module.css';
 
 interface WhitewaterSidebarProps {
   route: RouteResult;
+  putInCoords: { lat: number; lng: number } | null;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   profileSelection: { startM: number; endM: number } | null;
   onClearSelection: () => void;
@@ -23,6 +24,7 @@ interface WhitewaterSidebarProps {
 
 export function WhitewaterSidebar({
   route,
+  putInCoords,
   canvasRef,
   profileSelection,
   onClearSelection,
@@ -159,7 +161,10 @@ export function WhitewaterSidebar({
       </div>
 
       {/* Weather */}
-      <WeatherConditions />
+      <WeatherConditions 
+        lat={putInCoords?.lat ?? null} 
+        lng={putInCoords?.lng ?? null} 
+      />
     </div>
   );
 }

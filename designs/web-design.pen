@@ -1069,6 +1069,36 @@
         },
         {
           "type": "frame",
+          "id": "rIndW",
+          "name": "Clear Route Button",
+          "width": "fill_container",
+          "fill": "rgba(239,68,68,0.08)",
+          "cornerRadius": 10,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "rgba(239,68,68,0.3)"
+          },
+          "padding": [
+            10,
+            16
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "tkXVG",
+              "fill": "#ef4444",
+              "content": "Clear Route",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
           "id": "wwGaugeCard",
           "name": "Gauge Card",
           "width": "fill_container",
@@ -1745,14 +1775,50 @@
           "padding": 16,
           "children": [
             {
-              "type": "text",
-              "id": "mWHck",
-              "fill": "$--text-muted",
-              "content": "KEY RAPIDS",
-              "fontFamily": "Inter",
-              "fontSize": 11,
-              "fontWeight": "600",
-              "letterSpacing": 1
+              "type": "frame",
+              "id": "VWIoh",
+              "name": "Rapids Header",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "MAdFp",
+                  "fill": "$--text-muted",
+                  "content": "KEY RAPIDS",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "Bxp25",
+                  "fill": "rgba(251,191,36,0.15)",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "rgba(251,191,36,0.3)"
+                  },
+                  "padding": [
+                    3,
+                    8
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "93dT6",
+                      "fill": "#fbbf24",
+                      "content": "Coming Soon",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "type": "frame",
@@ -2735,6 +2801,36 @@
         },
         {
           "type": "frame",
+          "id": "omW0I",
+          "name": "Clear Route Button",
+          "width": "fill_container",
+          "fill": "rgba(239,68,68,0.08)",
+          "cornerRadius": 10,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "rgba(239,68,68,0.3)"
+          },
+          "padding": [
+            10,
+            16
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "1AqA5",
+              "fill": "#ef4444",
+              "content": "Clear Route",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            }
+          ]
+        },
+        {
+          "type": "frame",
           "id": "KiICL",
           "name": "Route Section",
           "width": "fill_container",
@@ -3584,14 +3680,50 @@
           "padding": 16,
           "children": [
             {
-              "type": "text",
-              "id": "bFKhC",
-              "fill": "$--text-muted",
-              "content": "DISCOVER ALONG THE WAY",
-              "fontFamily": "Inter",
-              "fontSize": 11,
-              "fontWeight": "600",
-              "letterSpacing": 1
+              "type": "frame",
+              "id": "54cNA",
+              "name": "Discover Header",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "mzfkZ",
+                  "fill": "$--text-muted",
+                  "content": "DISCOVER ALONG THE WAY",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "frame",
+                  "id": "qei4Y",
+                  "fill": "rgba(251,191,36,0.15)",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "rgba(251,191,36,0.3)"
+                  },
+                  "padding": [
+                    3,
+                    8
+                  ],
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "j8xJH",
+                      "fill": "#fbbf24",
+                      "content": "Coming Soon",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    }
+                  ]
+                }
+              ]
             },
             {
               "type": "frame",
@@ -4589,6 +4721,36 @@
               "fontFamily": "Inter",
               "fontSize": 22,
               "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "wRg9n",
+          "name": "Clear Route Button",
+          "width": "fill_container",
+          "fill": "rgba(239,68,68,0.08)",
+          "cornerRadius": 10,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "rgba(239,68,68,0.3)"
+          },
+          "padding": [
+            10,
+            16
+          ],
+          "justifyContent": "center",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "BnAQS",
+              "fill": "#ef4444",
+              "content": "Clear Route",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
             }
           ]
         },

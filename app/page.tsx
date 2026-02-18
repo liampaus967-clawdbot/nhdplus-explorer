@@ -5,21 +5,15 @@ import mapboxgl from 'mapbox-gl';
 import styles from './page.module.css';
 
 // Types
-import { BasemapStyle, SnapResult } from './types';
+import { BasemapStyle, PersonaMode, SnapResult } from './types';
 
 // Hooks
 import { useRoute, useElevationProfile } from './hooks';
 
 // Components
-import {
-  BasemapSelector,
-  RouteSection,
-  StatsSection,
-  LiveConditions,
-  PaddleSpeedSlider,
-  ElevationProfile,
-} from './components/Panel';
-import { MapLayerControl, LayerVisibility } from './components/Map';
+import { Header } from './components/Header';
+import { Sidebar } from './components/Sidebar';
+import { MapControls, LayerVisibility } from './components/Map';
 
 // Layers
 import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight } from './layers';
@@ -40,10 +34,13 @@ export default function Home() {
   // State
   const [basemap, setBasemap] = useState<BasemapStyle>('outdoors');
   const basemapRef = useRef<BasemapStyle>('outdoors');
+  const [personaMode, setPersonaMode] = useState<PersonaMode>('explorer');
   const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
     blmLands: true,
     wilderness: true,
     rivers: true,
+    lakes: true,
+    wildScenicRivers: false,
     accessPoints: true,
     campgrounds: true,
     rapids: true,
@@ -140,14 +137,12 @@ export default function Home() {
   // Handle swap points
   const handleSwapPoints = useCallback(async () => {
     if (putIn && takeOut) {
-      // Swap markers visually
       if (putInMarker.current && takeOutMarker.current) {
         const putInPos = putInMarker.current.getLngLat();
         const takeOutPos = takeOutMarker.current.getLngLat();
         putInMarker.current.setLngLat(takeOutPos);
         takeOutMarker.current.setLngLat(putInPos);
       }
-      // Swap state and recalculate
       const tempPutIn = putIn;
       setPutIn(takeOut);
       setTakeOut(tempPutIn);
@@ -175,6 +170,8 @@ export default function Home() {
       blmLands: ['blm-lands-fill', 'blm-lands-outline'],
       wilderness: ['wilderness-fill', 'wilderness-outline'],
       rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
+      lakes: ['lakes-fill', 'lakes-outline'],
+      wildScenicRivers: ['wsr-line', 'wsr-labels'],
       accessPoints: ['access-points-backdrop'],
       campgrounds: ['campgrounds-backdrop'],
       rapids: ['rapids-backdrop'],
@@ -245,7 +242,6 @@ export default function Home() {
     if (route) {
       updateRouteData(map.current, route.route);
 
-      // Fit to bounds
       if (route.route.features.length > 0) {
         const coords = route.route.features.flatMap((f: any) => f.geometry.coordinates);
         const bounds = coords.reduce(
@@ -257,14 +253,7 @@ export default function Home() {
     }
   }, [route]);
 
-  // Draw elevation profile when route changes
-  useEffect(() => {
-    if (route?.stats.elevation_profile) {
-      setTimeout(() => {
-        drawProfile(route.stats.elevation_profile, route.stats.steep_sections || []);
-      }, 100);
-    }
-  }, [route, drawProfile]);
+  // Note: elevation profile drawing is handled by the ElevationProfile component itself
 
   // Update profile highlight on map
   useEffect(() => {
@@ -301,84 +290,53 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <div className={styles.header}>
-        <h1>River Router</h1>
-        <p>Click to set a put-in and take-out, then get your float route with estimated times</p>
-      </div>
+      <Header mode={personaMode} onModeChange={setPersonaMode} />
 
-      <div className={styles.container}>
+      <div className={styles.body}>
         <div className={styles.mapWrapper}>
           <div ref={mapContainer} className={styles.map} />
-          <MapLayerControl layers={layerVisibility} onChange={handleLayerVisibilityChange} />
+          <MapControls
+            layers={layerVisibility}
+            onLayersChange={handleLayerVisibilityChange}
+            basemap={basemap}
+            onBasemapChange={handleBasemapChange}
+          />
         </div>
 
-        <div className={styles.panel}>
-          <BasemapSelector basemap={basemap} onChange={handleBasemapChange} />
-
-          <RouteSection
-            putIn={putIn}
-            takeOut={takeOut}
-            loading={loading}
-            onClear={handleClearRoute}
-          />
-
+        <div className={styles.sidebar}>
           {error && (
             <div className={styles.error}>
-              ⚠️ {error}
+              {error}
               {error.includes('Upstream') && (
                 <button className={styles.swapBtn} onClick={handleSwapPoints}>
-                  🔄 Swap Points
+                  Swap Points
                 </button>
               )}
             </div>
           )}
 
-          {route?.warnings && route.warnings.length > 0 && (
-            <div className={styles.section}>
-              <div className={styles.upstreamWarning}>
-                {route.warnings.map((warning, i) => (
-                  <div key={i} className={styles.warningItem}>
-                    {warning}
-                  </div>
-                ))}
-              </div>
-            </div>
+          {loading && (
+            <div className={styles.loadingBar}>Calculating route...</div>
           )}
 
-          {route && (
-            <>
-              <StatsSection stats={route.stats} />
-              <LiveConditions conditions={route.stats.live_conditions} />
-              <PaddleSpeedSlider
-                speed={paddleSpeed}
-                onChange={handlePaddleSpeedChange}
-                stats={route.stats}
-              />
-              <ElevationProfile
-                profile={route.stats.elevation_profile}
-                steepSections={route.stats.steep_sections || []}
-                canvasRef={canvasRef}
-                selection={profileSelection}
-                onClearSelection={() => setProfileSelection(null)}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseLeave}
-              />
-            </>
-          )}
-
-          <div className={styles.section}>
-            <h3>ℹ️ About</h3>
-            <p className={styles.info}>
-              <strong>Real-time data:</strong> NOAA National Water Model (NWM) — hourly velocity &
-              streamflow forecasts for 2.7M river reaches.
-            </p>
-            <p className={styles.info}>
-              <strong>Historical baseline:</strong> USGS NHDPlus EROM (Extended Reach Output Model)
-              — mean annual velocity estimates.
-            </p>
-          </div>
+          <Sidebar
+            mode={personaMode}
+            onModeChange={setPersonaMode}
+            route={route}
+            putIn={putIn}
+            takeOut={takeOut}
+            paddleSpeed={paddleSpeed}
+            onPaddleSpeedChange={handlePaddleSpeedChange}
+            canvasRef={canvasRef}
+            drawProfile={drawProfile}
+            profileSelection={profileSelection}
+            onClearSelection={() => setProfileSelection(null)}
+            onClearRoute={handleClearRoute}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+          />
         </div>
       </div>
     </main>

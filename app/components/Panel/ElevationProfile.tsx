@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { ElevationPoint, SteepSection } from '../../types';
 import styles from '../../page.module.css';
 
@@ -12,6 +13,7 @@ interface ElevationProfileProps {
   profile: ElevationPoint[];
   steepSections: SteepSection[];
   canvasRef: React.RefObject<HTMLCanvasElement>;
+  drawProfile: (profile: ElevationPoint[], steepSections: SteepSection[]) => void;
   selection: ProfileSelection | null;
   onClearSelection: () => void;
   onMouseDown: (e: React.MouseEvent<HTMLCanvasElement>) => void;
@@ -24,6 +26,7 @@ export function ElevationProfile({
   profile,
   steepSections,
   canvasRef,
+  drawProfile,
   selection,
   onClearSelection,
   onMouseDown,
@@ -31,11 +34,23 @@ export function ElevationProfile({
   onMouseUp,
   onMouseLeave,
 }: ElevationProfileProps) {
+  // Draw the profile when the component mounts or profile data changes
+  useEffect(() => {
+    if (!profile || profile.length < 2) return;
+
+    // Use requestAnimationFrame to ensure the canvas is laid out
+    const frameId = requestAnimationFrame(() => {
+      drawProfile(profile, steepSections);
+    });
+
+    return () => cancelAnimationFrame(frameId);
+  }, [profile, steepSections, drawProfile]);
+
   if (!profile || profile.length === 0) return null;
 
   return (
     <div className={styles.section}>
-      <h3>📈 Elevation Profile</h3>
+      <h3>Elevation Profile</h3>
       <canvas
         ref={canvasRef}
         className={styles.elevationChart}
@@ -46,7 +61,7 @@ export function ElevationProfile({
       />
       {selection && Math.abs(selection.endM - selection.startM) > 100 && (
         <div className={styles.selectionInfo}>
-          📍 Selection: {((Math.abs(selection.endM - selection.startM)) / 1609.34).toFixed(2)} mi
+          Selection: {((Math.abs(selection.endM - selection.startM)) / 1609.34).toFixed(2)} mi
           <button className={styles.clearSelectionBtn} onClick={onClearSelection}>
             Clear
           </button>
@@ -72,7 +87,7 @@ export function ElevationProfile({
       </div>
       {steepSections && steepSections.length > 0 && (
         <div className={styles.steepWarning}>
-          ⚠️ {steepSections.length} potential rapid/riffle section
+          {steepSections.length} potential rapid/riffle section
           {steepSections.length > 1 ? 's' : ''} detected
         </div>
       )}

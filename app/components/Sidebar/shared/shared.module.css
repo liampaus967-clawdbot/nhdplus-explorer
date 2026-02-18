@@ -1,0 +1,122 @@
+.modeTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--accent-dark);
+  border: 1px solid var(--accent);
+}
+
+.modeTagText {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.weatherCard {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.weatherHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.weatherLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.weatherUpdated {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.weatherZero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.weatherZeroTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.weatherZeroDesc {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.zeroState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.zeroStateTitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.zeroStateDesc {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.clearRouteBtn {
+  width: 100%;
+  padding: 10px 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.clearRouteBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.comingSoonBadge {
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(251, 191, 36, 0.15);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  color: var(--warning);
+  letter-spacing: 0;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}

@@ -1,0 +1,200 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.headerCard {
+  gap: 12px;
+}
+
+.riverName {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.riverSubtitle {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.gaugeCard {
+  gap: 12px;
+}
+
+.gaugeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.gaugeName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.gaugeBadge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.gaugeGood {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--success);
+}
+
+.gaugeValue {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.gaugeCfs {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: var(--font-mono);
+}
+
+.gaugeUnit {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+.gaugeTrack {
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.gaugeFill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.gaugeLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+}
+
+.gaugeOptimal {
+  color: var(--success);
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.statsRow {
+  display: flex;
+  gap: 8px;
+}
+
+.statBox {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.statValue {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+  font-family: var(--font-mono);
+}
+
+.statLabel {
+  font-size: 10px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statsCard {
+  gap: 10px;
+}
+
+.rapidsList {
+  gap: 12px;
+}
+
+.rapidsItems {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rapidItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.rapidItemDanger {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
+.rapidName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.rapidClass {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.rapidClassNormal {
+  background: rgba(251, 191, 36, 0.15);
+  color: var(--warning);
+}
+
+.rapidClassDanger {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+.rapidMile {
+  font-size: 11px;
+  color: var(--text-dim);
+}

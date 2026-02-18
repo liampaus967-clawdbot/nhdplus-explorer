@@ -1,3 +1,3 @@
 export { Map } from './Map';
-export { MapLayerControl } from './LayerControl';
-export type { LayerVisibility } from './LayerControl';
+export { MapControls } from './MapControls';
+export type { LayerVisibility } from './MapControls';

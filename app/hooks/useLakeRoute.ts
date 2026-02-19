@@ -7,14 +7,21 @@ import * as turf from '@turf/turf';
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-// Smooth a line using Bezier curves
-function smoothLine(coords: [number, number][], resolution: number = 50): [number, number][] {
-  if (coords.length < 2) return coords;
-  if (coords.length === 2) return coords;
+// Simplify a line to reduce noise, then smooth with Bezier curves
+function smoothLine(coords: [number, number][], options?: { simplifyTolerance?: number; resolution?: number }): [number, number][] {
+  if (coords.length < 3) return coords;
+  
+  const { simplifyTolerance = 0.0005, resolution = 100 } = options || {};
   
   try {
     const line = turf.lineString(coords);
-    const smoothed = turf.bezierSpline(line, { resolution });
+    
+    // First simplify to remove noise (Douglas-Peucker algorithm)
+    const simplified = turf.simplify(line, { tolerance: simplifyTolerance, highQuality: true });
+    
+    // Then smooth with Bezier spline for flowing curves
+    const smoothed = turf.bezierSpline(simplified, { resolution, sharpness: 0.85 });
+    
     return smoothed.geometry.coordinates as [number, number][];
   } catch {
     return coords;
@@ -40,12 +47,13 @@ export function useLakeRoute() {
   const [lakeRoute, setLakeRoute] = useState<LakeRoute | null>(null);
   const [paddleSpeed, setPaddleSpeed] = useState(3.0); // Default 3 mph
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   
   // Freehand drawing state
   const freehandCoords = useRef<[number, number][]>([]);
 
   // Build GeoJSON from waypoints
-  const buildRouteFromWaypoints = useCallback((wps: LakeWaypoint[]): LakeRoute => {
+  const buildRouteFromWaypoints = useCallback((wps: LakeWaypoint[], submitted: boolean = false): LakeRoute => {
     if (wps.length < 2) {
       return {
         waypoints: wps,
@@ -64,7 +72,10 @@ export function useLakeRoute() {
       features: [
         {
           type: 'Feature',
-          properties: { type: 'lake-route' },
+          properties: { 
+            type: 'lake-route',
+            submitted: submitted,
+          },
           geometry: {
             type: 'LineString',
             coordinates: coords,
@@ -105,6 +116,7 @@ export function useLakeRoute() {
 
     const newWaypoints = [...waypoints, newWaypoint];
     setWaypoints(newWaypoints);
+    setIsSubmitted(false);
     
     const route = buildRouteFromWaypoints(newWaypoints);
     setLakeRoute(route);
@@ -119,6 +131,7 @@ export function useLakeRoute() {
       .map((wp, idx) => ({ ...wp, index: idx }));
     
     setWaypoints(newWaypoints);
+    setIsSubmitted(false);
     
     if (newWaypoints.length >= 2) {
       const route = buildRouteFromWaypoints(newWaypoints);
@@ -131,6 +144,7 @@ export function useLakeRoute() {
   // Start freehand drawing
   const startFreehand = useCallback((lng: number, lat: number) => {
     setIsDrawing(true);
+    setIsSubmitted(false);
     freehandCoords.current = [[lng, lat]];
   }, []);
 
@@ -138,11 +152,12 @@ export function useLakeRoute() {
   const addFreehandPoint = useCallback((lng: number, lat: number) => {
     if (!isDrawing) return;
     
-    // Only add if sufficiently different from last point (prevents too many points)
+    // Only add if sufficiently different from last point
     const lastCoord = freehandCoords.current[freehandCoords.current.length - 1];
     if (lastCoord) {
       const dist = Math.sqrt(Math.pow(lng - lastCoord[0], 2) + Math.pow(lat - lastCoord[1], 2));
-      if (dist < 0.0001) return; // Skip if too close
+      // Increased minimum distance to reduce noise
+      if (dist < 0.0002) return;
     }
     
     freehandCoords.current.push([lng, lat]);
@@ -155,14 +170,19 @@ export function useLakeRoute() {
     freehandCoords.current.push([lng, lat]);
     setIsDrawing(false);
     
-    // Smooth the line
-    const smoothedCoords = smoothLine(freehandCoords.current);
+    // Smooth the line with better parameters
+    const smoothedCoords = smoothLine(freehandCoords.current, {
+      simplifyTolerance: 0.0003, // Simplify first to remove noise
+      resolution: 150, // Higher resolution for smoother curves
+    });
+    
     const distance_mi = calculateDistanceMiles(smoothedCoords);
     const paddle_time_min = (distance_mi / paddleSpeed) * 60;
 
-    // Convert to waypoints for consistency
+    // Convert to waypoints for consistency (keep more points for smoother route)
+    const sampleRate = Math.max(1, Math.floor(smoothedCoords.length / 50));
     const newWaypoints: LakeWaypoint[] = smoothedCoords
-      .filter((_, idx) => idx % Math.max(1, Math.floor(smoothedCoords.length / 20)) === 0 || idx === smoothedCoords.length - 1)
+      .filter((_, idx) => idx % sampleRate === 0 || idx === smoothedCoords.length - 1)
       .map((coord, idx) => ({
         id: generateId(),
         lng: coord[0],
@@ -177,7 +197,7 @@ export function useLakeRoute() {
       features: [
         {
           type: 'Feature',
-          properties: { type: 'lake-route' },
+          properties: { type: 'lake-route', submitted: false },
           geometry: {
             type: 'LineString',
             coordinates: smoothedCoords,
@@ -204,11 +224,36 @@ export function useLakeRoute() {
     return freehandCoords.current;
   }, []);
 
+  // Submit route (mark as done, change to orange)
+  const submitRoute = useCallback(() => {
+    if (!lakeRoute?.geojson) return;
+    
+    setIsSubmitted(true);
+    
+    // Update geojson to mark as submitted
+    const updatedGeojson: GeoJSON.FeatureCollection = {
+      ...lakeRoute.geojson,
+      features: lakeRoute.geojson.features.map(f => ({
+        ...f,
+        properties: {
+          ...f.properties,
+          submitted: true,
+        },
+      })),
+    };
+    
+    setLakeRoute({
+      ...lakeRoute,
+      geojson: updatedGeojson,
+    });
+  }, [lakeRoute]);
+
   // Undo last action
   const undo = useCallback(() => {
     if (drawingMode === 'waypoint' && waypoints.length > 0) {
       const newWaypoints = waypoints.slice(0, -1);
       setWaypoints(newWaypoints);
+      setIsSubmitted(false);
       
       if (newWaypoints.length >= 2) {
         const route = buildRouteFromWaypoints(newWaypoints);
@@ -227,6 +272,7 @@ export function useLakeRoute() {
     setWaypoints([]);
     setLakeRoute(null);
     setIsDrawing(false);
+    setIsSubmitted(false);
     freehandCoords.current = [];
   }, []);
 
@@ -249,6 +295,7 @@ export function useLakeRoute() {
     lakeRoute,
     paddleSpeed,
     isDrawing,
+    isSubmitted,
     
     // Actions
     setDrawingMode,
@@ -258,6 +305,7 @@ export function useLakeRoute() {
     addFreehandPoint,
     finishFreehand,
     getFreehandPreview,
+    submitRoute,
     undo,
     clearRoute,
     updatePaddleSpeed,

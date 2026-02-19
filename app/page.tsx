@@ -85,6 +85,7 @@ export default function Home() {
     lakeRoute,
     paddleSpeed: lakePaddleSpeed,
     isDrawing: isLakeDrawing,
+    isSubmitted: isLakeSubmitted,
     setDrawingMode: setLakeDrawingMode,
     addWaypoint,
     deleteWaypoint,
@@ -92,6 +93,7 @@ export default function Home() {
     addFreehandPoint,
     finishFreehand,
     getFreehandPreview,
+    submitRoute: submitLakeRoute,
     undo: lakeUndo,
     clearRoute: clearLakeRoute,
     updatePaddleSpeed: updateLakePaddleSpeed,
@@ -324,19 +326,38 @@ export default function Home() {
       if (map.current) {
         addAllLayers(map.current, basemapRef.current);
         
-        // Add lake route source and layer
+        // Add lake route source and layers
         if (!map.current.getSource('lake-route')) {
           map.current.addSource('lake-route', {
             type: 'geojson',
             data: { type: 'FeatureCollection', features: [] }
           });
           
+          // Glow layer for submitted routes (animated pulse)
+          map.current.addLayer({
+            id: 'lake-route-glow',
+            type: 'line',
+            source: 'lake-route',
+            filter: ['==', ['get', 'submitted'], true],
+            paint: {
+              'line-color': '#f59e0b',
+              'line-width': 12,
+              'line-opacity': 0.3,
+              'line-blur': 8
+            }
+          });
+          
+          // Main route line - cyan while drawing, orange when submitted
           map.current.addLayer({
             id: 'lake-route-line',
             type: 'line',
             source: 'lake-route',
             paint: {
-              'line-color': '#67e8f9',
+              'line-color': [
+                'case',
+                ['==', ['get', 'submitted'], true], '#f59e0b', // Orange when submitted
+                '#67e8f9' // Cyan while drawing
+              ],
               'line-width': 4,
               'line-opacity': 0.9
             }
@@ -471,16 +492,16 @@ export default function Home() {
             basemap={basemap}
             onBasemapChange={handleBasemapChange}
           />
-          {/* Lake Mode Drawing Controls */}
+          {/* Lake Mode Drawing Controls - hidden when route is submitted */}
           <DrawingControls
-            visible={personaMode === 'lake' && (lakeWaypoints.length > 0 || isLakeDrawing)}
+            visible={personaMode === 'lake' && (lakeWaypoints.length > 0 || isLakeDrawing) && !isLakeSubmitted}
             drawingMode={lakeDrawingMode}
             waypointCount={lakeWaypoints.length}
             hasRoute={!!(lakeRoute && lakeRoute.distance_mi > 0)}
             isDrawing={isLakeDrawing}
             onUndo={handleLakeUndo}
             onClear={handleLakeClear}
-            onSubmit={() => { /* Route is auto-submitted, this could trigger save dialog */ }}
+            onSubmit={submitLakeRoute}
           />
         </div>
 

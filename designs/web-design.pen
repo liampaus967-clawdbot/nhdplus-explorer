@@ -1104,31 +1104,90 @@
         },
         {
           "type": "frame",
-          "id": "rIndW",
-          "name": "Clear Route Button",
+          "id": "AuKI4",
+          "name": "Action Buttons",
           "width": "fill_container",
-          "fill": "rgba(239,68,68,0.08)",
-          "cornerRadius": 10,
-          "stroke": {
-            "align": "inside",
-            "thickness": 1,
-            "fill": "rgba(239,68,68,0.3)"
-          },
-          "padding": [
-            10,
-            16
-          ],
-          "justifyContent": "center",
-          "alignItems": "center",
+          "gap": 8,
           "children": [
             {
-              "type": "text",
-              "id": "tkXVG",
-              "fill": "#ef4444",
-              "content": "Clear Route",
-              "fontFamily": "Inter",
-              "fontSize": 13,
-              "fontWeight": "600"
+              "type": "frame",
+              "id": "aW1ph",
+              "name": "Undo Button",
+              "width": "fill_container",
+              "fill": "$--bg",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "rXIME",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "undo-2",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "id": "TmZ5S",
+                  "fill": "$--text-muted",
+                  "content": "Undo",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "5u3cZ",
+              "name": "Save Route Button",
+              "width": "fill_container",
+              "fill": "rgba(103,232,249,0.15)",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "rgba(103,232,249,0.3)"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "oh5fU",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "save",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--cyan"
+                },
+                {
+                  "type": "text",
+                  "id": "3fZQx",
+                  "fill": "$--cyan",
+                  "content": "Save Route",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
             }
           ]
         },
@@ -2836,31 +2895,90 @@
         },
         {
           "type": "frame",
-          "id": "omW0I",
-          "name": "Clear Route Button",
+          "id": "yXRWV",
+          "name": "Action Buttons",
           "width": "fill_container",
-          "fill": "rgba(239,68,68,0.08)",
-          "cornerRadius": 10,
-          "stroke": {
-            "align": "inside",
-            "thickness": 1,
-            "fill": "rgba(239,68,68,0.3)"
-          },
-          "padding": [
-            10,
-            16
-          ],
-          "justifyContent": "center",
-          "alignItems": "center",
+          "gap": 8,
           "children": [
             {
-              "type": "text",
-              "id": "1AqA5",
-              "fill": "#ef4444",
-              "content": "Clear Route",
-              "fontFamily": "Inter",
-              "fontSize": 13,
-              "fontWeight": "600"
+              "type": "frame",
+              "id": "9RURM",
+              "name": "Undo Button",
+              "width": "fill_container",
+              "fill": "$--bg",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "ffj2U",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "undo-2",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "id": "A4LH2",
+                  "fill": "$--text-muted",
+                  "content": "Undo",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "a0sPS",
+              "name": "Save Route Button",
+              "width": "fill_container",
+              "fill": "rgba(103,232,249,0.15)",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "rgba(103,232,249,0.3)"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "N61hk",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "save",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--cyan"
+                },
+                {
+                  "type": "text",
+                  "id": "mvJxs",
+                  "fill": "$--cyan",
+                  "content": "Save Route",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
             }
           ]
         },
@@ -4761,31 +4879,90 @@
         },
         {
           "type": "frame",
-          "id": "wRg9n",
-          "name": "Clear Route Button",
+          "id": "CK0r0",
+          "name": "Action Buttons",
           "width": "fill_container",
-          "fill": "rgba(239,68,68,0.08)",
-          "cornerRadius": 10,
-          "stroke": {
-            "align": "inside",
-            "thickness": 1,
-            "fill": "rgba(239,68,68,0.3)"
-          },
-          "padding": [
-            10,
-            16
-          ],
-          "justifyContent": "center",
-          "alignItems": "center",
+          "gap": 8,
           "children": [
             {
-              "type": "text",
-              "id": "BnAQS",
-              "fill": "#ef4444",
-              "content": "Clear Route",
-              "fontFamily": "Inter",
-              "fontSize": 13,
-              "fontWeight": "600"
+              "type": "frame",
+              "id": "2qw5W",
+              "name": "Undo Button",
+              "width": "fill_container",
+              "fill": "$--bg",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "00Bg7",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "undo-2",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "id": "ivoFY",
+                  "fill": "$--text-muted",
+                  "content": "Undo",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lXRpN",
+              "name": "Save Route Button",
+              "width": "fill_container",
+              "fill": "rgba(103,232,249,0.15)",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "rgba(103,232,249,0.3)"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "h5IiP",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "save",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--cyan"
+                },
+                {
+                  "type": "text",
+                  "id": "yv08j",
+                  "fill": "$--cyan",
+                  "content": "Save Route",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
             }
           ]
         },
@@ -6329,6 +6506,95 @@
         },
         {
           "type": "frame",
+          "id": "actionButtons",
+          "name": "Action Buttons",
+          "width": "fill_container",
+          "gap": 8,
+          "children": [
+            {
+              "type": "frame",
+              "id": "undoBtn",
+              "name": "Undo Button",
+              "width": "fill_container",
+              "fill": "$--bg",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "undoIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "undo-2",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "id": "undoText",
+                  "fill": "$--text-muted",
+                  "content": "Undo",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "saveBtn",
+              "name": "Save Route Button",
+              "width": "fill_container",
+              "fill": "rgba(103,232,249,0.15)",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "rgba(103,232,249,0.3)"
+              },
+              "gap": 8,
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "saveIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "save",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--cyan"
+                },
+                {
+                  "type": "text",
+                  "id": "saveText",
+                  "fill": "$--cyan",
+                  "content": "Save Route",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
           "id": "drawModeCard",
           "name": "Drawing Mode",
           "width": "fill_container",
@@ -6373,13 +6639,13 @@
                     "thickness": 1,
                     "fill": "$--border"
                   },
+                  "gap": 6,
                   "padding": [
                     8,
                     12
                   ],
                   "justifyContent": "center",
                   "alignItems": "center",
-                  "gap": 6,
                   "children": [
                     {
                       "type": "icon_font",
@@ -6408,13 +6674,13 @@
                   "width": "fill_container",
                   "fill": "transparent",
                   "cornerRadius": 6,
+                  "gap": 6,
                   "padding": [
                     8,
                     12
                   ],
                   "justifyContent": "center",
                   "alignItems": "center",
-                  "gap": 6,
                   "children": [
                     {
                       "type": "icon_font",
@@ -6723,8 +6989,6 @@
                     "thickness": 2,
                     "fill": "$--border"
                   },
-                  "justifyContent": "center",
-                  "alignItems": "center",
                   "layout": "none",
                   "children": [
                     {
@@ -6776,12 +7040,12 @@
                       "id": "windArrow",
                       "x": 28,
                       "y": 20,
+                      "rotation": 225,
                       "width": 24,
                       "height": 24,
                       "iconFontName": "arrow-up",
                       "iconFontFamily": "lucide",
-                      "fill": "$--cyan",
-                      "rotation": 225
+                      "fill": "$--cyan"
                     }
                   ]
                 },
@@ -6875,7 +7139,7 @@
                   "id": "shelteredSegment",
                   "x": 0,
                   "y": 0,
-                  "width": 91,
+                  "width": 79,
                   "height": 24,
                   "fill": "$--success",
                   "cornerRadius": [
@@ -6888,18 +7152,18 @@
                 {
                   "type": "frame",
                   "id": "moderateSegment",
-                  "x": 91,
+                  "x": 79.18181818181802,
                   "y": 0,
-                  "width": 122,
+                  "width": 106,
                   "height": 24,
                   "fill": "$--warning"
                 },
                 {
                   "type": "frame",
                   "id": "exposedSegment",
-                  "x": 213,
+                  "x": 185.33766233766255,
                   "y": 0,
-                  "width": 95,
+                  "width": 83,
                   "height": 24,
                   "fill": "$--danger",
                   "cornerRadius": [
@@ -6991,95 +7255,6 @@
                       "fontWeight": "normal"
                     }
                   ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "actionButtons",
-          "name": "Action Buttons",
-          "width": "fill_container",
-          "gap": 8,
-          "children": [
-            {
-              "type": "frame",
-              "id": "undoBtn",
-              "name": "Undo Button",
-              "width": "fill_container",
-              "fill": "$--bg",
-              "cornerRadius": 10,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1,
-                "fill": "$--border"
-              },
-              "padding": [
-                12,
-                16
-              ],
-              "justifyContent": "center",
-              "alignItems": "center",
-              "gap": 8,
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "undoIcon",
-                  "width": 16,
-                  "height": 16,
-                  "iconFontName": "undo-2",
-                  "iconFontFamily": "lucide",
-                  "fill": "$--text-muted"
-                },
-                {
-                  "type": "text",
-                  "id": "undoText",
-                  "fill": "$--text-muted",
-                  "content": "Undo",
-                  "fontFamily": "Inter",
-                  "fontSize": 13,
-                  "fontWeight": "500"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "saveBtn",
-              "name": "Save Route Button",
-              "width": "fill_container",
-              "fill": "rgba(103,232,249,0.15)",
-              "cornerRadius": 10,
-              "stroke": {
-                "align": "inside",
-                "thickness": 1,
-                "fill": "rgba(103,232,249,0.3)"
-              },
-              "padding": [
-                12,
-                16
-              ],
-              "justifyContent": "center",
-              "alignItems": "center",
-              "gap": 8,
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "saveIcon",
-                  "width": 16,
-                  "height": 16,
-                  "iconFontName": "save",
-                  "iconFontFamily": "lucide",
-                  "fill": "$--cyan"
-                },
-                {
-                  "type": "text",
-                  "id": "saveText",
-                  "fill": "$--cyan",
-                  "content": "Save Route",
-                  "fontFamily": "Inter",
-                  "fontSize": 13,
-                  "fontWeight": "600"
                 }
               ]
             }

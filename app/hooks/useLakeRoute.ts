@@ -7,20 +7,18 @@ import * as turf from '@turf/turf';
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-// Simplify a line to reduce noise, then smooth with Bezier curves
-function smoothLine(coords: [number, number][], options?: { simplifyTolerance?: number; resolution?: number }): [number, number][] {
+// Smooth a line using Bezier curves - minimal simplification to preserve shape
+function smoothLine(coords: [number, number][], options?: { resolution?: number }): [number, number][] {
   if (coords.length < 3) return coords;
   
-  const { simplifyTolerance = 0.0005, resolution = 100 } = options || {};
+  const { resolution = 100 } = options || {};
   
   try {
     const line = turf.lineString(coords);
     
-    // First simplify to remove noise (Douglas-Peucker algorithm)
-    const simplified = turf.simplify(line, { tolerance: simplifyTolerance, highQuality: true });
-    
-    // Then smooth with Bezier spline for flowing curves
-    const smoothed = turf.bezierSpline(simplified, { resolution, sharpness: 0.85 });
+    // Use Bezier spline for smooth flowing curves - no aggressive simplification
+    // sharpness 0.85 keeps the route closer to original path
+    const smoothed = turf.bezierSpline(line, { resolution, sharpness: 0.85 });
     
     return smoothed.geometry.coordinates as [number, number][];
   } catch {
@@ -170,10 +168,9 @@ export function useLakeRoute() {
     freehandCoords.current.push([lng, lat]);
     setIsDrawing(false);
     
-    // Smooth the line with better parameters
+    // Smooth the line - preserve original path shape
     const smoothedCoords = smoothLine(freehandCoords.current, {
-      simplifyTolerance: 0.0003, // Simplify first to remove noise
-      resolution: 150, // Higher resolution for smoother curves
+      resolution: 100, // Smooth but preserve shape
     });
     
     const distance_mi = calculateDistanceMiles(smoothedCoords);

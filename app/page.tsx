@@ -151,6 +151,14 @@ export default function Home() {
     }
   }, [clearLakeRoute, clearLakeMarkers]);
 
+  // Handle lake submit (Done button) - clears markers and submits route
+  const handleLakeSubmit = useCallback(() => {
+    // Remove all waypoint markers from map
+    clearLakeMarkers();
+    // Submit the route (changes to orange)
+    submitLakeRoute();
+  }, [clearLakeMarkers, submitLakeRoute]);
+
   // Handle map click
   const handleMapClick = useCallback(
     async (lng: number, lat: number) => {
@@ -501,7 +509,7 @@ export default function Home() {
             isDrawing={isLakeDrawing}
             onUndo={handleLakeUndo}
             onClear={handleLakeClear}
-            onSubmit={submitLakeRoute}
+            onSubmit={handleLakeSubmit}
           />
         </div>
 

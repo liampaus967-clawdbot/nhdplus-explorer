@@ -7,20 +7,37 @@ import * as turf from '@turf/turf';
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-// Smooth a line using Bezier curves - minimal simplification to preserve shape
-function smoothLine(coords: [number, number][], options?: { resolution?: number }): [number, number][] {
+// Smooth a line using Bezier curves - preserves endpoints
+function smoothLine(coords: [number, number][], options?: { resolution?: number; sharpness?: number }): [number, number][] {
   if (coords.length < 3) return coords;
   
-  const { resolution = 100 } = options || {};
+  const { resolution = 150, sharpness = 0.5 } = options || {};
   
   try {
+    // Save original start and end points
+    const startPoint = coords[0];
+    const endPoint = coords[coords.length - 1];
+    
     const line = turf.lineString(coords);
     
-    // Use Bezier spline for smooth flowing curves - no aggressive simplification
-    // sharpness 0.85 keeps the route closer to original path
-    const smoothed = turf.bezierSpline(line, { resolution, sharpness: 0.85 });
+    // Use Bezier spline for smooth flowing curves
+    // Lower sharpness = smoother, more curved lines
+    const smoothed = turf.bezierSpline(line, { resolution, sharpness });
+    const smoothedCoords = smoothed.geometry.coordinates as [number, number][];
     
-    return smoothed.geometry.coordinates as [number, number][];
+    // Ensure the smoothed line includes original start and end points
+    // Bezier splines can "pull back" from endpoints
+    const result: [number, number][] = [startPoint];
+    
+    // Add smoothed points (skip first and last as we're adding originals)
+    for (let i = 1; i < smoothedCoords.length - 1; i++) {
+      result.push(smoothedCoords[i]);
+    }
+    
+    // Always end at the exact end point
+    result.push(endPoint);
+    
+    return result;
   } catch {
     return coords;
   }
@@ -168,9 +185,10 @@ export function useLakeRoute() {
     freehandCoords.current.push([lng, lat]);
     setIsDrawing(false);
     
-    // Smooth the line - preserve original path shape
+    // Smooth the line - preserve original path shape with flowing curves
     const smoothedCoords = smoothLine(freehandCoords.current, {
-      resolution: 100, // Smooth but preserve shape
+      resolution: 200,   // More points = smoother curves
+      sharpness: 0.4,    // Lower = smoother, more flowing curves
     });
     
     const distance_mi = calculateDistanceMiles(smoothedCoords);

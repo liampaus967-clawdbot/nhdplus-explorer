@@ -356,7 +356,7 @@ export default function Home() {
               'line-color': [
                 'case',
                 ['==', ['get', 'submitted'], true], '#f59e0b', // Orange when submitted
-                '#67e8f9' // Cyan while drawing
+                '#006BF7' // Cyan while drawing
               ],
               'line-width': 4,
               'line-opacity': 0.9

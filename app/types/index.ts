@@ -79,4 +79,21 @@ export interface RouteResult {
 
 export type FlowCondition = 'low' | 'normal' | 'high';
 export type BasemapStyle = 'outdoors' | 'satellite' | 'dark' | 'terrain';
-export type PersonaMode = 'whitewater' | 'explorer' | 'floater';
+export type PersonaMode = 'whitewater' | 'explorer' | 'floater' | 'lake';
+
+// Lake mode specific types
+export type LakeDrawingMode = 'waypoint' | 'freehand';
+
+export interface LakeWaypoint {
+  id: string;
+  lng: number;
+  lat: number;
+  index: number;
+}
+
+export interface LakeRoute {
+  waypoints: LakeWaypoint[];
+  geojson: GeoJSON.FeatureCollection | null;
+  distance_mi: number;
+  paddle_time_min: number;
+}

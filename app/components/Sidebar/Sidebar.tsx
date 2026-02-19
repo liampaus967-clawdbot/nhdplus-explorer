@@ -1,10 +1,11 @@
 'use client';
 
-import { PersonaMode, RouteResult, SnapResult, ElevationPoint, SteepSection } from '../../types';
+import { PersonaMode, RouteResult, SnapResult, ElevationPoint, SteepSection, LakeDrawingMode, LakeRoute, LakeWaypoint } from '../../types';
 import { WelcomeSidebar } from './WelcomeSidebar';
 import { WhitewaterSidebar } from './WhitewaterSidebar';
 import { ExplorerSidebar } from './ExplorerSidebar';
 import { FloaterSidebar } from './FloaterSidebar';
+import { LakeSidebar } from './LakeSidebar';
 
 interface SidebarProps {
   mode: PersonaMode;
@@ -23,6 +24,17 @@ interface SidebarProps {
   onMouseMove: (e: React.MouseEvent<HTMLCanvasElement>) => void;
   onMouseUp: () => void;
   onMouseLeave: () => void;
+  // Lake mode props
+  lakeDrawingMode?: LakeDrawingMode;
+  onLakeDrawingModeChange?: (mode: LakeDrawingMode) => void;
+  lakePaddleSpeed?: number;
+  onLakePaddleSpeedChange?: (speed: number) => void;
+  lakeRoute?: LakeRoute | null;
+  lakeWaypoints?: LakeWaypoint[];
+  onDeleteLakeWaypoint?: (id: string) => void;
+  onLakeUndo?: () => void;
+  onLakeSaveRoute?: () => void;
+  isLakeDrawing?: boolean;
 }
 
 export function Sidebar({
@@ -42,7 +54,37 @@ export function Sidebar({
   onMouseMove,
   onMouseUp,
   onMouseLeave,
+  // Lake mode props
+  lakeDrawingMode = 'waypoint',
+  onLakeDrawingModeChange,
+  lakePaddleSpeed = 3.0,
+  onLakePaddleSpeedChange,
+  lakeRoute,
+  lakeWaypoints = [],
+  onDeleteLakeWaypoint,
+  onLakeUndo,
+  onLakeSaveRoute,
+  isLakeDrawing = false,
 }: SidebarProps) {
+  // Lake mode always shows sidebar (no route required to start)
+  if (mode === 'lake') {
+    return (
+      <LakeSidebar
+        drawingMode={lakeDrawingMode}
+        onDrawingModeChange={onLakeDrawingModeChange || (() => {})}
+        paddleSpeed={lakePaddleSpeed}
+        onPaddleSpeedChange={onLakePaddleSpeedChange || (() => {})}
+        lakeRoute={lakeRoute || null}
+        waypoints={lakeWaypoints}
+        onDeleteWaypoint={onDeleteLakeWaypoint || (() => {})}
+        onUndo={onLakeUndo || (() => {})}
+        onSaveRoute={onLakeSaveRoute || (() => {})}
+        isDrawing={isLakeDrawing}
+      />
+    );
+  }
+
+  // For other modes, show welcome if no route
   if (!route) {
     return <WelcomeSidebar onModeSelect={onModeChange} />;
   }
@@ -92,5 +134,7 @@ export function Sidebar({
           onClearRoute={onClearRoute}
         />
       );
+    default:
+      return null;
   }
 }

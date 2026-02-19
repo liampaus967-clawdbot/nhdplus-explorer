@@ -1,6 +1,6 @@
 'use client';
 
-import { Navigation, Waves, Compass, LifeBuoy } from 'lucide-react';
+import { Navigation, Waves, Compass, LifeBuoy, Anchor } from 'lucide-react';
 import { PersonaMode } from '../../types';
 import styles from './Header.module.css';
 
@@ -13,6 +13,7 @@ const MODES: { key: PersonaMode; label: string; icon: React.ReactNode }[] = [
   { key: 'whitewater', label: 'Whitewater', icon: <Waves size={14} /> },
   { key: 'explorer', label: 'Explorer', icon: <Compass size={14} /> },
   { key: 'floater', label: 'Floater', icon: <LifeBuoy size={14} /> },
+  { key: 'lake', label: 'Lake', icon: <Anchor size={14} /> },
 ];
 
 export function Header({ mode, onModeChange }: HeaderProps) {

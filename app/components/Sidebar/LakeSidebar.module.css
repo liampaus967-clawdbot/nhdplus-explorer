@@ -1,0 +1,396 @@
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.card {
+  background: var(--bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+
+.headerCard {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modeTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(103, 232, 249, 0.15);
+  border: 1px solid rgba(103, 232, 249, 0.3);
+  border-radius: 20px;
+  color: var(--cyan);
+  font-size: 13px;
+  font-weight: 600;
+  width: fit-content;
+}
+
+.lakeName {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.sectionLabel {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+/* Drawing Mode Toggle */
+.drawingToggle {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.toggleBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggleBtn:hover {
+  background: var(--bg-secondary);
+}
+
+.toggleBtnActive {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Paddle Speed */
+.paddleHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.paddleValue {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cyan);
+}
+
+.slider {
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-tertiary);
+  appearance: none;
+  cursor: pointer;
+  margin: 8px 0;
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sliderLabels {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.hint {
+  font-size: 10px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+/* Trip Stats */
+.statsRow {
+  display: flex;
+  gap: 8px;
+}
+
+.statCard {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.statValue {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+.statLabel {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Wind Card */
+.windRow {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.compass {
+  width: 80px;
+  height: 80px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.compassLabel {
+  position: absolute;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.compassN { top: 6px; left: 50%; transform: translateX(-50%); }
+.compassS { bottom: 6px; left: 50%; transform: translateX(-50%); }
+.compassE { right: 8px; top: 50%; transform: translateY(-50%); }
+.compassW { left: 8px; top: 50%; transform: translateY(-50%); }
+
+.windArrow {
+  color: var(--cyan);
+  transform: rotate(225deg);
+}
+
+.windInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.windSpeed {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.windGusts {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.windWarning {
+  display: inline-block;
+  padding: 3px 6px;
+  background: rgba(251, 191, 36, 0.15);
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--warning);
+}
+
+/* Route Exposure */
+.exposureBar {
+  display: flex;
+  height: 24px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.exposureSegment {
+  height: 100%;
+}
+
+.sheltered { background: var(--success); }
+.moderate { background: var(--warning); }
+.exposed { background: var(--danger); }
+
+.exposureLegend {
+  display: flex;
+  justify-content: space-between;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+.legendText {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* Action Buttons */
+.actionButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.actionBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.actionBtn:hover {
+  background: var(--bg-secondary);
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.saveBtn {
+  background: rgba(103, 232, 249, 0.15);
+  border-color: rgba(103, 232, 249, 0.3);
+  color: var(--cyan);
+  font-weight: 600;
+}
+
+.saveBtn:hover {
+  background: rgba(103, 232, 249, 0.25);
+}
+
+/* Waypoint List */
+.waypointList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.waypointItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.waypointInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.waypointIndex {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--cyan);
+  color: var(--bg);
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 50%;
+}
+
+.waypointCoords {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+.waypointDelete {
+  padding: 4px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.waypointDelete:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger);
+}
+
+/* Empty state */
+.emptyState {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.emptyIcon {
+  margin-bottom: 8px;
+  opacity: 0.5;
+}
+
+/* Freehand instructions */
+.instructions {
+  padding: 12px;
+  background: rgba(103, 232, 249, 0.08);
+  border: 1px solid rgba(103, 232, 249, 0.15);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.instructions strong {
+  color: var(--cyan);
+}

@@ -7,40 +7,37 @@ import * as turf from '@turf/turf';
 // Generate unique IDs
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-// Smooth a line using Bezier curves - preserves endpoints
-function smoothLine(coords: [number, number][], options?: { resolution?: number; sharpness?: number }): [number, number][] {
+// Smooth a line using moving average - preserves shape better than Bezier
+function smoothLine(coords: [number, number][], windowSize: number = 3): [number, number][] {
   if (coords.length < 3) return coords;
   
-  const { resolution = 150, sharpness = 0.5 } = options || {};
+  const result: [number, number][] = [];
+  const halfWindow = Math.floor(windowSize / 2);
   
-  try {
-    // Save original start and end points
-    const startPoint = coords[0];
-    const endPoint = coords[coords.length - 1];
-    
-    const line = turf.lineString(coords);
-    
-    // Use Bezier spline for smooth flowing curves
-    // Lower sharpness = smoother, more curved lines
-    const smoothed = turf.bezierSpline(line, { resolution, sharpness });
-    const smoothedCoords = smoothed.geometry.coordinates as [number, number][];
-    
-    // Ensure the smoothed line includes original start and end points
-    // Bezier splines can "pull back" from endpoints
-    const result: [number, number][] = [startPoint];
-    
-    // Add smoothed points (skip first and last as we're adding originals)
-    for (let i = 1; i < smoothedCoords.length - 1; i++) {
-      result.push(smoothedCoords[i]);
+  for (let i = 0; i < coords.length; i++) {
+    // Keep first and last points exactly as they are
+    if (i < halfWindow || i >= coords.length - halfWindow) {
+      result.push(coords[i]);
+      continue;
     }
     
-    // Always end at the exact end point
-    result.push(endPoint);
+    // Average nearby points for smoothing
+    let sumLng = 0;
+    let sumLat = 0;
+    let count = 0;
     
-    return result;
-  } catch {
-    return coords;
+    for (let j = i - halfWindow; j <= i + halfWindow; j++) {
+      if (j >= 0 && j < coords.length) {
+        sumLng += coords[j][0];
+        sumLat += coords[j][1];
+        count++;
+      }
+    }
+    
+    result.push([sumLng / count, sumLat / count]);
   }
+  
+  return result;
 }
 
 // Calculate distance of a line in miles
@@ -185,11 +182,8 @@ export function useLakeRoute() {
     freehandCoords.current.push([lng, lat]);
     setIsDrawing(false);
     
-    // Smooth the line - preserve original path shape with flowing curves
-    const smoothedCoords = smoothLine(freehandCoords.current, {
-      resolution: 200,   // More points = smoother curves
-      sharpness: 0.4,    // Lower = smoother, more flowing curves
-    });
+    // Smooth the line using moving average - preserves path shape
+    const smoothedCoords = smoothLine(freehandCoords.current, 5);
     
     const distance_mi = calculateDistanceMiles(smoothedCoords);
     const paddle_time_min = (distance_mi / paddleSpeed) * 60;

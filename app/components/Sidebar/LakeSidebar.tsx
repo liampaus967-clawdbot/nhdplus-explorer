@@ -207,6 +207,14 @@ export function LakeSidebar({
           <>
             <div className={styles.windRow}>
               <div className={styles.compass}>
+                {/* Tick marks around compass edge */}
+                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
+                  <div 
+                    key={deg}
+                    className={`${styles.compassTick} ${deg % 90 === 0 ? styles.compassTickMajor : ''}`}
+                    style={{ transform: `rotate(${deg}deg)` }}
+                  />
+                ))}
                 <span className={`${styles.compassLabel} ${styles.compassN}`}>N</span>
                 <span className={`${styles.compassLabel} ${styles.compassS}`}>S</span>
                 <span className={`${styles.compassLabel} ${styles.compassE}`}>E</span>
@@ -218,9 +226,14 @@ export function LakeSidebar({
                 />
               </div>
               <div className={styles.windInfo}>
-                <span className={styles.windSpeed}>
-                  {windData.windSpeed} mph {getWindDirection(windData.windDirection)}
+                <div className={styles.windSpeedRow}>
+                  <span className={styles.windSpeed}>{windData.windSpeed}</span>
+                  <span className={styles.windSpeedUnit}>mph</span>
+                </div>
+                <span className={styles.windDirection}>
+                  From {getWindDirection(windData.windDirection)}
                 </span>
+                <span className={styles.windDegrees}>{Math.round(windData.windDirection)}°</span>
                 <span className={styles.windGusts}>Gusts to {windData.windGusts} mph</span>
                 {chopAssessment && (
                   <span 

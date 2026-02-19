@@ -47,6 +47,17 @@ export function getWeatherDescription(code: number): { label: string; icon: stri
 }
 
 export function getWindDirection(degrees: number): string {
+  const directions = [
+    'North', 'North-Northeast', 'Northeast', 'East-Northeast',
+    'East', 'East-Southeast', 'Southeast', 'South-Southeast',
+    'South', 'South-Southwest', 'Southwest', 'West-Southwest',
+    'West', 'West-Northwest', 'Northwest', 'North-Northwest'
+  ];
+  const index = Math.round(degrees / 22.5) % 16;
+  return directions[index];
+}
+
+export function getWindDirectionShort(degrees: number): string {
   const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
   const index = Math.round(degrees / 22.5) % 16;
   return directions[index];

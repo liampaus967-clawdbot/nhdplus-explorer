@@ -117,7 +117,7 @@ export function LakeSidebar({
 
       {/* Waypoint List (only in waypoint mode) */}
       {drawingMode === 'waypoint' && waypoints.length > 0 && (
-        <div className={styles.card}>
+        <div className={`${styles.card} ${styles.waypointCard}`}>
           <div className={styles.sectionLabel}>WAYPOINTS ({waypoints.length})</div>
           <div className={styles.waypointList}>
             {waypoints.map((wp, idx) => (
@@ -151,7 +151,7 @@ export function LakeSidebar({
       )}
 
       {/* Paddle Speed */}
-      <div className={styles.card}>
+      <div className={`${styles.card} ${styles.paddleCard}`}>
         <div className={styles.paddleHeader}>
           <div className={styles.sectionLabel}>PADDLE SPEED</div>
           <span className={styles.paddleValue}>{paddleSpeed.toFixed(1)} mph</span>
@@ -173,7 +173,7 @@ export function LakeSidebar({
       </div>
 
       {/* Trip Stats */}
-      <div className={styles.card}>
+      <div className={`${styles.card} ${styles.statsCard}`}>
         <div className={styles.sectionLabel}>TRIP STATS</div>
         <div className={styles.statsRow}>
           <div className={styles.statCard}>
@@ -190,7 +190,7 @@ export function LakeSidebar({
       </div>
 
       {/* Wind Conditions - Live Data */}
-      <div className={styles.card}>
+      <div className={`${styles.card} ${styles.windCard}`}>
         <div className={styles.paddleHeader}>
           <div className={styles.sectionLabel}>WIND CONDITIONS</div>
           <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>
@@ -262,7 +262,7 @@ export function LakeSidebar({
 
       {/* Route Exposure (placeholder) */}
       {hasRoute && (
-        <div className={styles.card}>
+        <div className={`${styles.card} ${styles.exposureCard}`}>
           <div className={styles.sectionLabel}>ROUTE EXPOSURE</div>
           <div className={styles.exposureBar}>
             <div className={`${styles.exposureSegment} ${styles.sheltered}`} style={{ width: '30%' }} />

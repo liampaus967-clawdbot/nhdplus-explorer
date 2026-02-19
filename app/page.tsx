@@ -13,7 +13,7 @@ import { useRoute, useElevationProfile, useLakeRoute } from './hooks';
 // Components
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
-import { MapControls, LayerVisibility } from './components/Map';
+import { MapControls, LayerVisibility, DrawingControls } from './components/Map';
 
 // Layers
 import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight } from './layers';
@@ -122,14 +122,18 @@ export default function Home() {
     }
   }, [clearRouteState, setProfileSelection]);
 
-  // Handle lake undo
+  // Handle lake undo - removes last waypoint, marker, and updates map line
   const handleLakeUndo = useCallback(() => {
-    lakeUndo();
-    // Remove last marker
+    // Remove last marker first
     if (lakeMarkers.current.length > 0) {
       const lastMarker = lakeMarkers.current.pop();
       lastMarker?.remove();
     }
+    
+    // Call the undo from hook (updates waypoints and lakeRoute)
+    lakeUndo();
+    
+    // Update map line - will be synced via useEffect on lakeRoute change
   }, [lakeUndo]);
 
   // Handle full lake clear
@@ -393,23 +397,30 @@ export default function Home() {
 
   // Update lake route on map
   useEffect(() => {
-    if (!map.current || !lakeRoute?.geojson) return;
-
+    if (!map.current) return;
+    
     const source = map.current.getSource('lake-route') as mapboxgl.GeoJSONSource;
-    if (source) {
-      source.setData(lakeRoute.geojson);
-      
-      // Fit bounds to lake route
-      const lineFeature = lakeRoute.geojson.features.find(f => f.geometry.type === 'LineString');
-      if (lineFeature && lineFeature.geometry.type === 'LineString') {
-        const coords = lineFeature.geometry.coordinates as [number, number][];
-        if (coords.length > 1) {
-          const bounds = coords.reduce(
-            (b: mapboxgl.LngLatBounds, c: [number, number]) => b.extend(c),
-            new mapboxgl.LngLatBounds(coords[0], coords[0])
-          );
-          map.current.fitBounds(bounds, { padding: 80 });
-        }
+    if (!source) return;
+
+    // If no route or no geojson, clear the map
+    if (!lakeRoute?.geojson) {
+      source.setData({ type: 'FeatureCollection', features: [] });
+      return;
+    }
+
+    // Update with new route data
+    source.setData(lakeRoute.geojson);
+    
+    // Fit bounds to lake route (only when route has meaningful length)
+    const lineFeature = lakeRoute.geojson.features.find(f => f.geometry.type === 'LineString');
+    if (lineFeature && lineFeature.geometry.type === 'LineString') {
+      const coords = lineFeature.geometry.coordinates as [number, number][];
+      if (coords.length > 1) {
+        const bounds = coords.reduce(
+          (b: mapboxgl.LngLatBounds, c: [number, number]) => b.extend(c),
+          new mapboxgl.LngLatBounds(coords[0], coords[0])
+        );
+        map.current.fitBounds(bounds, { padding: 80 });
       }
     }
   }, [lakeRoute]);
@@ -459,6 +470,17 @@ export default function Home() {
             onLayersChange={handleLayerVisibilityChange}
             basemap={basemap}
             onBasemapChange={handleBasemapChange}
+          />
+          {/* Lake Mode Drawing Controls */}
+          <DrawingControls
+            visible={personaMode === 'lake' && (lakeWaypoints.length > 0 || isLakeDrawing)}
+            drawingMode={lakeDrawingMode}
+            waypointCount={lakeWaypoints.length}
+            hasRoute={!!(lakeRoute && lakeRoute.distance_mi > 0)}
+            isDrawing={isLakeDrawing}
+            onUndo={handleLakeUndo}
+            onClear={handleLakeClear}
+            onSubmit={() => { /* Route is auto-submitted, this could trigger save dialog */ }}
           />
         </div>
 

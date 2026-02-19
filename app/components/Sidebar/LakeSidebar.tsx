@@ -48,6 +48,26 @@ export function LakeSidebar({
         <h2 className={styles.lakeName}>Lake Route</h2>
       </div>
 
+      {/* Action Buttons - At Top */}
+      <div className={styles.actionButtons}>
+        <button
+          className={styles.actionBtn}
+          onClick={onUndo}
+          disabled={waypoints.length === 0 && !hasRoute}
+        >
+          <Undo2 size={16} />
+          Undo
+        </button>
+        <button
+          className={`${styles.actionBtn} ${styles.saveBtn}`}
+          onClick={onSaveRoute}
+          disabled={!hasRoute}
+        >
+          <Save size={16} />
+          Save Route
+        </button>
+      </div>
+
       {/* Drawing Mode */}
       <div className={styles.card}>
         <div className={styles.sectionLabel}>DRAWING MODE</div>
@@ -73,12 +93,12 @@ export function LakeSidebar({
           {drawingMode === 'waypoint' ? (
             <>
               <strong>Waypoint Mode:</strong> Click on the map to add waypoints. 
-              A route line will connect your points. Click waypoints to select and delete them.
+              A route line will connect your points.
             </>
           ) : (
             <>
               <strong>Freehand Mode:</strong> Click to start drawing, move your mouse to trace your route, 
-              then click again to finish. The line will be smoothed automatically.
+              then click again to finish.
             </>
           )}
         </div>
@@ -205,26 +225,6 @@ export function LakeSidebar({
           </div>
         </div>
       )}
-
-      {/* Action Buttons */}
-      <div className={styles.actionButtons}>
-        <button
-          className={styles.actionBtn}
-          onClick={onUndo}
-          disabled={waypoints.length === 0 && !hasRoute}
-        >
-          <Undo2 size={16} />
-          Undo
-        </button>
-        <button
-          className={`${styles.actionBtn} ${styles.saveBtn}`}
-          onClick={onSaveRoute}
-          disabled={!hasRoute}
-        >
-          <Save size={16} />
-          Save Route
-        </button>
-      </div>
     </div>
   );
 }

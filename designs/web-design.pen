@@ -6992,47 +6992,131 @@
                   "layout": "none",
                   "children": [
                     {
+                      "type": "frame",
+                      "id": "tickN",
+                      "x": 38,
+                      "y": 2,
+                      "width": 2,
+                      "height": 8,
+                      "fill": "$--text-dim",
+                      "opacity": 0.7
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tickNE",
+                      "x": 62,
+                      "y": 12,
+                      "rotation": 45,
+                      "width": 1,
+                      "height": 6,
+                      "fill": "$--text-dim",
+                      "opacity": 0.4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tickE",
+                      "x": 70,
+                      "y": 38,
+                      "width": 8,
+                      "height": 2,
+                      "fill": "$--text-dim",
+                      "opacity": 0.7
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tickSE",
+                      "x": 62,
+                      "y": 62,
+                      "rotation": -45,
+                      "width": 1,
+                      "height": 6,
+                      "fill": "$--text-dim",
+                      "opacity": 0.4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tickS",
+                      "x": 38,
+                      "y": 70,
+                      "width": 2,
+                      "height": 8,
+                      "fill": "$--text-dim",
+                      "opacity": 0.7
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tickSW",
+                      "x": 12,
+                      "y": 62,
+                      "rotation": 45,
+                      "width": 1,
+                      "height": 6,
+                      "fill": "$--text-dim",
+                      "opacity": 0.4
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tickW",
+                      "x": 2,
+                      "y": 38,
+                      "width": 8,
+                      "height": 2,
+                      "fill": "$--text-dim",
+                      "opacity": 0.7
+                    },
+                    {
+                      "type": "frame",
+                      "id": "tickNW",
+                      "x": 12,
+                      "y": 12,
+                      "rotation": -45,
+                      "width": 1,
+                      "height": 6,
+                      "fill": "$--text-dim",
+                      "opacity": 0.4
+                    },
+                    {
                       "type": "text",
                       "id": "compassN",
                       "x": 34,
-                      "y": 6,
+                      "y": 10,
                       "fill": "$--text-dim",
                       "content": "N",
                       "fontFamily": "Inter",
-                      "fontSize": 10,
+                      "fontSize": 9,
                       "fontWeight": "600"
                     },
                     {
                       "type": "text",
                       "id": "compassS",
                       "x": 35,
-                      "y": 62,
+                      "y": 58,
                       "fill": "$--text-dim",
                       "content": "S",
                       "fontFamily": "Inter",
-                      "fontSize": 10,
+                      "fontSize": 9,
                       "fontWeight": "600"
                     },
                     {
                       "type": "text",
                       "id": "compassE",
-                      "x": 64,
+                      "x": 60,
                       "y": 33,
                       "fill": "$--text-dim",
                       "content": "E",
                       "fontFamily": "Inter",
-                      "fontSize": 10,
+                      "fontSize": 9,
                       "fontWeight": "600"
                     },
                     {
                       "type": "text",
                       "id": "compassW",
-                      "x": 8,
+                      "x": 10,
                       "y": 33,
                       "fill": "$--text-dim",
                       "content": "W",
                       "fontFamily": "Inter",
-                      "fontSize": 10,
+                      "fontSize": 9,
                       "fontWeight": "600"
                     },
                     {
@@ -7040,7 +7124,7 @@
                       "id": "windArrow",
                       "x": 28,
                       "y": 20,
-                      "rotation": 225,
+                      "rotation": 45,
                       "width": 24,
                       "height": 24,
                       "iconFontName": "arrow-up",
@@ -7052,44 +7136,86 @@
                 {
                   "type": "frame",
                   "id": "windInfo",
+                  "width": "fill_container",
                   "layout": "vertical",
-                  "gap": 4,
+                  "gap": 2,
                   "children": [
                     {
+                      "type": "frame",
+                      "id": "windSpeedRow",
+                      "gap": 4,
+                      "alignItems": "baseline",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "windSpeed",
+                          "fill": "$--text",
+                          "content": "12",
+                          "fontFamily": "$--font-mono",
+                          "fontSize": 28,
+                          "fontWeight": "700"
+                        },
+                        {
+                          "type": "text",
+                          "id": "windSpeedUnit",
+                          "fill": "$--text-muted",
+                          "content": "mph",
+                          "fontFamily": "Inter",
+                          "fontSize": 14,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    },
+                    {
                       "type": "text",
-                      "id": "windSpeed",
+                      "id": "windDirection",
                       "fill": "$--text",
-                      "content": "12 mph SW",
+                      "content": "From Southwest",
+                      "fontFamily": "Inter",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    },
+                    {
+                      "type": "text",
+                      "id": "windDegrees",
+                      "fill": "$--text-dim",
+                      "content": "225°",
                       "fontFamily": "$--font-mono",
-                      "fontSize": 18,
-                      "fontWeight": "700"
+                      "fontSize": 11,
+                      "fontWeight": "normal"
                     },
                     {
                       "type": "text",
                       "id": "windGusts",
-                      "fill": "$--text-dim",
+                      "fill": "$--warning",
                       "content": "Gusts to 18 mph",
                       "fontFamily": "Inter",
-                      "fontSize": 12,
+                      "fontSize": 11,
                       "fontWeight": "normal"
                     },
                     {
                       "type": "frame",
                       "id": "windWarning",
                       "fill": "rgba(251,191,36,0.15)",
-                      "cornerRadius": 4,
+                      "cornerRadius": 6,
+                      "stroke": {
+                        "align": "inside",
+                        "thickness": 1,
+                        "fill": "rgba(251,191,36,0.3)"
+                      },
                       "padding": [
-                        3,
-                        6
+                        8,
+                        12
                       ],
+                      "marginTop": 8,
                       "children": [
                         {
                           "type": "text",
                           "id": "windWarningText",
                           "fill": "$--warning",
-                          "content": "Moderate chop expected",
+                          "content": "Moderate waves, use caution",
                           "fontFamily": "Inter",
-                          "fontSize": 10,
+                          "fontSize": 12,
                           "fontWeight": "500"
                         }
                       ]

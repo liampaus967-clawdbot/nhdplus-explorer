@@ -179,6 +179,41 @@
                       "fontWeight": "500"
                     }
                   ]
+                },
+                {
+                  "type": "frame",
+                  "id": "btnLake",
+                  "name": "Lake Button",
+                  "fill": "transparent",
+                  "cornerRadius": 6,
+                  "gap": 8,
+                  "padding": [
+                    8,
+                    16
+                  ],
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "psLake",
+                      "name": "psLake",
+                      "width": 16,
+                      "height": 16,
+                      "iconFontName": "anchor",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--text-muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "lakeLabel",
+                      "name": "Lake Label",
+                      "fill": "$--text-muted",
+                      "content": "Lake",
+                      "fontFamily": "$--font-primary",
+                      "fontSize": 13,
+                      "fontWeight": "500"
+                    }
+                  ]
                 }
               ]
             },
@@ -6201,6 +6236,850 @@
                   "fontFamily": "Inter",
                   "fontSize": 12,
                   "fontWeight": "500"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "sidebarLake",
+      "x": 2610,
+      "y": 0,
+      "name": "Sidebar - Lake Mode",
+      "width": 340,
+      "fill": "$--bg-secondary",
+      "cornerRadius": 16,
+      "stroke": {
+        "align": "inside",
+        "thickness": {
+          "left": 1
+        },
+        "fill": "$--border"
+      },
+      "layout": "vertical",
+      "gap": 16,
+      "padding": 20,
+      "children": [
+        {
+          "type": "frame",
+          "id": "lakeHeader",
+          "width": "fill_container",
+          "fill": "$--bg",
+          "cornerRadius": 12,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "lakeTag",
+              "fill": "rgba(103,232,249,0.15)",
+              "cornerRadius": 20,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "rgba(103,232,249,0.3)"
+              },
+              "gap": 8,
+              "padding": [
+                6,
+                14
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "lakeIcon",
+                  "name": "lakeIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "anchor",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--cyan"
+                },
+                {
+                  "type": "text",
+                  "id": "lakeTagText",
+                  "fill": "$--cyan",
+                  "content": "Lake Mode",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "lakeName",
+              "fill": "$--text",
+              "content": "Lake Champlain",
+              "fontFamily": "Inter",
+              "fontSize": 22,
+              "fontWeight": "700"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "drawModeCard",
+          "name": "Drawing Mode",
+          "width": "fill_container",
+          "fill": "$--bg",
+          "cornerRadius": 12,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "drawLabel",
+              "fill": "$--text-muted",
+              "content": "DRAWING MODE",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "drawToggle",
+              "width": "fill_container",
+              "fill": "$--bg-tertiary",
+              "cornerRadius": 8,
+              "padding": 4,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "waypointBtn",
+                  "name": "Waypoint Button (Selected)",
+                  "width": "fill_container",
+                  "fill": "$--bg",
+                  "cornerRadius": 6,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "waypointIcon",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "map-pin",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--text"
+                    },
+                    {
+                      "type": "text",
+                      "id": "waypointText",
+                      "fill": "$--text",
+                      "content": "Waypoint",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "freehandBtn",
+                  "name": "Freehand Button",
+                  "width": "fill_container",
+                  "fill": "transparent",
+                  "cornerRadius": 6,
+                  "padding": [
+                    8,
+                    12
+                  ],
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "freehandIcon",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "pencil",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--text-muted"
+                    },
+                    {
+                      "type": "text",
+                      "id": "freehandText",
+                      "fill": "$--text-muted",
+                      "content": "Freehand",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "paddleSpeedCard",
+          "name": "Paddle Speed",
+          "width": "fill_container",
+          "fill": "$--bg",
+          "cornerRadius": 12,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "paddleHeader",
+              "name": "paddleHeader",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "paddleLabel",
+                  "fill": "$--text-muted",
+                  "content": "PADDLE SPEED",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "text",
+                  "id": "paddleValue",
+                  "fill": "$--cyan",
+                  "content": "3.0 mph",
+                  "fontFamily": "$--font-mono",
+                  "fontSize": 14,
+                  "fontWeight": "600"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "paddleSliderTrack",
+              "width": "fill_container",
+              "height": 6,
+              "fill": "$--bg-tertiary",
+              "cornerRadius": 3,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "paddleSliderFill",
+                  "x": 0,
+                  "y": 0,
+                  "width": 150,
+                  "height": 6,
+                  "fill": "$--cyan",
+                  "cornerRadius": 3
+                },
+                {
+                  "type": "ellipse",
+                  "id": "paddleSliderThumb",
+                  "x": 142,
+                  "y": -5,
+                  "fill": "#FFFFFF",
+                  "width": 16,
+                  "height": 16
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "paddleSliderLabels",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "paddleMin",
+                  "fill": "$--text-dim",
+                  "content": "1 mph",
+                  "fontFamily": "$--font-mono",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "paddleMax",
+                  "fill": "$--text-dim",
+                  "content": "5 mph",
+                  "fontFamily": "$--font-mono",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "paddleHint",
+              "fill": "$--text-dim",
+              "content": "Avg kayak: 3 mph • Avg canoe: 2.5 mph",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "normal"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "tripStatsCard",
+          "name": "Trip Stats",
+          "width": "fill_container",
+          "fill": "$--bg",
+          "cornerRadius": 12,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "tripStatsLabel",
+              "fill": "$--text-muted",
+              "content": "TRIP STATS",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "statsRow",
+              "width": "fill_container",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "distanceStat",
+                  "width": "fill_container",
+                  "fill": "$--bg",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 14,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "distanceVal",
+                      "fill": "$--cyan",
+                      "content": "4.2",
+                      "fontFamily": "$--font-mono",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "distanceLabel",
+                      "fill": "$--text-dim",
+                      "content": "miles",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "timeStat",
+                  "width": "fill_container",
+                  "fill": "$--bg",
+                  "cornerRadius": 10,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": 14,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "timeVal",
+                      "fill": "$--cyan",
+                      "content": "1:24",
+                      "fontFamily": "$--font-mono",
+                      "fontSize": 24,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "timeLabel",
+                      "fill": "$--text-dim",
+                      "content": "paddle time",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "windCard",
+          "name": "Wind Conditions",
+          "width": "fill_container",
+          "fill": "$--bg",
+          "cornerRadius": 12,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "windHeader",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "windLabel",
+                  "fill": "$--text-muted",
+                  "content": "WIND CONDITIONS",
+                  "fontFamily": "Inter",
+                  "fontSize": 11,
+                  "fontWeight": "600",
+                  "letterSpacing": 1
+                },
+                {
+                  "type": "text",
+                  "id": "windUpdated",
+                  "fill": "$--text-dim",
+                  "content": "Live",
+                  "fontFamily": "Inter",
+                  "fontSize": 10,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "windCompassRow",
+              "width": "fill_container",
+              "gap": 16,
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "compassContainer",
+                  "width": 80,
+                  "height": 80,
+                  "fill": "$--bg-secondary",
+                  "cornerRadius": 40,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 2,
+                    "fill": "$--border"
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "compassN",
+                      "x": 34,
+                      "y": 6,
+                      "fill": "$--text-dim",
+                      "content": "N",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "compassS",
+                      "x": 35,
+                      "y": 62,
+                      "fill": "$--text-dim",
+                      "content": "S",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "compassE",
+                      "x": 64,
+                      "y": 33,
+                      "fill": "$--text-dim",
+                      "content": "E",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "text",
+                      "id": "compassW",
+                      "x": 8,
+                      "y": 33,
+                      "fill": "$--text-dim",
+                      "content": "W",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "windArrow",
+                      "x": 28,
+                      "y": 20,
+                      "width": 24,
+                      "height": 24,
+                      "iconFontName": "arrow-up",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--cyan",
+                      "rotation": 225
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "windInfo",
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "windSpeed",
+                      "fill": "$--text",
+                      "content": "12 mph SW",
+                      "fontFamily": "$--font-mono",
+                      "fontSize": 18,
+                      "fontWeight": "700"
+                    },
+                    {
+                      "type": "text",
+                      "id": "windGusts",
+                      "fill": "$--text-dim",
+                      "content": "Gusts to 18 mph",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "normal"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "windWarning",
+                      "fill": "rgba(251,191,36,0.15)",
+                      "cornerRadius": 4,
+                      "padding": [
+                        3,
+                        6
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "windWarningText",
+                          "fill": "$--warning",
+                          "content": "Moderate chop expected",
+                          "fontFamily": "Inter",
+                          "fontSize": 10,
+                          "fontWeight": "500"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "exposureCard",
+          "name": "Route Exposure",
+          "width": "fill_container",
+          "fill": "$--bg",
+          "cornerRadius": 12,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 10,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "exposureLabel",
+              "fill": "$--text-muted",
+              "content": "ROUTE EXPOSURE",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "exposureBar",
+              "width": "fill_container",
+              "height": 24,
+              "cornerRadius": 6,
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "shelteredSegment",
+                  "x": 0,
+                  "y": 0,
+                  "width": 91,
+                  "height": 24,
+                  "fill": "$--success",
+                  "cornerRadius": [
+                    6,
+                    0,
+                    0,
+                    6
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "moderateSegment",
+                  "x": 91,
+                  "y": 0,
+                  "width": 122,
+                  "height": 24,
+                  "fill": "$--warning"
+                },
+                {
+                  "type": "frame",
+                  "id": "exposedSegment",
+                  "x": 213,
+                  "y": 0,
+                  "width": 95,
+                  "height": 24,
+                  "fill": "$--danger",
+                  "cornerRadius": [
+                    0,
+                    6,
+                    6,
+                    0
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "exposureLegend",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "leg1",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "leg1dot",
+                      "width": 8,
+                      "height": 8,
+                      "fill": "$--success",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "text",
+                      "id": "leg1text",
+                      "fill": "$--text-dim",
+                      "content": "Sheltered 30%",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "leg2",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "leg2dot",
+                      "width": 8,
+                      "height": 8,
+                      "fill": "$--warning",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "text",
+                      "id": "leg2text",
+                      "fill": "$--text-dim",
+                      "content": "Moderate 40%",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "leg3",
+                  "gap": 4,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "leg3dot",
+                      "width": 8,
+                      "height": 8,
+                      "fill": "$--danger",
+                      "cornerRadius": 2
+                    },
+                    {
+                      "type": "text",
+                      "id": "leg3text",
+                      "fill": "$--text-dim",
+                      "content": "Exposed 30%",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "actionButtons",
+          "name": "Action Buttons",
+          "width": "fill_container",
+          "gap": 8,
+          "children": [
+            {
+              "type": "frame",
+              "id": "undoBtn",
+              "name": "Undo Button",
+              "width": "fill_container",
+              "fill": "$--bg",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "$--border"
+              },
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "undoIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "undo-2",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "id": "undoText",
+                  "fill": "$--text-muted",
+                  "content": "Undo",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "saveBtn",
+              "name": "Save Route Button",
+              "width": "fill_container",
+              "fill": "rgba(103,232,249,0.15)",
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "inside",
+                "thickness": 1,
+                "fill": "rgba(103,232,249,0.3)"
+              },
+              "padding": [
+                12,
+                16
+              ],
+              "justifyContent": "center",
+              "alignItems": "center",
+              "gap": 8,
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "saveIcon",
+                  "width": 16,
+                  "height": 16,
+                  "iconFontName": "save",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--cyan"
+                },
+                {
+                  "type": "text",
+                  "id": "saveText",
+                  "fill": "$--cyan",
+                  "content": "Save Route",
+                  "fontFamily": "Inter",
+                  "fontSize": 13,
+                  "fontWeight": "600"
                 }
               ]
             }

@@ -24,6 +24,9 @@ import { MAP_CONFIG, BASEMAP_STYLES, COLORS } from './constants';
 // Utils
 import { getPointAtDistance, buildLineCoordsBetweenDistances } from './utils';
 
+// Services
+import { WeatherData, ChopAssessment, fetchRouteWindConditions } from './services/weather';
+
 export default function Home() {
   // Map refs
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -98,6 +101,11 @@ export default function Home() {
     clearRoute: clearLakeRoute,
     updatePaddleSpeed: updateLakePaddleSpeed,
   } = useLakeRoute();
+
+  // Lake wind data state
+  const [lakeWindData, setLakeWindData] = useState<WeatherData | null>(null);
+  const [lakeChopAssessment, setLakeChopAssessment] = useState<ChopAssessment | null>(null);
+  const [lakeWindLoading, setLakeWindLoading] = useState(false);
 
   // Clear lake markers
   const clearLakeMarkers = useCallback(() => {
@@ -454,6 +462,37 @@ export default function Home() {
     }
   }, [lakeRoute]);
 
+  // Fetch wind data when lake route changes
+  useEffect(() => {
+    if (!lakeRoute?.geojson) {
+      setLakeWindData(null);
+      setLakeChopAssessment(null);
+      return;
+    }
+
+    const lineFeature = lakeRoute.geojson.features.find(f => f.geometry.type === 'LineString');
+    if (!lineFeature || lineFeature.geometry.type !== 'LineString') return;
+
+    const coords = lineFeature.geometry.coordinates as [number, number][];
+    if (coords.length < 2) return;
+
+    // Fetch wind conditions for the route
+    setLakeWindLoading(true);
+    fetchRouteWindConditions(coords)
+      .then((result) => {
+        if (result) {
+          setLakeWindData(result.avgWind);
+          setLakeChopAssessment(result.chop);
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to fetch wind data:', err);
+      })
+      .finally(() => {
+        setLakeWindLoading(false);
+      });
+  }, [lakeRoute]);
+
   // Update profile highlight on map
   useEffect(() => {
     if (!map.current || !route) return;
@@ -557,6 +596,9 @@ export default function Home() {
             onLakeUndo={handleLakeUndo}
             onLakeSaveRoute={() => { /* TODO: implement save */ }}
             isLakeDrawing={isLakeDrawing}
+            lakeWindData={lakeWindData}
+            lakeChopAssessment={lakeChopAssessment}
+            lakeWindLoading={lakeWindLoading}
           />
         </div>
       </div>

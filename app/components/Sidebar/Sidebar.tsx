@@ -1,6 +1,7 @@
 'use client';
 
 import { PersonaMode, RouteResult, SnapResult, ElevationPoint, SteepSection, LakeDrawingMode, LakeRoute, LakeWaypoint } from '../../types';
+import { WeatherData, ChopAssessment } from '../../services/weather';
 import { WelcomeSidebar } from './WelcomeSidebar';
 import { WhitewaterSidebar } from './WhitewaterSidebar';
 import { ExplorerSidebar } from './ExplorerSidebar';
@@ -35,6 +36,10 @@ interface SidebarProps {
   onLakeUndo?: () => void;
   onLakeSaveRoute?: () => void;
   isLakeDrawing?: boolean;
+  // Lake wind data
+  lakeWindData?: WeatherData | null;
+  lakeChopAssessment?: ChopAssessment | null;
+  lakeWindLoading?: boolean;
 }
 
 export function Sidebar({
@@ -65,6 +70,9 @@ export function Sidebar({
   onLakeUndo,
   onLakeSaveRoute,
   isLakeDrawing = false,
+  lakeWindData = null,
+  lakeChopAssessment = null,
+  lakeWindLoading = false,
 }: SidebarProps) {
   // Lake mode always shows sidebar (no route required to start)
   if (mode === 'lake') {
@@ -80,6 +88,9 @@ export function Sidebar({
         onUndo={onLakeUndo || (() => {})}
         onSaveRoute={onLakeSaveRoute || (() => {})}
         isDrawing={isLakeDrawing}
+        windData={lakeWindData}
+        chopAssessment={lakeChopAssessment}
+        windLoading={lakeWindLoading}
       />
     );
   }

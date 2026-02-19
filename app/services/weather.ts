@@ -52,6 +52,102 @@ export function getWindDirection(degrees: number): string {
   return directions[index];
 }
 
+// Chop assessment based on wind speed (mph)
+export interface ChopAssessment {
+  level: 'calm' | 'light' | 'moderate' | 'heavy' | 'dangerous';
+  label: string;
+  color: string;
+  description: string;
+}
+
+export function assessChop(windSpeed: number, windGusts?: number): ChopAssessment {
+  // Use gusts if significantly higher than sustained wind
+  const effectiveWind = windGusts && windGusts > windSpeed * 1.3 ? (windSpeed + windGusts) / 2 : windSpeed;
+  
+  if (effectiveWind < 5) {
+    return {
+      level: 'calm',
+      label: 'Calm',
+      color: 'var(--success)',
+      description: 'Flat water, ideal paddling',
+    };
+  } else if (effectiveWind < 10) {
+    return {
+      level: 'light',
+      label: 'Light chop',
+      color: 'var(--success)',
+      description: 'Small ripples, easy paddling',
+    };
+  } else if (effectiveWind < 15) {
+    return {
+      level: 'moderate',
+      label: 'Moderate chop',
+      color: 'var(--warning)',
+      description: 'Noticeable waves, some spray',
+    };
+  } else if (effectiveWind < 20) {
+    return {
+      level: 'heavy',
+      label: 'Heavy chop',
+      color: 'var(--danger)',
+      description: 'Large waves, challenging conditions',
+    };
+  } else {
+    return {
+      level: 'dangerous',
+      label: 'Dangerous',
+      color: 'var(--danger)',
+      description: 'Not recommended for paddling',
+    };
+  }
+}
+
+// Fetch wind data for multiple points along a route and average them
+export async function fetchRouteWindConditions(
+  coords: [number, number][]
+): Promise<{ avgWind: WeatherData; chop: ChopAssessment } | null> {
+  if (coords.length === 0) return null;
+  
+  // Sample up to 3 points along the route (start, middle, end)
+  const samplePoints: [number, number][] = [];
+  
+  if (coords.length === 1) {
+    samplePoints.push(coords[0]);
+  } else if (coords.length === 2) {
+    samplePoints.push(coords[0], coords[coords.length - 1]);
+  } else {
+    const midIndex = Math.floor(coords.length / 2);
+    samplePoints.push(coords[0], coords[midIndex], coords[coords.length - 1]);
+  }
+  
+  try {
+    // Fetch weather for each sample point
+    const weatherPromises = samplePoints.map(([lng, lat]) => fetchWeather(lat, lng));
+    const weatherResults = await Promise.all(weatherPromises);
+    
+    // Average the results
+    const avgWeather: WeatherData = {
+      temperature: Math.round(weatherResults.reduce((sum, w) => sum + w.temperature, 0) / weatherResults.length),
+      apparentTemperature: Math.round(weatherResults.reduce((sum, w) => sum + w.apparentTemperature, 0) / weatherResults.length),
+      humidity: Math.round(weatherResults.reduce((sum, w) => sum + w.humidity, 0) / weatherResults.length),
+      weatherCode: weatherResults[0].weatherCode, // Use first point's weather code
+      windSpeed: Math.round(weatherResults.reduce((sum, w) => sum + w.windSpeed, 0) / weatherResults.length),
+      windDirection: Math.round(weatherResults.reduce((sum, w) => sum + w.windDirection, 0) / weatherResults.length),
+      windGusts: Math.round(weatherResults.reduce((sum, w) => sum + w.windGusts, 0) / weatherResults.length),
+      sunrise: weatherResults[0].sunrise,
+      sunset: weatherResults[0].sunset,
+      updatedAt: new Date(),
+    };
+    
+    const chop = assessChop(avgWeather.windSpeed, avgWeather.windGusts);
+    
+    return { avgWind: avgWeather, chop };
+  } catch (error) {
+    console.error('Failed to fetch route wind conditions:', error);
+    return null;
+  }
+}
+
 export async function fetchWeather(lat: number, lng: number): Promise<WeatherData> {
   const params = new URLSearchParams({
     latitude: lat.toString(),

@@ -1,7 +1,8 @@
 'use client';
 
-import { Anchor, MapPin, Pencil, Undo2, Save, ArrowUp, X } from 'lucide-react';
+import { Anchor, MapPin, Pencil, Undo2, Save, ArrowUp, X, Loader2 } from 'lucide-react';
 import { LakeDrawingMode, LakeRoute, LakeWaypoint } from '../../types';
+import { WeatherData, ChopAssessment, getWindDirection } from '../../services/weather';
 import styles from './LakeSidebar.module.css';
 
 interface LakeSidebarProps {
@@ -15,6 +16,10 @@ interface LakeSidebarProps {
   onUndo: () => void;
   onSaveRoute: () => void;
   isDrawing: boolean;
+  // Wind data
+  windData: WeatherData | null;
+  chopAssessment: ChopAssessment | null;
+  windLoading: boolean;
 }
 
 export function LakeSidebar({
@@ -28,6 +33,9 @@ export function LakeSidebar({
   onUndo,
   onSaveRoute,
   isDrawing,
+  windData,
+  chopAssessment,
+  windLoading,
 }: LakeSidebarProps) {
   const hasRoute = lakeRoute && lakeRoute.distance_mi > 0;
   
@@ -36,6 +44,9 @@ export function LakeSidebar({
   const paddleTimeFormatted = paddleTimeMin > 0 
     ? `${Math.floor(paddleTimeMin / 60)}:${String(Math.floor(paddleTimeMin % 60)).padStart(2, '0')}`
     : '0:00';
+
+  // Wind arrow rotation (convert meteorological degrees to visual rotation)
+  const windArrowRotation = windData ? (windData.windDirection + 180) % 360 : 225;
 
   return (
     <div className={styles.sidebar}>
@@ -178,26 +189,62 @@ export function LakeSidebar({
         </div>
       </div>
 
-      {/* Wind Conditions (placeholder - would be live data) */}
+      {/* Wind Conditions - Live Data */}
       <div className={styles.card}>
         <div className={styles.paddleHeader}>
           <div className={styles.sectionLabel}>WIND CONDITIONS</div>
-          <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>Live</span>
+          <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>
+            {windLoading ? 'Loading...' : windData ? 'Live' : 'Draw route for data'}
+          </span>
         </div>
-        <div className={styles.windRow}>
-          <div className={styles.compass}>
-            <span className={`${styles.compassLabel} ${styles.compassN}`}>N</span>
-            <span className={`${styles.compassLabel} ${styles.compassS}`}>S</span>
-            <span className={`${styles.compassLabel} ${styles.compassE}`}>E</span>
-            <span className={`${styles.compassLabel} ${styles.compassW}`}>W</span>
-            <ArrowUp size={24} className={styles.windArrow} />
+        
+        {windLoading ? (
+          <div className={styles.windLoading}>
+            <Loader2 size={24} className={styles.spinner} />
+            <span>Fetching wind data...</span>
           </div>
-          <div className={styles.windInfo}>
-            <span className={styles.windSpeed}>12 mph SW</span>
-            <span className={styles.windGusts}>Gusts to 18 mph</span>
-            <span className={styles.windWarning}>Moderate chop expected</span>
+        ) : windData ? (
+          <>
+            <div className={styles.windRow}>
+              <div className={styles.compass}>
+                <span className={`${styles.compassLabel} ${styles.compassN}`}>N</span>
+                <span className={`${styles.compassLabel} ${styles.compassS}`}>S</span>
+                <span className={`${styles.compassLabel} ${styles.compassE}`}>E</span>
+                <span className={`${styles.compassLabel} ${styles.compassW}`}>W</span>
+                <ArrowUp 
+                  size={24} 
+                  className={styles.windArrow} 
+                  style={{ transform: `rotate(${windArrowRotation}deg)` }}
+                />
+              </div>
+              <div className={styles.windInfo}>
+                <span className={styles.windSpeed}>
+                  {windData.windSpeed} mph {getWindDirection(windData.windDirection)}
+                </span>
+                <span className={styles.windGusts}>Gusts to {windData.windGusts} mph</span>
+                {chopAssessment && (
+                  <span 
+                    className={styles.windWarning}
+                    style={{ 
+                      background: chopAssessment.level === 'calm' || chopAssessment.level === 'light' 
+                        ? 'rgba(34, 197, 94, 0.15)' 
+                        : chopAssessment.level === 'moderate'
+                        ? 'rgba(251, 191, 36, 0.15)'
+                        : 'rgba(239, 68, 68, 0.15)',
+                      color: chopAssessment.color,
+                    }}
+                  >
+                    {chopAssessment.description}
+                  </span>
+                )}
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className={styles.windPlaceholder}>
+            <span>Draw a route to see wind conditions along your path</span>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Route Exposure (placeholder) */}

@@ -463,27 +463,29 @@ export default function Home() {
     }
   }, [lakeRoute]);
 
-  // Detect lake name when waypoints change
+  // Detect lake name when waypoints change (using PostGIS)
   useEffect(() => {
-    if (!map.current || lakeWaypoints.length === 0) {
+    if (lakeWaypoints.length === 0) {
       setLakeName(null);
       return;
     }
 
     // Query the first waypoint to find which lake it's on
     const firstWp = lakeWaypoints[0];
-    const point = map.current.project([firstWp.lng, firstWp.lat]);
     
-    // Query the lakes layer at this point
-    const features = map.current.queryRenderedFeatures(point, {
-      layers: ['lakes-fill'],
-    });
-
-    if (features.length > 0 && features[0].properties?.name) {
-      setLakeName(features[0].properties.name);
-    } else {
-      setLakeName(null);
-    }
+    fetch(`/api/lake-at-point?lng=${firstWp.lng}&lat=${firstWp.lat}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.lake?.name) {
+          setLakeName(data.lake.name);
+        } else {
+          setLakeName(null);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to fetch lake name:', err);
+        setLakeName(null);
+      });
   }, [lakeWaypoints]);
 
   // Fetch wind data when lake route changes

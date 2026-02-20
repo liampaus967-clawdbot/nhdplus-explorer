@@ -3,14 +3,7 @@
  * Queries PostGIS to find which lake/waterbody contains a given point
  */
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
-
-// Must use Node.js runtime for pg
-export const runtime = 'nodejs';
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+import { query } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -26,7 +19,7 @@ export async function GET(request: NextRequest) {
   }
   
   try {
-    const result = await pool.query(
+    const result = await query(
       `SELECT 
         gnis_name as name,
         areasqkm as area_sqkm,

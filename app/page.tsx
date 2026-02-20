@@ -12,7 +12,7 @@ import { useRoute, useElevationProfile, useLakeRoute } from './hooks';
 
 // Components
 import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
+import { Sidebar, IconRail } from './components/Sidebar';
 import { MapControls, NavigationControls, LayerVisibility, DrawingControls } from './components/Map';
 
 // Layers
@@ -552,6 +552,8 @@ export default function Home() {
             onSubmit={handleLakeSubmit}
           />
         </div>
+
+        <IconRail mode={personaMode} onModeChange={handleModeChange} />
 
         <div className={styles.sidebar}>
           {error && (

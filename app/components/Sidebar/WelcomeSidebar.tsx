@@ -1,18 +1,7 @@
 'use client';
 
-import { MapPin, Search, ChevronRight, Navigation } from 'lucide-react';
-import { PersonaMode } from '../../types';
+import { MapPin, Search, Navigation } from 'lucide-react';
 import styles from './WelcomeSidebar.module.css';
-
-interface WelcomeSidebarProps {
-  onModeSelect: (mode: PersonaMode) => void;
-}
-
-const MODE_CARDS: { key: PersonaMode; emoji: string; name: string; desc: string }[] = [
-  { key: 'whitewater', emoji: '\u{1F30A}', name: 'Whitewater', desc: 'Rapids, gauge data, difficulty ratings' },
-  { key: 'explorer', emoji: '\u{1F6F6}', name: 'Explorer', desc: 'Scenic routes, campsites, wildlife' },
-  { key: 'floater', emoji: '\u{1F37A}', name: 'Floater', desc: 'Casual floats, tubing, beer runs' },
-];
 
 const NEARBY_RIVERS = [
   { name: 'James River', dist: '12 mi away', flow: 'Normal flow' },
@@ -20,7 +9,7 @@ const NEARBY_RIVERS = [
   { name: 'Shenandoah River', dist: '34 mi away', flow: 'High flow' },
 ];
 
-export function WelcomeSidebar({ onModeSelect }: WelcomeSidebarProps) {
+export function WelcomeSidebar() {
   return (
     <div className={styles.container}>
       <div className={`${styles.card} ${styles.welcome}`}>
@@ -34,26 +23,6 @@ export function WelcomeSidebar({ onModeSelect }: WelcomeSidebarProps) {
       <div className={styles.searchBar}>
         <Search size={18} color="var(--text-dim)" />
         <span className={styles.searchText}>Search rivers, streams, lakes...</span>
-      </div>
-
-      <div className={styles.card}>
-        <div className={styles.sectionLabel}>Choose Your Mode</div>
-        <div className={styles.modeCards}>
-          {MODE_CARDS.map((m) => (
-            <button
-              key={m.key}
-              className={styles.modeCard}
-              onClick={() => onModeSelect(m.key)}
-            >
-              <span className={styles.modeEmoji}>{m.emoji}</span>
-              <div className={styles.modeInfo}>
-                <div className={styles.modeName}>{m.name}</div>
-                <div className={styles.modeDesc}>{m.desc}</div>
-              </div>
-              <ChevronRight size={16} color="var(--text-dim)" />
-            </button>
-          ))}
-        </div>
       </div>
 
       <div className={styles.card}>

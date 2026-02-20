@@ -545,245 +545,6 @@
                 },
                 {
                   "type": "frame",
-                  "id": "DPxgr",
-                  "name": "Choose Mode",
-                  "width": "fill_container",
-                  "fill": "$--bg-secondary",
-                  "cornerRadius": 12,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1,
-                    "fill": "$--border"
-                  },
-                  "layout": "vertical",
-                  "gap": 12,
-                  "padding": 16,
-                  "children": [
-                    {
-                      "type": "text",
-                      "id": "pSZDN",
-                      "name": "modeLabel",
-                      "fill": "$--text-muted",
-                      "content": "CHOOSE YOUR MODE",
-                      "fontFamily": "Inter",
-                      "fontSize": 11,
-                      "fontWeight": "600",
-                      "letterSpacing": 1
-                    },
-                    {
-                      "type": "frame",
-                      "id": "eMfuu",
-                      "name": "wwModeCard",
-                      "width": "fill_container",
-                      "fill": "$--bg",
-                      "cornerRadius": 10,
-                      "stroke": {
-                        "align": "inside",
-                        "thickness": 1,
-                        "fill": "$--border"
-                      },
-                      "gap": 12,
-                      "padding": [
-                        14,
-                        16
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "7dAWK",
-                          "name": "wwEmoji",
-                          "content": "🌊",
-                          "fontFamily": "Inter",
-                          "fontSize": 22,
-                          "fontWeight": "normal"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "WRtno",
-                          "name": "wwInfo",
-                          "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "Ged6w",
-                              "name": "wwName",
-                              "fill": "$--text",
-                              "content": "Whitewater",
-                              "fontFamily": "Inter",
-                              "fontSize": 14,
-                              "fontWeight": "600"
-                            },
-                            {
-                              "type": "text",
-                              "id": "KdgmV",
-                              "name": "wwDesc",
-                              "fill": "$--text-dim",
-                              "content": "Rapids, gauge data, difficulty ratings",
-                              "fontFamily": "Inter",
-                              "fontSize": 11,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "icon_font",
-                          "id": "tu0RD",
-                          "name": "wwArrow",
-                          "width": 16,
-                          "height": 16,
-                          "iconFontName": "chevron-right",
-                          "iconFontFamily": "lucide",
-                          "fill": "$--text-dim"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "A16Fi",
-                      "name": "expModeCard",
-                      "width": "fill_container",
-                      "fill": "$--bg",
-                      "cornerRadius": 10,
-                      "stroke": {
-                        "align": "inside",
-                        "thickness": 1,
-                        "fill": "$--border"
-                      },
-                      "gap": 12,
-                      "padding": [
-                        14,
-                        16
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "bOf9v",
-                          "name": "expEmoji",
-                          "content": "🛶",
-                          "fontFamily": "Inter",
-                          "fontSize": 22,
-                          "fontWeight": "normal"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "i1uxo",
-                          "name": "expInfo",
-                          "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "KYeEy",
-                              "name": "expName",
-                              "fill": "$--text",
-                              "content": "Explorer",
-                              "fontFamily": "Inter",
-                              "fontSize": 14,
-                              "fontWeight": "600"
-                            },
-                            {
-                              "type": "text",
-                              "id": "1DTmt",
-                              "name": "expDesc",
-                              "fill": "$--text-dim",
-                              "content": "Scenic routes, campsites, wildlife",
-                              "fontFamily": "Inter",
-                              "fontSize": 11,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "icon_font",
-                          "id": "IFAGf",
-                          "name": "expArrow",
-                          "width": 16,
-                          "height": 16,
-                          "iconFontName": "chevron-right",
-                          "iconFontFamily": "lucide",
-                          "fill": "$--text-dim"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "frame",
-                      "id": "vnbXG",
-                      "name": "floatModeCard",
-                      "width": "fill_container",
-                      "fill": "$--bg",
-                      "cornerRadius": 10,
-                      "stroke": {
-                        "align": "inside",
-                        "thickness": 1,
-                        "fill": "$--border"
-                      },
-                      "gap": 12,
-                      "padding": [
-                        14,
-                        16
-                      ],
-                      "alignItems": "center",
-                      "children": [
-                        {
-                          "type": "text",
-                          "id": "XGSH2",
-                          "name": "floatEmoji",
-                          "content": "🍺",
-                          "fontFamily": "Inter",
-                          "fontSize": 22,
-                          "fontWeight": "normal"
-                        },
-                        {
-                          "type": "frame",
-                          "id": "w43z2",
-                          "name": "floatInfo",
-                          "width": "fill_container",
-                          "layout": "vertical",
-                          "gap": 2,
-                          "children": [
-                            {
-                              "type": "text",
-                              "id": "VWW7k",
-                              "name": "floatName",
-                              "fill": "$--text",
-                              "content": "Floater",
-                              "fontFamily": "Inter",
-                              "fontSize": 14,
-                              "fontWeight": "600"
-                            },
-                            {
-                              "type": "text",
-                              "id": "w7Mk0",
-                              "name": "floatDesc",
-                              "fill": "$--text-dim",
-                              "content": "Casual floats, tubing, beer runs",
-                              "fontFamily": "Inter",
-                              "fontSize": 11,
-                              "fontWeight": "normal"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "icon_font",
-                          "id": "vTU8N",
-                          "name": "floatArrow",
-                          "width": 16,
-                          "height": 16,
-                          "iconFontName": "chevron-right",
-                          "iconFontFamily": "lucide",
-                          "fill": "$--text-dim"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
                   "id": "HxeNJ",
                   "name": "Nearby Rivers",
                   "width": "fill_container",
@@ -861,7 +622,7 @@
                               "id": "ZnGiy",
                               "name": "r1Dist",
                               "fill": "$--text-dim",
-                              "content": "12 mi away  •  Normal flow",
+                              "content": "12 mi away  \u2022  Normal flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -922,7 +683,7 @@
                               "id": "UD1tY",
                               "name": "r2Dist",
                               "fill": "$--text-dim",
-                              "content": "18 mi away  •  Low flow",
+                              "content": "18 mi away  \u2022  Low flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -983,7 +744,7 @@
                               "id": "fYOB2",
                               "name": "r3Dist",
                               "fill": "$--text-dim",
-                              "content": "34 mi away  •  High flow",
+                              "content": "34 mi away  \u2022  High flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -1093,7 +854,7 @@
                   "type": "text",
                   "id": "iN5U9",
                   "fill": "$--text-muted",
-                  "content": "Upper Section • Class IV-V",
+                  "content": "Upper Section \u2022 Class IV-V",
                   "fontFamily": "Inter",
                   "fontSize": 13,
                   "fontWeight": "normal"
@@ -1242,7 +1003,7 @@
                       "type": "text",
                       "id": "UbSuO",
                       "fill": "#22c55e",
-                      "content": "● RUNNABLE",
+                      "content": "\u25cf RUNNABLE",
                       "fontFamily": "Inter",
                       "fontSize": 10,
                       "fontWeight": "600",
@@ -2301,7 +2062,7 @@
                       "id": "D4V3y",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68°F  Partly Cloudy",
+                      "content": "68\u00b0F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -2311,7 +2072,7 @@
                       "id": "uuq1n",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72°F  •  Humidity 54%",
+                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -2884,7 +2645,7 @@
                   "type": "text",
                   "id": "ANOPS",
                   "fill": "$--text-muted",
-                  "content": "Charlottesville → Palmyra",
+                  "content": "Charlottesville \u2192 Palmyra",
                   "fontFamily": "Inter",
                   "fontSize": 12,
                   "fontWeight": "normal"
@@ -3048,7 +2809,7 @@
                       "id": "vfIRl",
                       "name": "putCoords",
                       "fill": "$--text-dim",
-                      "content": "38.0293°N, 78.4767°W",
+                      "content": "38.0293\u00b0N, 78.4767\u00b0W",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -3096,7 +2857,7 @@
                       "id": "oj4C1",
                       "name": "takeCoords",
                       "fill": "$--text-dim",
-                      "content": "37.8612°N, 78.5134°W",
+                      "content": "37.8612\u00b0N, 78.5134\u00b0W",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -3916,7 +3677,7 @@
                         {
                           "type": "text",
                           "id": "FKQgb",
-                          "content": "🏕️",
+                          "content": "\ud83c\udfd5\ufe0f",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -3982,7 +3743,7 @@
                         {
                           "type": "text",
                           "id": "GxmCt",
-                          "content": "🌲",
+                          "content": "\ud83c\udf32",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -4048,7 +3809,7 @@
                         {
                           "type": "text",
                           "id": "mYh5E",
-                          "content": "📸",
+                          "content": "\ud83d\udcf8",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -4114,7 +3875,7 @@
                         {
                           "type": "text",
                           "id": "NHSZb",
-                          "content": "⚠️",
+                          "content": "\u26a0\ufe0f",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -4200,7 +3961,7 @@
               "type": "text",
               "id": "RcNGL",
               "fill": "$--text",
-              "content": "68°F",
+              "content": "68\u00b0F",
               "fontFamily": "Inter",
               "fontSize": 14,
               "fontWeight": "600"
@@ -4302,7 +4063,7 @@
                       "id": "khwsp",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68°F  Partly Cloudy",
+                      "content": "68\u00b0F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -4312,7 +4073,7 @@
                       "id": "F1Ao7",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72°F  •  Humidity 54%",
+                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -5138,7 +4899,7 @@
                       "type": "text",
                       "id": "ZG6sY",
                       "fill": "$--text-dim",
-                      "content": "Free parking • Restrooms • Easy entry",
+                      "content": "Free parking \u2022 Restrooms \u2022 Easy entry",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -5205,7 +4966,7 @@
                       "type": "text",
                       "id": "0Nk8L",
                       "fill": "$--text-dim",
-                      "content": "$5 parking • Food nearby • Shuttle available",
+                      "content": "$5 parking \u2022 Food nearby \u2022 Shuttle available",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -5929,7 +5690,7 @@
                       "id": "WCYnJ",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68°F  Partly Cloudy",
+                      "content": "68\u00b0F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -5939,7 +5700,7 @@
                       "id": "iTQCj",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72°F  •  Humidity 54%",
+                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -6811,7 +6572,7 @@
               "type": "text",
               "id": "paddleHint",
               "fill": "$--text-dim",
-              "content": "Avg kayak: 3 mph • Avg canoe: 2.5 mph",
+              "content": "Avg kayak: 3 mph \u2022 Avg canoe: 2.5 mph",
               "fontFamily": "Inter",
               "fontSize": 10,
               "fontWeight": "normal"
@@ -7179,7 +6940,7 @@
                       "type": "text",
                       "id": "windDegrees",
                       "fill": "$--text-dim",
-                      "content": "225°",
+                      "content": "225\u00b0",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"

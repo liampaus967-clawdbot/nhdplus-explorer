@@ -2,14 +2,8 @@
 
 import { Navigation } from 'lucide-react';
 import styles from './Header.module.css';
-import { PersonaMode } from '../../types';
 
-interface HeaderProps {
-  mode: PersonaMode;
-  onModeChange: (mode: PersonaMode) => void;
-}
-
-export function Header({ mode, onModeChange }: HeaderProps) {
+export function Header() {
   return (
     <header className={styles.header}>
       <div className={styles.titleGroup}>

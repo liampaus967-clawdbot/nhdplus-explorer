@@ -13,7 +13,7 @@ import { useRoute, useElevationProfile, useLakeRoute } from './hooks';
 // Components
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
-import { MapControls, LayerVisibility, DrawingControls } from './components/Map';
+import { MapControls, NavigationControls, LayerVisibility, DrawingControls } from './components/Map';
 
 // Layers
 import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight } from './layers';
@@ -528,11 +528,12 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <Header mode={personaMode} onModeChange={handleModeChange} />
+      <Header />
 
       <div className={styles.body}>
         <div className={styles.mapWrapper}>
           <div ref={mapContainer} className={styles.map} />
+          <NavigationControls map={map.current} />
           <MapControls
             layers={layerVisibility}
             onLayersChange={handleLayerVisibilityChange}

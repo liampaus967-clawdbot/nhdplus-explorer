@@ -20,6 +20,7 @@ interface LakeSidebarProps {
   windData: WeatherData | null;
   chopAssessment: ChopAssessment | null;
   windLoading: boolean;
+  lakeName?: string | null;
 }
 
 export function LakeSidebar({
@@ -36,6 +37,7 @@ export function LakeSidebar({
   windData,
   chopAssessment,
   windLoading,
+  lakeName,
 }: LakeSidebarProps) {
   const hasRoute = lakeRoute && lakeRoute.distance_mi > 0;
   
@@ -52,7 +54,7 @@ export function LakeSidebar({
           <Anchor size={16} />
           Lake Mode
         </div>
-        <h2 className={styles.lakeName}>Lake Route</h2>
+        <h2 className={styles.lakeName}>{lakeName || 'Lake Route'}</h2>
       </div>
 
       {/* Action Buttons */}

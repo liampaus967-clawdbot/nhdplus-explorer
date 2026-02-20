@@ -106,6 +106,7 @@ export default function Home() {
   const [lakeWindData, setLakeWindData] = useState<WeatherData | null>(null);
   const [lakeChopAssessment, setLakeChopAssessment] = useState<ChopAssessment | null>(null);
   const [lakeWindLoading, setLakeWindLoading] = useState(false);
+  const [lakeName, setLakeName] = useState<string | null>(null);
 
   // Clear lake markers
   const clearLakeMarkers = useCallback(() => {
@@ -462,6 +463,29 @@ export default function Home() {
     }
   }, [lakeRoute]);
 
+  // Detect lake name when waypoints change
+  useEffect(() => {
+    if (!map.current || lakeWaypoints.length === 0) {
+      setLakeName(null);
+      return;
+    }
+
+    // Query the first waypoint to find which lake it's on
+    const firstWp = lakeWaypoints[0];
+    const point = map.current.project([firstWp.lng, firstWp.lat]);
+    
+    // Query the lakes layer at this point
+    const features = map.current.queryRenderedFeatures(point, {
+      layers: ['lakes-fill'],
+    });
+
+    if (features.length > 0 && features[0].properties?.name) {
+      setLakeName(features[0].properties.name);
+    } else {
+      setLakeName(null);
+    }
+  }, [lakeWaypoints]);
+
   // Fetch wind data when lake route changes
   useEffect(() => {
     if (!lakeRoute?.geojson) {
@@ -602,6 +626,7 @@ export default function Home() {
             lakeWindData={lakeWindData}
             lakeChopAssessment={lakeChopAssessment}
             lakeWindLoading={lakeWindLoading}
+            lakeName={lakeName}
           />
         </div>
       </div>

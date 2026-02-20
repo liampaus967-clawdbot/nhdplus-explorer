@@ -40,6 +40,7 @@ interface SidebarProps {
   lakeWindData?: WeatherData | null;
   lakeChopAssessment?: ChopAssessment | null;
   lakeWindLoading?: boolean;
+  lakeName?: string | null;
 }
 
 export function Sidebar({
@@ -73,6 +74,7 @@ export function Sidebar({
   lakeWindData = null,
   lakeChopAssessment = null,
   lakeWindLoading = false,
+  lakeName = null,
 }: SidebarProps) {
   // Lake mode always shows sidebar (no route required to start)
   if (mode === 'lake') {
@@ -91,6 +93,7 @@ export function Sidebar({
         windData={lakeWindData}
         chopAssessment={lakeChopAssessment}
         windLoading={lakeWindLoading}
+        lakeName={lakeName}
       />
     );
   }

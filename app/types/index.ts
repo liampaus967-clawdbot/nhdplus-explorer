@@ -1,5 +1,35 @@
 // Route and map related types
 
+/* ─── GeoJSON Type Helpers ─── */
+
+export interface LineStringGeometry {
+  type: 'LineString';
+  coordinates: [number, number][];
+}
+
+export interface PointGeometry {
+  type: 'Point';
+  coordinates: [number, number];
+}
+
+export interface PolygonGeometry {
+  type: 'Polygon';
+  coordinates: [number, number][][];
+}
+
+export interface RouteFeature extends GeoJSON.Feature {
+  geometry: LineStringGeometry;
+  properties: {
+    comid?: number;
+    gnis_name?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface RouteFeatureCollection extends GeoJSON.FeatureCollection {
+  features: RouteFeature[];
+}
+
 export interface ElevationPoint {
   dist_m: number;
   elev_m: number;

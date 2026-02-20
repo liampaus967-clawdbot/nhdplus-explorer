@@ -472,10 +472,19 @@ export default function Home() {
 
     // Query the first waypoint to find which lake it's on
     const firstWp = lakeWaypoints[0];
+    const url = `/api/lake-at-point?lng=${firstWp.lng}&lat=${firstWp.lat}`;
     
-    fetch(`/api/lake-at-point?lng=${firstWp.lng}&lat=${firstWp.lat}`)
-      .then(res => res.json())
+    console.log('Fetching lake name:', url);
+    
+    fetch(url)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(`API error: ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
+        console.log('Lake API response:', data);
         if (data.lake?.name) {
           setLakeName(data.lake.name);
         } else {

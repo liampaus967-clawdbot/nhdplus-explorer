@@ -12,8 +12,8 @@ import { useRoute, useElevationProfile, useLakeRoute } from './hooks';
 
 // Components
 import { Header } from './components/Header';
-import { Sidebar, IconRail } from './components/Sidebar';
-import { MapControls, NavigationControls, LayerVisibility, DrawingControls } from './components/Map';
+import { Sidebar } from './components/Sidebar';
+import { MapControls, LayerVisibility, DrawingControls } from './components/Map';
 
 // Layers
 import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight } from './layers';
@@ -38,7 +38,6 @@ export default function Home() {
   // State
   const [basemap, setBasemap] = useState<BasemapStyle>('outdoors');
   const basemapRef = useRef<BasemapStyle>('outdoors');
-  const layerVisibilityRef = useRef<LayerVisibility>(null!);
   const [personaMode, setPersonaMode] = useState<PersonaMode>('explorer');
   const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
     blmLands: true,
@@ -51,7 +50,6 @@ export default function Home() {
     rapids: true,
     waterfalls: true,
   });
-  layerVisibilityRef.current = layerVisibility;
 
   // Custom hooks
   const {
@@ -283,23 +281,24 @@ export default function Home() {
     [basemap]
   );
 
-  // Layer mapping from toggle keys to Mapbox layer IDs
-  const layerMapping: Record<keyof LayerVisibility, string[]> = {
-    blmLands: ['blm-lands-fill', 'blm-lands-outline'],
-    wilderness: ['wilderness-fill', 'wilderness-outline'],
-    rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
-    lakes: ['lakes-fill', 'lakes-outline'],
-    wildScenicRivers: ['wsr-line', 'wsr-labels'],
-    accessPoints: ['access-points-backdrop'],
-    campgrounds: ['campgrounds-backdrop'],
-    rapids: ['rapids-backdrop'],
-    waterfalls: ['waterfalls-backdrop'],
-  };
-
-  // Apply layer visibility state to the map
-  const applyLayerVisibility = useCallback((visibility: LayerVisibility) => {
+  // Handle layer visibility change
+  const handleLayerVisibilityChange = useCallback((newVisibility: LayerVisibility) => {
+    setLayerVisibility(newVisibility);
     if (!map.current) return;
-    Object.entries(visibility).forEach(([key, visible]) => {
+
+    const layerMapping: Record<keyof LayerVisibility, string[]> = {
+      blmLands: ['blm-lands-fill', 'blm-lands-outline'],
+      wilderness: ['wilderness-fill', 'wilderness-outline'],
+      rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
+      lakes: ['lakes-fill', 'lakes-outline', 'lakes-labels'],
+      wildScenicRivers: ['wsr-line', 'wsr-labels'],
+      accessPoints: ['access-points-backdrop'],
+      campgrounds: ['campgrounds-backdrop'],
+      rapids: ['rapids-backdrop'],
+      waterfalls: ['waterfalls-backdrop'],
+    };
+
+    Object.entries(newVisibility).forEach(([key, visible]) => {
       const layers = layerMapping[key as keyof LayerVisibility];
       layers?.forEach((layerId) => {
         if (map.current?.getLayer(layerId)) {
@@ -308,12 +307,6 @@ export default function Home() {
       });
     });
   }, []);
-
-  // Handle layer visibility change
-  const handleLayerVisibilityChange = useCallback((newVisibility: LayerVisibility) => {
-    setLayerVisibility(newVisibility);
-    applyLayerVisibility(newVisibility);
-  }, [applyLayerVisibility]);
 
   // Handle persona mode change
   const handleModeChange = useCallback((newMode: PersonaMode) => {
@@ -342,22 +335,13 @@ export default function Home() {
       pitch: MAP_CONFIG.pitch,
     });
 
+    map.current.addControl(new mapboxgl.NavigationControl());
     map.current.addControl(new mapboxgl.FullscreenControl());
 
     const setupLayers = () => {
       if (map.current) {
         addAllLayers(map.current, basemapRef.current);
-
-        // Re-apply layer visibility after layers are recreated
-        Object.entries(layerVisibilityRef.current).forEach(([key, visible]) => {
-          const layers = layerMapping[key as keyof LayerVisibility];
-          layers?.forEach((layerId) => {
-            if (map.current?.getLayer(layerId)) {
-              map.current.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
-            }
-          });
-        });
-
+        
         // Add lake route source and layers
         if (!map.current.getSource('lake-route')) {
           map.current.addSource('lake-route', {
@@ -544,18 +528,18 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <Header />
+      <Header mode={personaMode} onModeChange={handleModeChange} />
 
       <div className={styles.body}>
         <div className={styles.mapWrapper}>
           <div ref={mapContainer} className={styles.map} />
-          <NavigationControls map={map.current} />
           <MapControls
             layers={layerVisibility}
             onLayersChange={handleLayerVisibilityChange}
             basemap={basemap}
             onBasemapChange={handleBasemapChange}
           />
+          {/* Lake Mode Drawing Controls - hidden when route is submitted */}
           <DrawingControls
             visible={personaMode === 'lake' && (lakeWaypoints.length > 0 || isLakeDrawing) && !isLakeSubmitted}
             drawingMode={lakeDrawingMode}
@@ -567,8 +551,6 @@ export default function Home() {
             onSubmit={handleLakeSubmit}
           />
         </div>
-
-        <IconRail mode={personaMode} onModeChange={handleModeChange} />
 
         <div className={styles.sidebar}>
           {error && (

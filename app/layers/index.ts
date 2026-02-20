@@ -1,5 +1,6 @@
 import mapboxgl from 'mapbox-gl';
 import { addRiversSource, addRiversLayers } from './rivers';
+import { addLakesSource, addLakesLayers } from './lakes';
 import { addAccessPointsSource, addAccessPointsBackdrop } from './accessPoints';
 import { addCampgroundsSource, addCampgroundsBackdrop } from './campgrounds';
 import { addRapidsSource, addRapidsBackdrop } from './rapids';
@@ -10,6 +11,7 @@ import { addWildernessSource, addWildernessLayers } from './wilderness';
 import { addPoiIcons } from './poiIcons';
 
 export * from './rivers';
+export * from './lakes';
 export * from './accessPoints';
 export * from './campgrounds';
 export * from './rapids';
@@ -25,6 +27,7 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   // Add sources
   addBlmLandsSource(map);
   addWildernessSource(map);
+  addLakesSource(map);
   addRiversSource(map);
   addAccessPointsSource(map);
   addWaterfallsSource(map);
@@ -36,6 +39,9 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   // Land layers first (below everything)
   addBlmLandsLayers(map);
   addWildernessLayers(map);
+  
+  // Lakes (below rivers)
+  addLakesLayers(map);
   
   // Then rivers
   addRiversLayers(map, basemap);

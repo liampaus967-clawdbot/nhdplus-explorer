@@ -35,6 +35,7 @@ export const GRADIENT_COLORS: Record<string, string> = {
 // Tileset URLs
 export const TILESETS = {
   rivers: 'mapbox://lman967.east-coast-rivers',
+  lakes: 'mapbox://lman967.ne-waterbodies',
   accessPoints: 'mapbox://lman967.access-points-clean',
   campgrounds: 'mapbox://lman967.campgrounds-near-water',
   rapids: 'mapbox://lman967.rapids',
@@ -46,6 +47,7 @@ export const TILESETS = {
 // Source layer names
 export const SOURCE_LAYERS = {
   rivers: 'eastCoastRivers',
+  lakes: 'New England Waterbodies',
   accessPoints: 'access_points_clean',
   campgrounds: 'campgrounds',
   rapids: 'rapids',
@@ -58,6 +60,9 @@ export const SOURCE_LAYERS = {
 export const COLORS = {
   river: '#3b82f6',
   riverLabel: '#1e40af',
+  lake: '#60a5fa', // Light blue for lake fill
+  lakeOutline: '#3b82f6', // Blue for lake outline
+  lakeLabel: '#1e40af', // Dark blue for lake labels
   accessPoint: '#3b82f6',
   campground: '#22c55e',
   rapid: '#ef4444',

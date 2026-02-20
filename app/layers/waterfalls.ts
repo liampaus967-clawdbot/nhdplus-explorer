@@ -1,5 +1,5 @@
 import mapboxgl from 'mapbox-gl';
-import { TILESETS, SOURCE_LAYERS, COLORS } from '../constants';
+import { TILESETS, SOURCE_LAYERS } from '../constants';
 
 export function addWaterfallsSource(map: mapboxgl.Map) {
   if (map.getSource('waterfalls')) return;
@@ -13,29 +13,29 @@ export function addWaterfallsBackdrop(map: mapboxgl.Map) {
   if (map.getLayer('waterfalls-backdrop')) return;
   map.addLayer({
     id: 'waterfalls-backdrop',
-    type: 'circle',
+    type: 'symbol',
     source: 'waterfalls',
     'source-layer': SOURCE_LAYERS.waterfalls,
-    paint: {
-      'circle-radius': [
+    layout: {
+      'icon-image': 'poi-waterfall',
+      'icon-size': [
         'interpolate', ['linear'], ['zoom'],
-        0, 1,
-        6, 3,
-        10, 6,
-        14, 10,
-        18, 16,
-        22, 24,
+        6, 0.3,
+        10, 0.6,
+        14, 1.5,
+        18, 2,
       ],
-      'circle-color': COLORS.waterfall,
-      'circle-stroke-width': 0.5,
-      'circle-stroke-color': '#000000',
+      'icon-allow-overlap': false,
+      'icon-anchor': 'bottom',
+    },
+    paint: {
+      'icon-opacity': 1,
     },
   });
 }
 
-// No symbols - just circles
 export function addWaterfallsSymbols(_map: mapboxgl.Map) {
-  // Removed - using circles only
+  // Icons handled by backdrop symbol layer
 }
 
 export function addWaterfallsLayers(map: mapboxgl.Map) {

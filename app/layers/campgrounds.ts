@@ -1,5 +1,5 @@
 import mapboxgl from 'mapbox-gl';
-import { TILESETS, SOURCE_LAYERS, COLORS } from '../constants';
+import { TILESETS, SOURCE_LAYERS } from '../constants';
 
 export function addCampgroundsSource(map: mapboxgl.Map) {
   if (map.getSource('campgrounds')) return;
@@ -13,29 +13,29 @@ export function addCampgroundsBackdrop(map: mapboxgl.Map) {
   if (map.getLayer('campgrounds-backdrop')) return;
   map.addLayer({
     id: 'campgrounds-backdrop',
-    type: 'circle',
+    type: 'symbol',
     source: 'campgrounds',
     'source-layer': SOURCE_LAYERS.campgrounds,
-    paint: {
-      'circle-radius': [
+    layout: {
+      'icon-image': 'poi-campground',
+      'icon-size': [
         'interpolate', ['linear'], ['zoom'],
-        0, 1,
-        6, 3,
-        10, 6,
-        14, 10,
-        18, 16,
-        22, 24,
+        6, 0.3,
+        10, 0.6,
+        14, 1.5,
+        18, 2,
       ],
-      'circle-color': COLORS.campground,
-      'circle-stroke-width': 0.5,
-      'circle-stroke-color': '#000000',
+      'icon-allow-overlap': false,
+      'icon-anchor': 'bottom',
+    },
+    paint: {
+      'icon-opacity': 1,
     },
   });
 }
 
-// No symbols - just circles
 export function addCampgroundsSymbols(_map: mapboxgl.Map) {
-  // Removed - using circles only
+  // Icons handled by backdrop symbol layer
 }
 
 export function addCampgroundsLayers(map: mapboxgl.Map) {

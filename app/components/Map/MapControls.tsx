@@ -5,7 +5,7 @@ import {
   Layers, Map, X, Check,
   LandPlot, TreePine, Waves, Droplets, Sparkles,
   MapPin, Tent, Zap, ArrowDownToLine,
-  Trees, Satellite, Moon, Mountain,
+  Trees, Satellite, Moon,
 } from 'lucide-react';
 import { BasemapStyle } from '../../types';
 import styles from './MapControls.module.css';
@@ -63,7 +63,6 @@ const BASEMAPS: BasemapDef[] = [
   { key: 'outdoors', label: 'Outdoors', icon: <Trees size={16} /> },
   { key: 'satellite', label: 'Satellite', icon: <Satellite size={16} /> },
   { key: 'dark', label: 'Dark', icon: <Moon size={16} /> },
-  { key: 'terrain', label: 'Terrain', icon: <Mountain size={16} /> },
 ];
 
 /* ─── Props ─── */

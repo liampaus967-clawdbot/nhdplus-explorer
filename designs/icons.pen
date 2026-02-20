@@ -1,0 +1,754 @@
+{
+  "version": "2.8",
+  "children": [
+    {
+      "type": "frame",
+      "id": "YDu64",
+      "x": 2,
+      "y": 468,
+      "name": "Iteration 4 — Soft Gradient Drop",
+      "gap": 48,
+      "padding": 32,
+      "children": [
+        {
+          "type": "frame",
+          "id": "JTDx8",
+          "name": "Icon / Access Point v4",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "UR31W",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#60A5FA",
+                    "position": 0
+                  },
+                  {
+                    "color": "#2563EB",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#2563EB50",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "VO5ic",
+                  "x": 11,
+                  "y": 11,
+                  "name": "ap4i",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "map-pin",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "itveo",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#2563EB",
+              "width": 16,
+              "height": 10
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "SMnjS",
+          "name": "Icon / Campground v4",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "npGqu",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#4ADE80",
+                    "position": 0
+                  },
+                  {
+                    "color": "#16A34A",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#16A34A50",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "xVWQf",
+                  "x": 11,
+                  "y": 11,
+                  "name": "cg4i",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "tent",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "a20k4",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#16A34A",
+              "width": 16,
+              "height": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "S9BVM",
+          "name": "Icon / Rapids v4",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "UklCF",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#F87171",
+                    "position": 0
+                  },
+                  {
+                    "color": "#DC2626",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#DC262650",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "ktWn9",
+                  "x": 11,
+                  "y": 11,
+                  "name": "rp4i",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "zap",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "zfrKp",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#DC2626",
+              "width": 16,
+              "height": 10
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "dK9dr",
+          "name": "Icon / Waterfall v4",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "HpryA",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#22D3EE",
+                    "position": 0
+                  },
+                  {
+                    "color": "#0891B2",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#0891B250",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "PijOI",
+                  "x": 11,
+                  "y": 11,
+                  "name": "wf4i",
+                  "width": 22,
+                  "height": 22,
+                  "iconFontName": "waves",
+                  "iconFontFamily": "lucide",
+                  "fill": "#FFFFFF"
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "YzErJ",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#0891B2",
+              "width": 16,
+              "height": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "3RIRc",
+      "x": 2,
+      "y": 626,
+      "name": "Iteration 5 — Gradient Drop (Dark Icon)",
+      "gap": 48,
+      "padding": 32,
+      "children": [
+        {
+          "type": "frame",
+          "id": "QnPaj",
+          "name": "Icon / Access Point v5",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "XEOZQ",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#60A5FA",
+                    "position": 0
+                  },
+                  {
+                    "color": "#2563EB",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#2563EB50",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "G3dev",
+                  "x": 3,
+                  "y": 4,
+                  "name": "ap5i",
+                  "width": 37,
+                  "height": 36,
+                  "fill": {
+                    "type": "image",
+                    "enabled": true,
+                    "url": "../assets/access-point-boat-icon-transparent.png",
+                    "mode": "fit",
+                    "blendMode": "darken"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "zumVB",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#2563EB",
+              "width": 16,
+              "height": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "z7SBL",
+          "name": "Icon / Campground v5",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "HaEQC",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#4ADE80",
+                    "position": 0
+                  },
+                  {
+                    "color": "#16A34A",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#16A34A50",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "iS6qa",
+                  "x": 7,
+                  "y": 5,
+                  "name": "cg5i",
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "tent",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "CLdsU",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#16A34A",
+              "width": 16,
+              "height": 10
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "bmBIt",
+          "name": "Icon / Rapids v5",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "deuZz",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#F87171",
+                    "position": 0
+                  },
+                  {
+                    "color": "#DC2626",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#DC262650",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "NbloF",
+                  "x": 7,
+                  "y": 6,
+                  "name": "rp5i",
+                  "width": 29,
+                  "height": 28,
+                  "iconFontName": "triangle-alert",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "EhZOI",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#DC2626",
+              "width": 16,
+              "height": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              }
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "3D6ax",
+          "name": "Icon / Waterfall v5",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "1sKi5",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#22D3EE",
+                    "position": 0
+                  },
+                  {
+                    "color": "#0891B2",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#0891B250",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "dAHoE",
+                  "x": 8,
+                  "y": 8,
+                  "name": "wf5i",
+                  "width": 28,
+                  "height": 28,
+                  "iconFontName": "waves",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "FRNCW",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#0891B2",
+              "width": 16,
+              "height": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "nlhL4",
+      "x": 2,
+      "y": 784,
+      "name": "Access Point — Icon Options",
+      "gap": 32,
+      "padding": 32,
+      "children": [
+        {
+          "type": "frame",
+          "id": "cv3cf",
+          "name": "F: paddle",
+          "layout": "vertical",
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "4Lu8v",
+              "name": "apF",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#60A5FA",
+                    "position": 0
+                  },
+                  {
+                    "color": "#2563EB",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "ellipse",
+                  "id": "hiiXR",
+                  "x": 15,
+                  "y": 4,
+                  "name": "blade",
+                  "fill": "#1A1A1A",
+                  "width": 14,
+                  "height": 16
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 1,
+                  "id": "iPosR",
+                  "x": 20.5,
+                  "y": 16,
+                  "name": "shaft",
+                  "fill": "#1A1A1A",
+                  "width": 3,
+                  "height": 18
+                },
+                {
+                  "type": "rectangle",
+                  "cornerRadius": 1,
+                  "id": "W6pvu",
+                  "x": 18,
+                  "y": 34,
+                  "name": "grip",
+                  "fill": "#1A1A1A",
+                  "width": 8,
+                  "height": 3
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "6JwBn",
+              "name": "labF",
+              "fill": "#1A1A1A",
+              "content": "F: paddle",
+              "fontFamily": "DM Sans",
+              "fontSize": 11,
+              "fontWeight": "normal"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

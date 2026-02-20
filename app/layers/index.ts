@@ -7,6 +7,7 @@ import { addWaterfallsSource, addWaterfallsBackdrop } from './waterfalls';
 import { addRouteSource, addRouteLayers } from './routeLayer';
 import { addBlmLandsSource, addBlmLandsLayers } from './blmLands';
 import { addWildernessSource, addWildernessLayers } from './wilderness';
+import { addPoiIcons } from './poiIcons';
 
 export * from './rivers';
 export * from './accessPoints';
@@ -39,7 +40,8 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   // Then rivers
   addRiversLayers(map, basemap);
   
-  // POI circles (no symbols)
+  // Register custom POI pin icons, then add symbol layers
+  await addPoiIcons(map);
   addWaterfallsBackdrop(map);
   addRapidsBackdrop(map);
   addCampgroundsBackdrop(map);

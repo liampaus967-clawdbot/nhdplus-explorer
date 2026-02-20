@@ -14,8 +14,7 @@ export const MAP_CONFIG = {
 export const BASEMAP_STYLES: Record<BasemapStyle, string | mapboxgl.StyleSpecification> = {
   outdoors: onWaterTopoLight as mapboxgl.StyleSpecification,
   satellite: 'mapbox://styles/mapbox/satellite-streets-v12',
-  dark: 'mapbox://styles/mapbox/dark-v11',
-  terrain: 'mapbox://styles/mapbox/outdoors-v12',
+  dark: 'mapbox://styles/lman967/cmlv3j9q3000v01s4b3ek6c6z',
 };
 
 // Flow conditions

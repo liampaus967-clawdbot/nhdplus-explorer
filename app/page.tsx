@@ -38,6 +38,7 @@ export default function Home() {
   // State
   const [basemap, setBasemap] = useState<BasemapStyle>('outdoors');
   const basemapRef = useRef<BasemapStyle>('outdoors');
+  const layerVisibilityRef = useRef<LayerVisibility>(null!);
   const [personaMode, setPersonaMode] = useState<PersonaMode>('explorer');
   const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
     blmLands: true,
@@ -50,6 +51,7 @@ export default function Home() {
     rapids: true,
     waterfalls: true,
   });
+  layerVisibilityRef.current = layerVisibility;
 
   // Custom hooks
   const {
@@ -281,24 +283,23 @@ export default function Home() {
     [basemap]
   );
 
-  // Handle layer visibility change
-  const handleLayerVisibilityChange = useCallback((newVisibility: LayerVisibility) => {
-    setLayerVisibility(newVisibility);
+  // Layer mapping from toggle keys to Mapbox layer IDs
+  const layerMapping: Record<keyof LayerVisibility, string[]> = {
+    blmLands: ['blm-lands-fill', 'blm-lands-outline'],
+    wilderness: ['wilderness-fill', 'wilderness-outline'],
+    rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
+    lakes: ['lakes-fill', 'lakes-outline'],
+    wildScenicRivers: ['wsr-line', 'wsr-labels'],
+    accessPoints: ['access-points-backdrop'],
+    campgrounds: ['campgrounds-backdrop'],
+    rapids: ['rapids-backdrop'],
+    waterfalls: ['waterfalls-backdrop'],
+  };
+
+  // Apply layer visibility state to the map
+  const applyLayerVisibility = useCallback((visibility: LayerVisibility) => {
     if (!map.current) return;
-
-    const layerMapping: Record<keyof LayerVisibility, string[]> = {
-      blmLands: ['blm-lands-fill', 'blm-lands-outline'],
-      wilderness: ['wilderness-fill', 'wilderness-outline'],
-      rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
-      lakes: ['lakes-fill', 'lakes-outline'],
-      wildScenicRivers: ['wsr-line', 'wsr-labels'],
-      accessPoints: ['access-points-backdrop'],
-      campgrounds: ['campgrounds-backdrop'],
-      rapids: ['rapids-backdrop'],
-      waterfalls: ['waterfalls-backdrop'],
-    };
-
-    Object.entries(newVisibility).forEach(([key, visible]) => {
+    Object.entries(visibility).forEach(([key, visible]) => {
       const layers = layerMapping[key as keyof LayerVisibility];
       layers?.forEach((layerId) => {
         if (map.current?.getLayer(layerId)) {
@@ -307,6 +308,12 @@ export default function Home() {
       });
     });
   }, []);
+
+  // Handle layer visibility change
+  const handleLayerVisibilityChange = useCallback((newVisibility: LayerVisibility) => {
+    setLayerVisibility(newVisibility);
+    applyLayerVisibility(newVisibility);
+  }, [applyLayerVisibility]);
 
   // Handle persona mode change
   const handleModeChange = useCallback((newMode: PersonaMode) => {
@@ -340,7 +347,17 @@ export default function Home() {
     const setupLayers = () => {
       if (map.current) {
         addAllLayers(map.current, basemapRef.current);
-        
+
+        // Re-apply layer visibility after layers are recreated
+        Object.entries(layerVisibilityRef.current).forEach(([key, visible]) => {
+          const layers = layerMapping[key as keyof LayerVisibility];
+          layers?.forEach((layerId) => {
+            if (map.current?.getLayer(layerId)) {
+              map.current.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+            }
+          });
+        });
+
         // Add lake route source and layers
         if (!map.current.getSource('lake-route')) {
           map.current.addSource('lake-route', {

@@ -1,9 +1,9 @@
 'use client';
 
-import { MapPin, Pencil, Undo2, Save, ArrowUp, X, Loader2 } from 'lucide-react';
+import { Anchor, MapPin, Pencil, Undo2, Save, X } from 'lucide-react';
 import { LakeDrawingMode, LakeRoute, LakeWaypoint } from '../../types';
-import { WeatherData, ChopAssessment, getWindDirection } from '../../services/weather';
-import { ModeTag } from './shared/ModeTag';
+import { WeatherData, ChopAssessment } from '../../services/weather';
+import { WindConditionsCard, ExposureBar } from './shared';
 import styles from './LakeSidebar.module.css';
 
 interface LakeSidebarProps {
@@ -17,7 +17,6 @@ interface LakeSidebarProps {
   onUndo: () => void;
   onSaveRoute: () => void;
   isDrawing: boolean;
-  // Wind data
   windData: WeatherData | null;
   chopAssessment: ChopAssessment | null;
   windLoading: boolean;
@@ -40,24 +39,23 @@ export function LakeSidebar({
 }: LakeSidebarProps) {
   const hasRoute = lakeRoute && lakeRoute.distance_mi > 0;
   
-  // Calculate paddle time based on distance and speed
   const paddleTimeMin = hasRoute ? (lakeRoute.distance_mi / paddleSpeed) * 60 : 0;
   const paddleTimeFormatted = paddleTimeMin > 0 
     ? `${Math.floor(paddleTimeMin / 60)}:${String(Math.floor(paddleTimeMin % 60)).padStart(2, '0')}`
     : '0:00';
 
-  // Wind arrow rotation (convert meteorological degrees to visual rotation)
-  const windArrowRotation = windData ? (windData.windDirection + 180) % 360 : 225;
-
   return (
     <div className={styles.sidebar}>
       {/* Header Card */}
       <div className={`${styles.card} ${styles.headerCard}`}>
-        <ModeTag mode="lake" />
-        <div className={styles.lakeName}>Lake Route</div>
+        <div className={styles.modeTag}>
+          <Anchor size={16} />
+          Lake Mode
+        </div>
+        <h2 className={styles.lakeName}>Lake Route</h2>
       </div>
 
-      {/* Action Buttons - At Top */}
+      {/* Action Buttons */}
       <div className={styles.actionButtons}>
         <button
           className={styles.actionBtn}
@@ -77,66 +75,19 @@ export function LakeSidebar({
         </button>
       </div>
 
-      {/* Drawing Mode */}
-      <div className={styles.card}>
-        <div className={styles.sectionLabel}>DRAWING MODE</div>
-        <div className={styles.drawingToggle}>
-          <button
-            className={`${styles.toggleBtn} ${drawingMode === 'waypoint' ? styles.toggleBtnActive : ''}`}
-            onClick={() => onDrawingModeChange('waypoint')}
-          >
-            <MapPin size={14} />
-            Waypoint
-          </button>
-          <button
-            className={`${styles.toggleBtn} ${drawingMode === 'freehand' ? styles.toggleBtnActive : ''}`}
-            onClick={() => onDrawingModeChange('freehand')}
-          >
-            <Pencil size={14} />
-            Freehand
-          </button>
-        </div>
-        
-        {/* Mode-specific instructions */}
-        <div className={styles.instructions} style={{ marginTop: '12px' }}>
-          {drawingMode === 'waypoint' ? (
-            <>
-              <strong>Waypoint Mode:</strong> Click on the map to add waypoints. 
-              A route line will connect your points.
-            </>
-          ) : (
-            <>
-              <strong>Freehand Mode:</strong> Click to start drawing, move your mouse to trace your route, 
-              then click again to finish.
-            </>
-          )}
-        </div>
-      </div>
+      {/* Drawing Mode Toggle */}
+      <DrawingModeCard
+        mode={drawingMode}
+        onModeChange={onDrawingModeChange}
+        isDrawing={isDrawing}
+      />
 
-      {/* Waypoint List (only in waypoint mode) */}
+      {/* Waypoint List */}
       {drawingMode === 'waypoint' && waypoints.length > 0 && (
-        <div className={`${styles.card} ${styles.waypointCard}`}>
-          <div className={styles.sectionLabel}>WAYPOINTS ({waypoints.length})</div>
-          <div className={styles.waypointList}>
-            {waypoints.map((wp, idx) => (
-              <div key={wp.id} className={styles.waypointItem}>
-                <div className={styles.waypointInfo}>
-                  <span className={styles.waypointIndex}>{idx + 1}</span>
-                  <span className={styles.waypointCoords}>
-                    {wp.lat.toFixed(4)}, {wp.lng.toFixed(4)}
-                  </span>
-                </div>
-                <button
-                  className={styles.waypointDelete}
-                  onClick={() => onDeleteWaypoint(wp.id)}
-                  title="Delete waypoint"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+        <WaypointList 
+          waypoints={waypoints} 
+          onDelete={onDeleteWaypoint} 
+        />
       )}
 
       {/* Freehand drawing state */}
@@ -149,140 +100,166 @@ export function LakeSidebar({
       )}
 
       {/* Paddle Speed */}
-      <div className={`${styles.card} ${styles.paddleCard}`}>
-        <div className={styles.paddleHeader}>
-          <div className={styles.sectionLabel}>PADDLE SPEED</div>
-          <span className={styles.paddleValue}>{paddleSpeed.toFixed(1)} mph</span>
-        </div>
-        <input
-          type="range"
-          min="1"
-          max="5"
-          step="0.1"
-          value={paddleSpeed}
-          onChange={(e) => onPaddleSpeedChange(parseFloat(e.target.value))}
-          className={styles.slider}
-        />
-        <div className={styles.sliderLabels}>
-          <span>1 mph</span>
-          <span>5 mph</span>
-        </div>
-        <div className={styles.hint}>Avg kayak: 3 mph • Avg canoe: 2.5 mph</div>
-      </div>
+      <PaddleSpeedCard
+        speed={paddleSpeed}
+        onChange={onPaddleSpeedChange}
+      />
 
       {/* Trip Stats */}
-      <div className={`${styles.card} ${styles.statsCard}`}>
-        <div className={styles.sectionLabel}>TRIP STATS</div>
-        <div className={styles.statsRow}>
-          <div className={styles.statCard}>
-            <span className={styles.statValue}>
-              {hasRoute ? lakeRoute.distance_mi.toFixed(1) : '0.0'}
-            </span>
-            <span className={styles.statLabel}>miles</span>
-          </div>
-          <div className={styles.statCard}>
-            <span className={styles.statValue}>{paddleTimeFormatted}</span>
-            <span className={styles.statLabel}>paddle time</span>
-          </div>
-        </div>
-      </div>
+      <TripStatsCard
+        distance={hasRoute ? lakeRoute.distance_mi : 0}
+        paddleTime={paddleTimeFormatted}
+      />
 
-      {/* Wind Conditions - Live Data */}
-      <div className={`${styles.card} ${styles.windCard}`}>
-        <div className={styles.paddleHeader}>
-          <div className={styles.sectionLabel}>WIND CONDITIONS</div>
-          <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>
-            {windLoading ? 'Loading...' : windData ? 'Live' : 'Draw route for data'}
-          </span>
-        </div>
-        
-        {windLoading ? (
-          <div className={styles.windLoading}>
-            <Loader2 size={24} className={styles.spinner} />
-            <span>Fetching wind data...</span>
-          </div>
-        ) : windData ? (
+      {/* Wind Conditions */}
+      <WindConditionsCard
+        windData={windData}
+        chopAssessment={chopAssessment}
+        loading={windLoading}
+      />
+
+      {/* Route Exposure */}
+      {hasRoute && (
+        <ExposureBar
+          exposure={{ sheltered: 30, moderate: 40, exposed: 30 }}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ─── Sub-components ─── */
+
+function DrawingModeCard({ 
+  mode, 
+  onModeChange, 
+  isDrawing 
+}: { 
+  mode: LakeDrawingMode; 
+  onModeChange: (mode: LakeDrawingMode) => void;
+  isDrawing: boolean;
+}) {
+  return (
+    <div className={styles.card}>
+      <div className={styles.sectionLabel}>DRAWING MODE</div>
+      <div className={styles.drawingToggle}>
+        <button
+          className={`${styles.toggleBtn} ${mode === 'waypoint' ? styles.toggleBtnActive : ''}`}
+          onClick={() => onModeChange('waypoint')}
+        >
+          <MapPin size={14} />
+          Waypoint
+        </button>
+        <button
+          className={`${styles.toggleBtn} ${mode === 'freehand' ? styles.toggleBtnActive : ''}`}
+          onClick={() => onModeChange('freehand')}
+        >
+          <Pencil size={14} />
+          Freehand
+        </button>
+      </div>
+      
+      <div className={styles.instructions} style={{ marginTop: '12px' }}>
+        {mode === 'waypoint' ? (
           <>
-            <div className={styles.windRow}>
-              <div className={styles.compass}>
-                {/* Tick marks around compass edge */}
-                {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => (
-                  <div 
-                    key={deg}
-                    className={`${styles.compassTick} ${deg % 90 === 0 ? styles.compassTickMajor : ''}`}
-                    style={{ transform: `rotate(${deg}deg)` }}
-                  />
-                ))}
-                <span className={`${styles.compassLabel} ${styles.compassN}`}>N</span>
-                <span className={`${styles.compassLabel} ${styles.compassS}`}>S</span>
-                <span className={`${styles.compassLabel} ${styles.compassE}`}>E</span>
-                <span className={`${styles.compassLabel} ${styles.compassW}`}>W</span>
-                <ArrowUp 
-                  size={24} 
-                  className={styles.windArrow} 
-                  style={{ transform: `rotate(${windArrowRotation}deg)` }}
-                />
-              </div>
-              <div className={styles.windInfo}>
-                <div className={styles.windSpeedRow}>
-                  <span className={styles.windSpeed}>{windData.windSpeed}</span>
-                  <span className={styles.windSpeedUnit}>mph</span>
-                </div>
-                <span className={styles.windDirection}>
-                  From {getWindDirection(windData.windDirection)}
-                </span>
-                <span className={styles.windDegrees}>{Math.round(windData.windDirection)}°</span>
-                <span className={styles.windGusts}>Gusts to {windData.windGusts} mph</span>
-                {chopAssessment && (
-                  <span 
-                    className={styles.windWarning}
-                    style={{ 
-                      background: chopAssessment.level === 'calm' || chopAssessment.level === 'light' 
-                        ? 'rgba(34, 197, 94, 0.15)' 
-                        : chopAssessment.level === 'moderate'
-                        ? 'rgba(251, 191, 36, 0.15)'
-                        : 'rgba(239, 68, 68, 0.15)',
-                      color: chopAssessment.color,
-                    }}
-                  >
-                    {chopAssessment.description}
-                  </span>
-                )}
-              </div>
-            </div>
+            <strong>Waypoint Mode:</strong> Click on the map to add waypoints. 
+            A route line will connect your points.
           </>
         ) : (
-          <div className={styles.windPlaceholder}>
-            <span>Draw a route to see wind conditions along your path</span>
-          </div>
+          <>
+            <strong>Freehand Mode:</strong> Click to start drawing, move your mouse to trace your route, 
+            then click again to finish.
+          </>
         )}
       </div>
+    </div>
+  );
+}
 
-      {/* Route Exposure (placeholder) */}
-      {hasRoute && (
-        <div className={`${styles.card} ${styles.exposureCard}`}>
-          <div className={styles.sectionLabel}>ROUTE EXPOSURE</div>
-          <div className={styles.exposureBar}>
-            <div className={`${styles.exposureSegment} ${styles.sheltered}`} style={{ width: '30%' }} />
-            <div className={`${styles.exposureSegment} ${styles.moderate}`} style={{ width: '40%' }} />
-            <div className={`${styles.exposureSegment} ${styles.exposed}`} style={{ width: '30%' }} />
+function WaypointList({ 
+  waypoints, 
+  onDelete 
+}: { 
+  waypoints: LakeWaypoint[]; 
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <div className={`${styles.card} ${styles.waypointCard}`}>
+      <div className={styles.sectionLabel}>WAYPOINTS ({waypoints.length})</div>
+      <div className={styles.waypointList}>
+        {waypoints.map((wp, idx) => (
+          <div key={wp.id} className={styles.waypointItem}>
+            <div className={styles.waypointInfo}>
+              <span className={styles.waypointIndex}>{idx + 1}</span>
+              <span className={styles.waypointCoords}>
+                {wp.lat.toFixed(4)}, {wp.lng.toFixed(4)}
+              </span>
+            </div>
+            <button
+              className={styles.waypointDelete}
+              onClick={() => onDelete(wp.id)}
+              title="Delete waypoint"
+            >
+              <X size={14} />
+            </button>
           </div>
-          <div className={styles.exposureLegend}>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendDot} ${styles.sheltered}`} />
-              <span className={styles.legendText}>Sheltered 30%</span>
-            </div>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendDot} ${styles.moderate}`} />
-              <span className={styles.legendText}>Moderate 40%</span>
-            </div>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendDot} ${styles.exposed}`} />
-              <span className={styles.legendText}>Exposed 30%</span>
-            </div>
-          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PaddleSpeedCard({ 
+  speed, 
+  onChange 
+}: { 
+  speed: number; 
+  onChange: (speed: number) => void;
+}) {
+  return (
+    <div className={`${styles.card} ${styles.paddleCard}`}>
+      <div className={styles.paddleHeader}>
+        <div className={styles.sectionLabel}>PADDLE SPEED</div>
+        <span className={styles.paddleValue}>{speed.toFixed(1)} mph</span>
+      </div>
+      <input
+        type="range"
+        min="1"
+        max="5"
+        step="0.1"
+        value={speed}
+        onChange={(e) => onChange(parseFloat(e.target.value))}
+        className={styles.slider}
+      />
+      <div className={styles.sliderLabels}>
+        <span>1 mph</span>
+        <span>5 mph</span>
+      </div>
+      <div className={styles.hint}>Avg kayak: 3 mph • Avg canoe: 2.5 mph</div>
+    </div>
+  );
+}
+
+function TripStatsCard({ 
+  distance, 
+  paddleTime 
+}: { 
+  distance: number; 
+  paddleTime: string;
+}) {
+  return (
+    <div className={`${styles.card} ${styles.statsCard}`}>
+      <div className={styles.sectionLabel}>TRIP STATS</div>
+      <div className={styles.statsRow}>
+        <div className={styles.statCard}>
+          <span className={styles.statValue}>{distance.toFixed(1)}</span>
+          <span className={styles.statLabel}>miles</span>
         </div>
-      )}
+        <div className={styles.statCard}>
+          <span className={styles.statValue}>{paddleTime}</span>
+          <span className={styles.statLabel}>paddle time</span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,0 +1,44 @@
+.compass {
+  background: var(--bg-secondary);
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.tick {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  width: 1px;
+  height: 6px;
+  background: var(--text-dim);
+  transform-origin: center 38px;
+  opacity: 0.4;
+}
+
+.tickMajor {
+  width: 2px;
+  height: 8px;
+  opacity: 0.7;
+}
+
+.label {
+  position: absolute;
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.labelN { top: 10px; left: 50%; transform: translateX(-50%); }
+.labelS { bottom: 10px; left: 50%; transform: translateX(-50%); }
+.labelE { right: 10px; top: 50%; transform: translateY(-50%); }
+.labelW { left: 10px; top: 50%; transform: translateY(-50%); }
+
+.arrow {
+  color: var(--cyan);
+  transition: transform 0.3s ease;
+}

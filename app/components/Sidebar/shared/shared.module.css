@@ -6,12 +6,19 @@
   border-radius: 20px;
   background: var(--accent-dark);
   border: 1px solid var(--accent);
+  color: var(--accent);
+}
+
+.modeTagCyan {
+  background: rgba(103, 232, 249, 0.15);
+  border-color: rgba(103, 232, 249, 0.3);
+  color: var(--cyan);
 }
 
 .modeTagText {
   font-size: 13px;
   font-weight: 600;
-  color: var(--accent);
+  color: inherit;
 }
 
 .weatherCard {

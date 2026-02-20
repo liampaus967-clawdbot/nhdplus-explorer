@@ -62,162 +62,6 @@
               ]
             },
             {
-              "type": "frame",
-              "id": "personaSel",
-              "name": "Persona Selector",
-              "fill": "$--bg-secondary",
-              "cornerRadius": 8,
-              "gap": 4,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "btnWhitewater",
-                  "name": "Whitewater Button",
-                  "fill": "transparent",
-                  "cornerRadius": 6,
-                  "gap": 8,
-                  "padding": [
-                    8,
-                    16
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon_font",
-                      "id": "c5phb",
-                      "name": "psWW",
-                      "width": 16,
-                      "height": 16,
-                      "iconFontName": "waves",
-                      "iconFontFamily": "lucide",
-                      "fill": "$--text-muted"
-                    },
-                    {
-                      "type": "text",
-                      "id": "wwLabel",
-                      "name": "Whitewater Label",
-                      "fill": "$--text-muted",
-                      "content": "Whitewater",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "500"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "btnExplorer",
-                  "name": "Explorer Button (Selected)",
-                  "fill": "$--bg",
-                  "cornerRadius": 6,
-                  "stroke": {
-                    "align": "inside",
-                    "thickness": 1,
-                    "fill": "$--border"
-                  },
-                  "gap": 8,
-                  "padding": [
-                    8,
-                    16
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon_font",
-                      "id": "yycME",
-                      "name": "psExp",
-                      "width": 16,
-                      "height": 16,
-                      "iconFontName": "compass",
-                      "iconFontFamily": "lucide",
-                      "fill": "$--text"
-                    },
-                    {
-                      "type": "text",
-                      "id": "expLabel",
-                      "name": "Explorer Label",
-                      "fill": "$--text",
-                      "content": "Explorer",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "600"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "btnFloater",
-                  "name": "Floater Button",
-                  "fill": "transparent",
-                  "cornerRadius": 6,
-                  "gap": 8,
-                  "padding": [
-                    8,
-                    16
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon_font",
-                      "id": "yj5Ek",
-                      "name": "psFloat",
-                      "width": 16,
-                      "height": 16,
-                      "iconFontName": "life-buoy",
-                      "iconFontFamily": "lucide",
-                      "fill": "$--text-muted"
-                    },
-                    {
-                      "type": "text",
-                      "id": "floatLabel",
-                      "name": "Floater Label",
-                      "fill": "$--text-muted",
-                      "content": "Floater",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "500"
-                    }
-                  ]
-                },
-                {
-                  "type": "frame",
-                  "id": "btnLake",
-                  "name": "Lake Button",
-                  "fill": "transparent",
-                  "cornerRadius": 6,
-                  "gap": 8,
-                  "padding": [
-                    8,
-                    16
-                  ],
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon_font",
-                      "id": "psLake",
-                      "name": "psLake",
-                      "width": 16,
-                      "height": 16,
-                      "iconFontName": "anchor",
-                      "iconFontFamily": "lucide",
-                      "fill": "$--text-muted"
-                    },
-                    {
-                      "type": "text",
-                      "id": "lakeLabel",
-                      "name": "Lake Label",
-                      "fill": "$--text-muted",
-                      "content": "Lake",
-                      "fontFamily": "$--font-primary",
-                      "fontSize": 13,
-                      "fontWeight": "500"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
               "type": "text",
               "id": "bC264",
               "name": "subtitleText",
@@ -262,6 +106,46 @@
               },
               "layout": "none",
               "children": [
+                {
+                  "type": "frame",
+                  "id": "CnxMG",
+                  "x": 10,
+                  "y": 229,
+                  "name": "Basemap Toggle Button",
+                  "width": 36,
+                  "height": 37,
+                  "fill": "$--bg-secondary",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#0000004D",
+                    "offset": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "blur": 8
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "xcJv8",
+                      "name": "basemapIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "map",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                },
                 {
                   "type": "frame",
                   "id": "D4gLJ",
@@ -435,6 +319,175 @@
                           "fill": "$--text-muted"
                         }
                       ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "s1p2J",
+                  "x": 10,
+                  "y": 182,
+                  "name": "Layer Toggle Button",
+                  "width": 36,
+                  "height": 36,
+                  "fill": "$--bg-secondary",
+                  "cornerRadius": 8,
+                  "stroke": {
+                    "align": "inside",
+                    "thickness": 1,
+                    "fill": "$--border"
+                  },
+                  "effect": {
+                    "type": "shadow",
+                    "shadowType": "outer",
+                    "color": "#0000004D",
+                    "offset": {
+                      "x": 0,
+                      "y": 2
+                    },
+                    "blur": 8
+                  },
+                  "justifyContent": "center",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "rk2Ix",
+                      "name": "layerIcon",
+                      "width": 20,
+                      "height": 20,
+                      "iconFontName": "layers",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--text-muted"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "SjiRr",
+              "name": "Icon Rail",
+              "width": 56,
+              "height": "fill_container",
+              "fill": "$--bg",
+              "stroke": {
+                "align": "inside",
+                "thickness": {
+                  "right": 1,
+                  "left": 1
+                },
+                "fill": "$--border"
+              },
+              "layout": "vertical",
+              "gap": 4,
+              "padding": [
+                16,
+                0
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "LgSva",
+                  "name": "WW Btn",
+                  "width": 48,
+                  "height": 44,
+                  "cornerRadius": 8,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "UDqbQ",
+                      "x": 13,
+                      "y": 11,
+                      "name": "wwIco",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "waves",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--text-dim"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "3pUFV",
+                  "name": "Explorer Btn (Active)",
+                  "width": 48,
+                  "height": 44,
+                  "fill": "$--accent-dark",
+                  "cornerRadius": 8,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "nf0M9",
+                      "x": 0,
+                      "y": 12,
+                      "name": "expAcc",
+                      "fill": "$--accent",
+                      "width": 3,
+                      "height": 20
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "IL6fx",
+                      "x": 13,
+                      "y": 11,
+                      "name": "expIco",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "compass",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--accent"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "pacaD",
+                  "name": "Floater Btn",
+                  "width": 48,
+                  "height": 44,
+                  "cornerRadius": 8,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "Gpx2L",
+                      "x": 13,
+                      "y": 11,
+                      "name": "fltIco",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "life-buoy",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--text-dim"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "eTxIU",
+                  "name": "Lake Btn",
+                  "width": 48,
+                  "height": 44,
+                  "cornerRadius": 8,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "7ooOi",
+                      "x": 13,
+                      "y": 11,
+                      "name": "lkIco",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "anchor",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--text-dim"
                     }
                   ]
                 }
@@ -622,7 +675,7 @@
                               "id": "ZnGiy",
                               "name": "r1Dist",
                               "fill": "$--text-dim",
-                              "content": "12 mi away  \u2022  Normal flow",
+                              "content": "12 mi away  •  Normal flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -683,7 +736,7 @@
                               "id": "UD1tY",
                               "name": "r2Dist",
                               "fill": "$--text-dim",
-                              "content": "18 mi away  \u2022  Low flow",
+                              "content": "18 mi away  •  Low flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -744,7 +797,7 @@
                               "id": "fYOB2",
                               "name": "r3Dist",
                               "fill": "$--text-dim",
-                              "content": "34 mi away  \u2022  High flow",
+                              "content": "34 mi away  •  High flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -854,7 +907,7 @@
                   "type": "text",
                   "id": "iN5U9",
                   "fill": "$--text-muted",
-                  "content": "Upper Section \u2022 Class IV-V",
+                  "content": "Upper Section • Class IV-V",
                   "fontFamily": "Inter",
                   "fontSize": 13,
                   "fontWeight": "normal"
@@ -1003,7 +1056,7 @@
                       "type": "text",
                       "id": "UbSuO",
                       "fill": "#22c55e",
-                      "content": "\u25cf RUNNABLE",
+                      "content": "● RUNNABLE",
                       "fontFamily": "Inter",
                       "fontSize": 10,
                       "fontWeight": "600",
@@ -2062,7 +2115,7 @@
                       "id": "D4V3y",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68\u00b0F  Partly Cloudy",
+                      "content": "68°F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -2072,7 +2125,7 @@
                       "id": "uuq1n",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
+                      "content": "Feels like 72°F  •  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -2592,7 +2645,7 @@
               "type": "frame",
               "id": "BLOMj",
               "fill": "$--accent-dark",
-              "cornerRadius": 16,
+              "cornerRadius": 20,
               "stroke": {
                 "align": "inside",
                 "thickness": 1,
@@ -2600,8 +2653,8 @@
               },
               "gap": 8,
               "padding": [
-                5,
-                12
+                6,
+                14
               ],
               "alignItems": "center",
               "children": [
@@ -2638,16 +2691,16 @@
                   "fill": "$--text",
                   "content": "Rivanna River Trail",
                   "fontFamily": "Inter",
-                  "fontSize": 20,
+                  "fontSize": 22,
                   "fontWeight": "700"
                 },
                 {
                   "type": "text",
                   "id": "ANOPS",
                   "fill": "$--text-muted",
-                  "content": "Charlottesville \u2192 Palmyra",
+                  "content": "Charlottesville → Palmyra",
                   "fontFamily": "Inter",
-                  "fontSize": 12,
+                  "fontSize": 13,
                   "fontWeight": "normal"
                 }
               ]
@@ -2809,7 +2862,7 @@
                       "id": "vfIRl",
                       "name": "putCoords",
                       "fill": "$--text-dim",
-                      "content": "38.0293\u00b0N, 78.4767\u00b0W",
+                      "content": "38.0293°N, 78.4767°W",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -2857,7 +2910,7 @@
                       "id": "oj4C1",
                       "name": "takeCoords",
                       "fill": "$--text-dim",
-                      "content": "37.8612\u00b0N, 78.5134\u00b0W",
+                      "content": "37.8612°N, 78.5134°W",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -3677,7 +3730,7 @@
                         {
                           "type": "text",
                           "id": "FKQgb",
-                          "content": "\ud83c\udfd5\ufe0f",
+                          "content": "🏕️",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -3743,7 +3796,7 @@
                         {
                           "type": "text",
                           "id": "GxmCt",
-                          "content": "\ud83c\udf32",
+                          "content": "🌲",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -3809,7 +3862,7 @@
                         {
                           "type": "text",
                           "id": "mYh5E",
-                          "content": "\ud83d\udcf8",
+                          "content": "📸",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -3875,7 +3928,7 @@
                         {
                           "type": "text",
                           "id": "NHSZb",
-                          "content": "\u26a0\ufe0f",
+                          "content": "⚠️",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -3961,7 +4014,7 @@
               "type": "text",
               "id": "RcNGL",
               "fill": "$--text",
-              "content": "68\u00b0F",
+              "content": "68°F",
               "fontFamily": "Inter",
               "fontSize": 14,
               "fontWeight": "600"
@@ -4063,7 +4116,7 @@
                       "id": "khwsp",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68\u00b0F  Partly Cloudy",
+                      "content": "68°F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -4073,7 +4126,7 @@
                       "id": "F1Ao7",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
+                      "content": "Feels like 72°F  •  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -4899,7 +4952,7 @@
                       "type": "text",
                       "id": "ZG6sY",
                       "fill": "$--text-dim",
-                      "content": "Free parking \u2022 Restrooms \u2022 Easy entry",
+                      "content": "Free parking • Restrooms • Easy entry",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -4966,7 +5019,7 @@
                       "type": "text",
                       "id": "0Nk8L",
                       "fill": "$--text-dim",
-                      "content": "$5 parking \u2022 Food nearby \u2022 Shuttle available",
+                      "content": "$5 parking • Food nearby • Shuttle available",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -5690,7 +5743,7 @@
                       "id": "WCYnJ",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68\u00b0F  Partly Cloudy",
+                      "content": "68°F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -5700,7 +5753,7 @@
                       "id": "iTQCj",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
+                      "content": "Feels like 72°F  •  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -6572,7 +6625,7 @@
               "type": "text",
               "id": "paddleHint",
               "fill": "$--text-dim",
-              "content": "Avg kayak: 3 mph \u2022 Avg canoe: 2.5 mph",
+              "content": "Avg kayak: 3 mph • Avg canoe: 2.5 mph",
               "fontFamily": "Inter",
               "fontSize": 10,
               "fontWeight": "normal"
@@ -6757,84 +6810,84 @@
                       "id": "tickN",
                       "x": 38,
                       "y": 2,
+                      "opacity": 0.7,
                       "width": 2,
                       "height": 8,
-                      "fill": "$--text-dim",
-                      "opacity": 0.7
+                      "fill": "$--text-dim"
                     },
                     {
                       "type": "frame",
                       "id": "tickNE",
                       "x": 62,
                       "y": 12,
+                      "opacity": 0.4,
                       "rotation": 45,
                       "width": 1,
                       "height": 6,
-                      "fill": "$--text-dim",
-                      "opacity": 0.4
+                      "fill": "$--text-dim"
                     },
                     {
                       "type": "frame",
                       "id": "tickE",
                       "x": 70,
                       "y": 38,
+                      "opacity": 0.7,
                       "width": 8,
                       "height": 2,
-                      "fill": "$--text-dim",
-                      "opacity": 0.7
+                      "fill": "$--text-dim"
                     },
                     {
                       "type": "frame",
                       "id": "tickSE",
                       "x": 62,
                       "y": 62,
+                      "opacity": 0.4,
                       "rotation": -45,
                       "width": 1,
                       "height": 6,
-                      "fill": "$--text-dim",
-                      "opacity": 0.4
+                      "fill": "$--text-dim"
                     },
                     {
                       "type": "frame",
                       "id": "tickS",
                       "x": 38,
                       "y": 70,
+                      "opacity": 0.7,
                       "width": 2,
                       "height": 8,
-                      "fill": "$--text-dim",
-                      "opacity": 0.7
+                      "fill": "$--text-dim"
                     },
                     {
                       "type": "frame",
                       "id": "tickSW",
                       "x": 12,
                       "y": 62,
+                      "opacity": 0.4,
                       "rotation": 45,
                       "width": 1,
                       "height": 6,
-                      "fill": "$--text-dim",
-                      "opacity": 0.4
+                      "fill": "$--text-dim"
                     },
                     {
                       "type": "frame",
                       "id": "tickW",
                       "x": 2,
                       "y": 38,
+                      "opacity": 0.7,
                       "width": 8,
                       "height": 2,
-                      "fill": "$--text-dim",
-                      "opacity": 0.7
+                      "fill": "$--text-dim"
                     },
                     {
                       "type": "frame",
                       "id": "tickNW",
                       "x": 12,
                       "y": 12,
+                      "opacity": 0.4,
                       "rotation": -45,
                       "width": 1,
                       "height": 6,
-                      "fill": "$--text-dim",
-                      "opacity": 0.4
+                      "fill": "$--text-dim"
                     },
                     {
                       "type": "text",
@@ -6905,7 +6958,6 @@
                       "type": "frame",
                       "id": "windSpeedRow",
                       "gap": 4,
-                      "alignItems": "baseline",
                       "children": [
                         {
                           "type": "text",
@@ -6940,7 +6992,7 @@
                       "type": "text",
                       "id": "windDegrees",
                       "fill": "$--text-dim",
-                      "content": "225\u00b0",
+                      "content": "225°",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -6968,7 +7020,6 @@
                         8,
                         12
                       ],
-                      "marginTop": 8,
                       "children": [
                         {
                           "type": "text",
@@ -8388,6 +8439,133 @@
           "fontFamily": "Inter",
           "fontSize": 11,
           "fontWeight": "500"
+        }
+      ]
+    },
+    {
+      "type": "frame",
+      "id": "31bq4",
+      "x": 3050,
+      "y": 0,
+      "name": "Icon Rail - Reference",
+      "width": 56,
+      "height": 964,
+      "fill": "$--bg",
+      "stroke": {
+        "align": "inside",
+        "thickness": {
+          "right": 1
+        },
+        "fill": "$--border"
+      },
+      "layout": "vertical",
+      "gap": 4,
+      "padding": [
+        16,
+        0
+      ],
+      "alignItems": "center",
+      "children": [
+        {
+          "type": "frame",
+          "id": "amMJA",
+          "name": "Whitewater",
+          "width": 56,
+          "height": 48,
+          "layout": "none",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "N2EVP",
+              "x": 17,
+              "y": 13,
+              "name": "wwIcon",
+              "width": 22,
+              "height": 22,
+              "iconFontName": "waves",
+              "iconFontFamily": "lucide",
+              "fill": "$--text-dim"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "YmOts",
+          "name": "Explorer (Active)",
+          "width": 56,
+          "height": 48,
+          "fill": "$--accent-dark",
+          "cornerRadius": 8,
+          "layout": "none",
+          "children": [
+            {
+              "type": "rectangle",
+              "cornerRadius": 2,
+              "id": "AhA9g",
+              "x": 0,
+              "y": 12,
+              "name": "expAccent",
+              "fill": "$--accent",
+              "width": 3,
+              "height": 24
+            },
+            {
+              "type": "icon_font",
+              "id": "CqFMJ",
+              "x": 17,
+              "y": 13,
+              "name": "expIcon",
+              "width": 22,
+              "height": 22,
+              "iconFontName": "compass",
+              "iconFontFamily": "lucide",
+              "fill": "$--accent"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "OlhQY",
+          "name": "Floater",
+          "width": 56,
+          "height": 48,
+          "layout": "none",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "opA3P",
+              "x": 17,
+              "y": 13,
+              "name": "floatIcon",
+              "width": 22,
+              "height": 22,
+              "iconFontName": "life-buoy",
+              "iconFontFamily": "lucide",
+              "fill": "$--text-dim"
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "zLRkk",
+          "name": "Lake",
+          "width": 56,
+          "height": 48,
+          "layout": "none",
+          "children": [
+            {
+              "type": "icon_font",
+              "id": "KdWFn",
+              "x": 17,
+              "y": 13,
+              "name": "lakeIcon",
+              "width": 22,
+              "height": 22,
+              "iconFontName": "anchor",
+              "iconFontFamily": "lucide",
+              "fill": "$--text-dim"
+            }
+          ]
         }
       ]
     }

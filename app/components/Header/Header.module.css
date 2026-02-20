@@ -21,41 +21,6 @@
   color: var(--text);
 }
 
-.personaSelector {
-  display: flex;
-  gap: 4px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-  padding: 4px;
-}
-
-.personaBtn {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.15s;
-  font-family: inherit;
-}
-
-.personaBtn:hover {
-  color: var(--text);
-  background: var(--bg);
-}
-
-.personaBtnActive {
-  background: var(--bg);
-  border-color: var(--border);
-  color: var(--text);
-}
-
 .subtitle {
   font-size: 13px;
   color: var(--text-muted);

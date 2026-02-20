@@ -33,7 +33,6 @@ export function Map({ basemap, route, onMapClick, onMapReady }: MapProps) {
       pitch: MAP_CONFIG.pitch,
     });
 
-    map.current.addControl(new mapboxgl.NavigationControl());
     map.current.addControl(new mapboxgl.FullscreenControl());
 
     map.current.on('load', () => {

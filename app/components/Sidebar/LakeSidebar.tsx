@@ -1,8 +1,9 @@
 'use client';
 
-import { Anchor, MapPin, Pencil, Undo2, Save, ArrowUp, X, Loader2 } from 'lucide-react';
+import { MapPin, Pencil, Undo2, Save, ArrowUp, X, Loader2 } from 'lucide-react';
 import { LakeDrawingMode, LakeRoute, LakeWaypoint } from '../../types';
 import { WeatherData, ChopAssessment, getWindDirection } from '../../services/weather';
+import { ModeTag } from './shared/ModeTag';
 import styles from './LakeSidebar.module.css';
 
 interface LakeSidebarProps {
@@ -52,11 +53,8 @@ export function LakeSidebar({
     <div className={styles.sidebar}>
       {/* Header Card */}
       <div className={`${styles.card} ${styles.headerCard}`}>
-        <div className={styles.modeTag}>
-          <Anchor size={16} />
-          Lake Mode
-        </div>
-        <h2 className={styles.lakeName}>Lake Route</h2>
+        <ModeTag mode="lake" />
+        <div className={styles.lakeName}>Lake Route</div>
       </div>
 
       {/* Action Buttons - At Top */}

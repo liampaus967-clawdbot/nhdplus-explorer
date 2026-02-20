@@ -28,7 +28,6 @@
   width: 360px;
   flex-shrink: 0;
   overflow-y: auto;
-  border-left: 1px solid var(--border);
   background: var(--bg-secondary);
 }
 

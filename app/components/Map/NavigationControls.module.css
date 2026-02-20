@@ -1,0 +1,80 @@
+.container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zoomControls {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.zoomBtn {
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  padding: 0;
+  font-family: inherit;
+}
+
+.zoomBtn:last-child {
+  border-bottom: none;
+}
+
+.zoomBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.controlBtn {
+  width: 36px;
+  height: 36px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  font-family: inherit;
+}
+
+.controlBtn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+.compassIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+/* Ensure Inter font is used */
+.container,
+.zoomBtn,
+.controlBtn {
+  font-family: var(--font-primary);
+}

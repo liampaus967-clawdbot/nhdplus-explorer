@@ -37,8 +37,9 @@ export default function Home() {
 
   // State
   const [basemap, setBasemap] = useState<BasemapStyle>('outdoors');
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const basemapRef = useRef<BasemapStyle>('outdoors');
-  const [personaMode, setPersonaMode] = useState<PersonaMode>('explorer');
+  const [personaMode, setPersonaMode] = useState<PersonaMode>('home');
   const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
     blmLands: true,
     wilderness: true,
@@ -171,6 +172,11 @@ export default function Home() {
   // Handle map click
   const handleMapClick = useCallback(
     async (lng: number, lat: number) => {
+      // Home mode - no route creation, just pan/scan
+      if (personaMode === 'home') {
+        return;
+      }
+
       // Lake mode - custom handling
       if (personaMode === 'lake') {
         if (lakeDrawingMode === 'waypoint') {
@@ -270,6 +276,16 @@ export default function Home() {
       await calculateRoute(takeOut, tempPutIn, flowCondition, paddleSpeed);
     }
   }, [putIn, takeOut, flowCondition, paddleSpeed, setPutIn, setTakeOut, calculateRoute]);
+
+  // Handle theme toggle
+  const handleThemeToggle = useCallback(() => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  }, []);
+
+  // Apply theme to document
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   // Handle basemap change
   const handleBasemapChange = useCallback(
@@ -552,7 +568,7 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <Header />
+      <Header theme={theme} onThemeToggle={handleThemeToggle} />
 
       <div className={styles.body}>
         <div className={styles.mapWrapper}>

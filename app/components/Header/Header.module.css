@@ -26,6 +26,31 @@
   color: var(--text-muted);
 }
 
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.themeToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.themeToggle:hover {
+  background: var(--bg-tertiary);
+  color: var(--accent);
+}
+
 @media (max-width: 900px) {
   .header {
     flex-direction: column;

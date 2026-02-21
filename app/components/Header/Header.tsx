@@ -1,9 +1,14 @@
 'use client';
 
-import { Navigation } from 'lucide-react';
+import { Navigation, Sun, Moon } from 'lucide-react';
 import styles from './Header.module.css';
 
-export function Header() {
+interface HeaderProps {
+  theme: 'light' | 'dark';
+  onThemeToggle: () => void;
+}
+
+export function Header({ theme, onThemeToggle }: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.titleGroup}>
@@ -11,9 +16,18 @@ export function Header() {
         <span className={styles.titleText}>River Router</span>
       </div>
 
-      <span className={styles.subtitle}>
-        Plan your float trip with real-time water data
-      </span>
+      <div className={styles.rightSection}>
+        <button
+          className={styles.themeToggle}
+          onClick={onThemeToggle}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        >
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
+        <span className={styles.subtitle}>
+          Plan your float trip with real-time water data
+        </span>
+      </div>
     </header>
   );
 }

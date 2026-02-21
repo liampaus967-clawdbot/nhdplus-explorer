@@ -76,6 +76,11 @@ export function Sidebar({
   lakeWindLoading = false,
   lakeName = null,
 }: SidebarProps) {
+  // Home mode - always show welcome/explore sidebar
+  if (mode === 'home') {
+    return <WelcomeSidebar />;
+  }
+
   // Lake mode always shows sidebar (no route required to start)
   if (mode === 'lake') {
     return (

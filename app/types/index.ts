@@ -109,7 +109,7 @@ export interface RouteResult {
 
 export type FlowCondition = 'low' | 'normal' | 'high';
 export type BasemapStyle = 'outdoors' | 'satellite' | 'dark';
-export type PersonaMode = 'whitewater' | 'explorer' | 'floater' | 'lake';
+export type PersonaMode = 'home' | 'whitewater' | 'explorer' | 'floater' | 'lake';
 
 // Lake mode specific types
 export type LakeDrawingMode = 'waypoint' | 'freehand';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Waves, Compass, LifeBuoy, Anchor } from 'lucide-react';
+import { House, Waves, Compass, LifeBuoy, Anchor } from 'lucide-react';
 import { PersonaMode } from '../../types';
 import styles from './IconRail.module.css';
 
@@ -10,6 +10,7 @@ interface IconRailProps {
 }
 
 const MODES: { key: PersonaMode; icon: React.ReactNode; label: string }[] = [
+  { key: 'home', icon: <House size={22} />, label: 'Home' },
   { key: 'whitewater', icon: <Waves size={22} />, label: 'Whitewater' },
   { key: 'explorer', icon: <Compass size={22} />, label: 'Explorer' },
   { key: 'floater', icon: <LifeBuoy size={22} />, label: 'Floater' },

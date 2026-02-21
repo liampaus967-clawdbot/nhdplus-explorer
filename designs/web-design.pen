@@ -416,7 +416,7 @@
                       "name": "homeIcon",
                       "width": 22,
                       "height": 22,
-                      "iconFontName": "home",
+                      "iconFontName": "house",
                       "iconFontFamily": "lucide",
                       "fill": "$--accent"
                     }

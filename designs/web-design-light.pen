@@ -389,6 +389,41 @@
               "children": [
                 {
                   "type": "frame",
+                  "id": "homeBtn",
+                  "name": "Home Btn (Active)",
+                  "width": 48,
+                  "height": 44,
+                  "fill": "$--accent-dark",
+                  "cornerRadius": 8,
+                  "layout": "none",
+                  "children": [
+                    {
+                      "type": "rectangle",
+                      "cornerRadius": 2,
+                      "id": "homeAcc",
+                      "x": 0,
+                      "y": 12,
+                      "name": "homeAccent",
+                      "fill": "$--accent",
+                      "width": 3,
+                      "height": 20
+                    },
+                    {
+                      "type": "icon_font",
+                      "id": "homeIco",
+                      "x": 13,
+                      "y": 11,
+                      "name": "homeIcon",
+                      "width": 22,
+                      "height": 22,
+                      "iconFontName": "home",
+                      "iconFontFamily": "lucide",
+                      "fill": "$--accent"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
                   "id": "LgSva",
                   "name": "WW Btn",
                   "width": 48,
@@ -413,24 +448,12 @@
                 {
                   "type": "frame",
                   "id": "3pUFV",
-                  "name": "Explorer Btn (Active)",
+                  "name": "Explorer Btn",
                   "width": 48,
                   "height": 44,
-                  "fill": "$--accent-dark",
                   "cornerRadius": 8,
                   "layout": "none",
                   "children": [
-                    {
-                      "type": "rectangle",
-                      "cornerRadius": 2,
-                      "id": "nf0M9",
-                      "x": 0,
-                      "y": 12,
-                      "name": "expAcc",
-                      "fill": "$--accent",
-                      "width": 3,
-                      "height": 20
-                    },
                     {
                       "type": "icon_font",
                       "id": "IL6fx",
@@ -441,7 +464,7 @@
                       "height": 22,
                       "iconFontName": "compass",
                       "iconFontFamily": "lucide",
-                      "fill": "$--accent"
+                      "fill": "$--text-dim"
                     }
                   ]
                 },

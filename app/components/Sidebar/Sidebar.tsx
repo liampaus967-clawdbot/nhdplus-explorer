@@ -105,7 +105,7 @@ export function Sidebar({
 
   // For other modes, show welcome if no route
   if (!route) {
-    return <WelcomeSidebar />;
+    return <WelcomeSidebar mode={mode} />;
   }
 
   switch (mode) {

@@ -7,6 +7,8 @@ interface GaugeStatus {
   status: 'very_low' | 'low' | 'normal' | 'high' | 'very_high';
   percentile: number | null;
   flow: number | null;
+  trend: 'rising' | 'falling' | 'stable' | 'unknown';
+  trend_rate: number | null;
 }
 
 interface GaugeStatusResponse {
@@ -45,12 +47,19 @@ export function useGaugeStatus() {
     return () => clearInterval(interval);
   }, [fetchStatuses]);
 
-  // Convert to simple status map for updateGaugeColors
+  // Convert to simple status map for percentile coloring
   const statusMap = data?.sites 
     ? Object.fromEntries(
         Object.entries(data.sites).map(([siteNo, info]) => [siteNo, info.status])
       )
     : null;
 
-  return { data, statusMap, loading, error, refresh: fetchStatuses };
+  // Convert to trend map for rising/falling coloring
+  const trendMap = data?.sites
+    ? Object.fromEntries(
+        Object.entries(data.sites).map(([siteNo, info]) => [siteNo, info.trend])
+      )
+    : null;
+
+  return { data, statusMap, trendMap, loading, error, refresh: fetchStatuses };
 }

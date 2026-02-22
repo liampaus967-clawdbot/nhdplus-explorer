@@ -125,6 +125,48 @@ export function updateGaugeColors(
 }
 
 /**
+ * Update gauge colors based on trend (rising/falling/stable).
+ */
+export function updateGaugeTrendColors(
+  map: mapboxgl.Map,
+  trendData: Record<string, string>
+) {
+  if (!map.getLayer('gauges-circles')) return;
+
+  const colorMatch: (string | string[])[] = ['match', ['get', 'site_no']];
+
+  for (const [siteNo, trend] of Object.entries(trendData)) {
+    colorMatch.push(siteNo);
+    switch (trend) {
+      case 'rising':
+        colorMatch.push('#3b82f6'); // Blue
+        break;
+      case 'falling':
+        colorMatch.push('#ef4444'); // Red
+        break;
+      case 'stable':
+        colorMatch.push('#22c55e'); // Green
+        break;
+      default:
+        colorMatch.push(COLORS.gauge); // Default amber
+    }
+  }
+
+  // Default color for gauges without trend data
+  colorMatch.push(COLORS.gauge);
+
+  map.setPaintProperty('gauges-circles', 'circle-color', colorMatch as mapboxgl.Expression);
+}
+
+/**
+ * Reset gauge colors to default (amber).
+ */
+export function resetGaugeColors(map: mapboxgl.Map) {
+  if (!map.getLayer('gauges-circles')) return;
+  map.setPaintProperty('gauges-circles', 'circle-color', COLORS.gauge);
+}
+
+/**
  * Get gauge at a point (for click handling)
  */
 export function getGaugeAtPoint(

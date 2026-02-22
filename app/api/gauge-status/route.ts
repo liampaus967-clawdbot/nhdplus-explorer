@@ -63,14 +63,28 @@ export async function GET() {
     const fgpData = await response.json();
     const sites = fgpData.sites || {};
     
-    // Transform to our format: { site_no: status }
-    const result: Record<string, { status: FlowStatus; percentile: number | null; flow: number | null }> = {};
+    // Transform to our format: { site_no: { status, trend, ... } }
+    const result: Record<string, { 
+      status: FlowStatus; 
+      percentile: number | null; 
+      flow: number | null;
+      trend: 'rising' | 'falling' | 'stable' | 'unknown';
+      trend_rate: number | null;
+    }> = {};
     
     for (const [siteNo, data] of Object.entries(sites) as [string, any][]) {
+      // Map trend
+      let trend: 'rising' | 'falling' | 'stable' | 'unknown' = 'unknown';
+      if (data.trend === 'rising' || data.trend_rate > 0.1) trend = 'rising';
+      else if (data.trend === 'falling' || data.trend_rate < -0.1) trend = 'falling';
+      else if (data.trend === 'stable' || (data.trend_rate !== null && Math.abs(data.trend_rate) <= 0.1)) trend = 'stable';
+      
       result[siteNo] = {
         status: mapFlowStatus(data.flow_status, data.percentile),
         percentile: data.percentile,
         flow: data.flow,
+        trend,
+        trend_rate: data.trend_rate,
       };
     }
     

@@ -14,10 +14,10 @@ import { useGaugeStatus } from './hooks/useGaugeStatus';
 // Components
 import { Header } from './components/Header';
 import { Sidebar, IconRail } from './components/Sidebar';
-import { MapControls, NavigationControls, LayerVisibility, DrawingControls } from './components/Map';
+import { MapControls, NavigationControls, LayerVisibility, DrawingControls, GaugeStyleControl, GaugeStyleMode } from './components/Map';
 
 // Layers
-import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight, updateGaugeColors } from './layers';
+import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight, updateGaugeColors, updateGaugeTrendColors } from './layers';
 
 // Constants
 import { MAP_CONFIG, BASEMAP_STYLES, COLORS } from './constants';
@@ -106,7 +106,8 @@ export default function Home() {
   } = useLakeRoute();
 
   // Gauge status for coloring gauges by flow
-  const { statusMap: gaugeStatusMap } = useGaugeStatus();
+  const { statusMap: gaugeStatusMap, trendMap: gaugeTrendMap } = useGaugeStatus();
+  const [gaugeStyleMode, setGaugeStyleMode] = useState<GaugeStyleMode>('percentile');
 
   // Lake wind data state
   const [lakeWindData, setLakeWindData] = useState<WeatherData | null>(null);
@@ -539,11 +540,16 @@ export default function Home() {
       });
   }, [lakeRoute]);
 
-  // Update gauge colors when flow status data loads
+  // Update gauge colors when flow status data loads or mode changes
   useEffect(() => {
-    if (!map.current || !gaugeStatusMap) return;
-    updateGaugeColors(map.current, gaugeStatusMap);
-  }, [gaugeStatusMap]);
+    if (!map.current) return;
+    
+    if (gaugeStyleMode === 'percentile' && gaugeStatusMap) {
+      updateGaugeColors(map.current, gaugeStatusMap);
+    } else if (gaugeStyleMode === 'trend' && gaugeTrendMap) {
+      updateGaugeTrendColors(map.current, gaugeTrendMap);
+    }
+  }, [gaugeStatusMap, gaugeTrendMap, gaugeStyleMode]);
 
   // Update profile highlight on map
   useEffect(() => {
@@ -602,6 +608,12 @@ export default function Home() {
             onUndo={handleLakeUndo}
             onClear={handleLakeClear}
             onSubmit={handleLakeSubmit}
+          />
+          {/* Gauge Style Control - visible when gauges layer is on */}
+          <GaugeStyleControl
+            visible={layerVisibility.gauges}
+            mode={gaugeStyleMode}
+            onModeChange={setGaugeStyleMode}
           />
         </div>
 

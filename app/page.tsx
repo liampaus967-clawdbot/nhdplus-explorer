@@ -41,6 +41,7 @@ export default function Home() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const basemapRef = useRef<BasemapStyle>('outdoors');
   const [personaMode, setPersonaMode] = useState<PersonaMode>('home');
+  const [styleVersion, setStyleVersion] = useState(0); // Increments on style.load to trigger re-application of settings
   const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
     blmLands: true,
     wilderness: true,
@@ -409,7 +410,11 @@ export default function Home() {
     };
 
     map.current.on('load', setupLayers);
-    map.current.on('style.load', setupLayers);
+    map.current.on('style.load', () => {
+      setupLayers();
+      // Increment styleVersion to trigger re-application of gauge colors and layer visibility
+      setStyleVersion(v => v + 1);
+    });
 
     return () => {
       map.current?.remove();
@@ -540,7 +545,7 @@ export default function Home() {
       });
   }, [lakeRoute]);
 
-  // Update gauge colors when flow status data loads or mode changes
+  // Update gauge colors when flow status data loads, mode changes, or style reloads
   useEffect(() => {
     if (!map.current) return;
     
@@ -553,7 +558,41 @@ export default function Home() {
     } else if (gaugeStyleMode === 'temp_trend' && gaugeTempTrendMap) {
       updateGaugeTempTrendColors(map.current, gaugeTempTrendMap);
     }
-  }, [gaugeStatusMap, gaugeTrendMap, gaugeTemperatureMap, gaugeTempTrendMap, gaugeStyleMode]);
+  }, [gaugeStatusMap, gaugeTrendMap, gaugeTemperatureMap, gaugeTempTrendMap, gaugeStyleMode, styleVersion]);
+
+  // Reapply layer visibility after style changes
+  useEffect(() => {
+    if (!map.current || styleVersion === 0) return;
+    
+    // Wait a tick for layers to be fully added
+    const timeout = setTimeout(() => {
+      if (!map.current) return;
+      
+      const layerMapping: Record<keyof LayerVisibility, string[]> = {
+        blmLands: ['blm-lands-fill', 'blm-lands-outline'],
+        wilderness: ['wilderness-fill', 'wilderness-outline'],
+        rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
+        lakes: ['lakes-fill', 'lakes-outline', 'lakes-labels'],
+        wildScenicRivers: ['wsr-line', 'wsr-labels'],
+        accessPoints: ['access-points-backdrop'],
+        campgrounds: ['campgrounds-backdrop'],
+        rapids: ['rapids-backdrop'],
+        waterfalls: ['waterfalls-backdrop'],
+        gauges: ['gauges-circles', 'gauges-labels'],
+      };
+
+      Object.entries(layerVisibility).forEach(([key, visible]) => {
+        const layers = layerMapping[key as keyof LayerVisibility];
+        layers?.forEach((layerId) => {
+          if (map.current?.getLayer(layerId)) {
+            map.current.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+          }
+        });
+      });
+    }, 50);
+    
+    return () => clearTimeout(timeout);
+  }, [styleVersion, layerVisibility]);
 
   // Update profile highlight on map
   useEffect(() => {

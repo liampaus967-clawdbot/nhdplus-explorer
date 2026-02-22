@@ -8592,6 +8592,83 @@
         }
       ]
     }
+    ,
+    {
+      "type": "frame",
+      "id": "gaugeControlLight",
+      "x": 1500,
+      "y": 700,
+      "name": "Gauge Style Control - Light",
+      "width": 220,
+      "fill": "$--bg-secondary",
+      "cornerRadius": 16,
+      "stroke": {"align": "inside", "thickness": 1, "fill": "$--border"},
+      "effect": {"type": "shadow", "shadowType": "outer", "color": "#0000000F", "offset": {"x": 0, "y": 4}, "blur": 24},
+      "layout": "vertical",
+      "gap": 12,
+      "padding": 14,
+      "children": [
+        {
+          "type": "frame",
+          "id": "gaugeHeaderLight",
+          "name": "Header",
+          "gap": 8,
+          "alignItems": "center",
+          "children": [
+            {"type": "icon_font", "id": "gaugeIconLight", "width": 16, "height": 16, "iconFontName": "gauge", "iconFontFamily": "lucide", "fill": "$--accent"},
+            {"type": "text", "id": "gaugeTitleLight", "fill": "$--text", "content": "Flow Gauges", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "600"}
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "gaugeToggleLight",
+          "name": "4-Way Toggle",
+          "width": "fill_container",
+          "fill": "$--bg-tertiary",
+          "cornerRadius": 10,
+          "padding": 3,
+          "children": [
+            {"type": "frame", "id": "toggleBtnLevelLight", "name": "Level", "width": "fill_container", "fill": "#ffffff", "cornerRadius": 8, "layout": "vertical", "gap": 2, "padding": [6, 4], "alignItems": "center", "children": [
+              {"type": "icon_font", "id": "levelIconLight", "width": 14, "height": 14, "iconFontName": "droplet", "iconFontFamily": "lucide", "fill": "$--text"},
+              {"type": "text", "id": "levelTextLight", "fill": "$--text", "content": "Level", "fontFamily": "Inter", "fontSize": 9, "fontWeight": "500"}
+            ]},
+            {"type": "frame", "id": "toggleBtnTrendLight", "name": "Trend", "width": "fill_container", "layout": "vertical", "gap": 2, "padding": [6, 4], "alignItems": "center", "children": [
+              {"type": "icon_font", "id": "trendIconLight", "width": 14, "height": 14, "iconFontName": "trending-up", "iconFontFamily": "lucide", "fill": "$--text-muted"},
+              {"type": "text", "id": "trendTextLight", "fill": "$--text-muted", "content": "Trend", "fontFamily": "Inter", "fontSize": 9, "fontWeight": "500"}
+            ]},
+            {"type": "frame", "id": "toggleBtnTempLight", "name": "Temp", "width": "fill_container", "layout": "vertical", "gap": 2, "padding": [6, 4], "alignItems": "center", "children": [
+              {"type": "icon_font", "id": "tempIconLight", "width": 14, "height": 14, "iconFontName": "thermometer", "iconFontFamily": "lucide", "fill": "$--text-muted"},
+              {"type": "text", "id": "tempTextLight", "fill": "$--text-muted", "content": "Temp", "fontFamily": "Inter", "fontSize": 9, "fontWeight": "500"}
+            ]},
+            {"type": "frame", "id": "toggleBtnTTrendLight", "name": "T-Trend", "width": "fill_container", "layout": "vertical", "gap": 2, "padding": [6, 4], "alignItems": "center", "children": [
+              {"type": "icon_font", "id": "ttrendIconLight", "width": 14, "height": 14, "iconFontName": "thermometer", "iconFontFamily": "lucide", "fill": "$--text-muted"},
+              {"type": "text", "id": "ttrendTextLight", "fill": "$--text-muted", "content": "T-Trend", "fontFamily": "Inter", "fontSize": 9, "fontWeight": "500"}
+            ]}
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "gaugeLegendLight",
+          "name": "Legend",
+          "width": "fill_container",
+          "stroke": {"align": "inside", "thickness": {"top": 1}, "fill": "$--border"},
+          "layout": "vertical",
+          "gap": 6,
+          "padding": [12, 0, 0, 0],
+          "children": [
+            {"type": "frame", "id": "gradientBarLight", "name": "Gradient", "width": "fill_container", "height": 8, "fill": {"type": "gradient", "gradientType": "linear", "enabled": true, "rotation": 90, "colors": [{"color": "#dc2626", "position": 0}, {"color": "#f97316", "position": 0.2}, {"color": "#22c55e", "position": 0.5}, {"color": "#3b82f6", "position": 0.8}, {"color": "#7c3aed", "position": 1}]}, "cornerRadius": 4},
+            {"type": "frame", "id": "gradientLabelsLight", "width": "fill_container", "justifyContent": "space_between", "children": [
+              {"type": "text", "id": "l1", "fill": "$--text-muted", "content": "V.Low", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"},
+              {"type": "text", "id": "l2", "fill": "$--text-muted", "content": "Low", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"},
+              {"type": "text", "id": "l3", "fill": "$--text-muted", "content": "Normal", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"},
+              {"type": "text", "id": "l4", "fill": "$--text-muted", "content": "High", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"},
+              {"type": "text", "id": "l5", "fill": "$--text-muted", "content": "V.High", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"}
+            ]},
+            {"type": "text", "id": "legendHintLight", "fill": "$--text-dim", "content": "Based on historical percentile", "fontFamily": "Inter", "fontSize": 10, "fontStyle": "italic"}
+          ]
+        }
+      ]
+    }
   ],
   "variables": {
     "--accent": {
@@ -8675,487 +8752,4 @@
       "value": "#15803d"
     }
   }
-},
-    {
-      "type": "frame",
-      "id": "gaugeControlLight",
-      "x": 1500,
-      "y": 700,
-      "name": "Gauge Style Control - Light",
-      "width": 220,
-      "fill": "$--bg-secondary",
-      "cornerRadius": 16,
-      "stroke": {
-        "align": "inside",
-        "thickness": 1,
-        "fill": "$--border"
-      },
-      "effect": {
-        "type": "shadow",
-        "shadowType": "outer",
-        "color": "#0000000F",
-        "offset": { "x": 0, "y": 4 },
-        "blur": 24
-      },
-      "layout": "vertical",
-      "gap": 12,
-      "padding": 14,
-      "children": [
-        {
-          "type": "frame",
-          "id": "gaugeHeaderLight",
-          "name": "Header",
-          "gap": 8,
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "icon_font",
-              "id": "gaugeIconLight",
-              "width": 16,
-              "height": 16,
-              "iconFontName": "gauge",
-              "iconFontFamily": "lucide",
-              "fill": "$--accent"
-            },
-            {
-              "type": "text",
-              "id": "gaugeTitleLight",
-              "fill": "$--text",
-              "content": "Flow Gauges",
-              "fontFamily": "Inter",
-              "fontSize": 13,
-              "fontWeight": "600"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "gaugeToggleLight",
-          "name": "4-Way Toggle",
-          "width": "fill_container",
-          "fill": "$--bg-tertiary",
-          "cornerRadius": 10,
-          "padding": 3,
-          "children": [
-            {
-              "type": "frame",
-              "id": "toggleBtnLevelLight",
-              "name": "Level (Active)",
-              "width": "fill_container",
-              "fill": "#ffffff",
-              "cornerRadius": 8,
-              "effect": {
-                "type": "shadow",
-                "shadowType": "outer",
-                "color": "#0000001A",
-                "offset": { "x": 0, "y": 2 },
-                "blur": 8
-              },
-              "layout": "vertical",
-              "gap": 2,
-              "padding": [6, 4],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "levelIconLight",
-                  "width": 14,
-                  "height": 14,
-                  "iconFontName": "droplet",
-                  "iconFontFamily": "lucide",
-                  "fill": "$--text"
-                },
-                {
-                  "type": "text",
-                  "id": "levelTextLight",
-                  "fill": "$--text",
-                  "content": "Level",
-                  "fontFamily": "Inter",
-                  "fontSize": 9,
-                  "fontWeight": "500"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "toggleBtnTrendLight",
-              "name": "Trend",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 2,
-              "padding": [6, 4],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "trendIconLight",
-                  "width": 14,
-                  "height": 14,
-                  "iconFontName": "trending-up",
-                  "iconFontFamily": "lucide",
-                  "fill": "$--text-muted"
-                },
-                {
-                  "type": "text",
-                  "id": "trendTextLight",
-                  "fill": "$--text-muted",
-                  "content": "Trend",
-                  "fontFamily": "Inter",
-                  "fontSize": 9,
-                  "fontWeight": "500"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "toggleBtnTempLight",
-              "name": "Temp",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 2,
-              "padding": [6, 4],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "tempIconLight",
-                  "width": 14,
-                  "height": 14,
-                  "iconFontName": "thermometer",
-                  "iconFontFamily": "lucide",
-                  "fill": "$--text-muted"
-                },
-                {
-                  "type": "text",
-                  "id": "tempTextLight",
-                  "fill": "$--text-muted",
-                  "content": "Temp",
-                  "fontFamily": "Inter",
-                  "fontSize": 9,
-                  "fontWeight": "500"
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "toggleBtnTTrendLight",
-              "name": "T-Trend",
-              "width": "fill_container",
-              "layout": "vertical",
-              "gap": 2,
-              "padding": [6, 4],
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "icon_font",
-                  "id": "ttrendIconLight",
-                  "width": 14,
-                  "height": 14,
-                  "iconFontName": "thermometer",
-                  "iconFontFamily": "lucide",
-                  "fill": "$--text-muted"
-                },
-                {
-                  "type": "text",
-                  "id": "ttrendTextLight",
-                  "fill": "$--text-muted",
-                  "content": "T-Trend",
-                  "fontFamily": "Inter",
-                  "fontSize": 9,
-                  "fontWeight": "500"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "gaugeLegendLight",
-          "name": "Legend - Level",
-          "width": "fill_container",
-          "stroke": {
-            "align": "inside",
-            "thickness": { "top": 1 },
-            "fill": "$--border"
-          },
-          "layout": "vertical",
-          "gap": 6,
-          "padding": [12, 0, 0, 0],
-          "children": [
-            {
-              "type": "frame",
-              "id": "gradientBarLight",
-              "name": "Gradient Bar",
-              "width": "fill_container",
-              "height": 8,
-              "fill": {
-                "type": "gradient",
-                "gradientType": "linear",
-                "enabled": true,
-                "rotation": 90,
-                "colors": [
-                  { "color": "#dc2626", "position": 0 },
-                  { "color": "#f97316", "position": 0.2 },
-                  { "color": "#22c55e", "position": 0.5 },
-                  { "color": "#3b82f6", "position": 0.8 },
-                  { "color": "#7c3aed", "position": 1 }
-                ]
-              },
-              "cornerRadius": 4
-            },
-            {
-              "type": "frame",
-              "id": "gradientLabelsLight",
-              "name": "Labels",
-              "width": "fill_container",
-              "justifyContent": "space_between",
-              "children": [
-                {
-                  "type": "text",
-                  "id": "labelVLowLight",
-                  "fill": "$--text-muted",
-                  "content": "V.Low",
-                  "fontFamily": "Inter",
-                  "fontSize": 8,
-                  "fontWeight": "500"
-                },
-                {
-                  "type": "text",
-                  "id": "labelLowLight",
-                  "fill": "$--text-muted",
-                  "content": "Low",
-                  "fontFamily": "Inter",
-                  "fontSize": 8,
-                  "fontWeight": "500"
-                },
-                {
-                  "type": "text",
-                  "id": "labelNormalLight",
-                  "fill": "$--text-muted",
-                  "content": "Normal",
-                  "fontFamily": "Inter",
-                  "fontSize": 8,
-                  "fontWeight": "500"
-                },
-                {
-                  "type": "text",
-                  "id": "labelHighLight",
-                  "fill": "$--text-muted",
-                  "content": "High",
-                  "fontFamily": "Inter",
-                  "fontSize": 8,
-                  "fontWeight": "500"
-                },
-                {
-                  "type": "text",
-                  "id": "labelVHighLight",
-                  "fill": "$--text-muted",
-                  "content": "V.High",
-                  "fontFamily": "Inter",
-                  "fontSize": 8,
-                  "fontWeight": "500"
-                }
-              ]
-            },
-            {
-              "type": "text",
-              "id": "legendHintLight",
-              "fill": "$--text-dim",
-              "content": "Based on historical percentile",
-              "fontFamily": "Inter",
-              "fontSize": 10,
-              "fontStyle": "italic"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "frame",
-      "id": "gaugeControlTrendLight",
-      "x": 1740,
-      "y": 700,
-      "name": "Gauge Style Control - Trend Legend Light",
-      "width": 220,
-      "fill": "$--bg-secondary",
-      "cornerRadius": 16,
-      "stroke": {
-        "align": "inside",
-        "thickness": 1,
-        "fill": "$--border"
-      },
-      "effect": {
-        "type": "shadow",
-        "shadowType": "outer",
-        "color": "#0000000F",
-        "offset": { "x": 0, "y": 4 },
-        "blur": 24
-      },
-      "layout": "vertical",
-      "gap": 12,
-      "padding": 14,
-      "children": [
-        {
-          "type": "frame",
-          "id": "trendHeaderLight",
-          "name": "Header",
-          "gap": 8,
-          "alignItems": "center",
-          "children": [
-            {
-              "type": "icon_font",
-              "id": "trendHeaderIconLight",
-              "width": 16,
-              "height": 16,
-              "iconFontName": "gauge",
-              "iconFontFamily": "lucide",
-              "fill": "$--accent"
-            },
-            {
-              "type": "text",
-              "id": "trendHeaderTitleLight",
-              "fill": "$--text",
-              "content": "Flow Gauges",
-              "fontFamily": "Inter",
-              "fontSize": 13,
-              "fontWeight": "600"
-            }
-          ]
-        },
-        {
-          "type": "frame",
-          "id": "trendLegendLight",
-          "name": "Trend Legend",
-          "width": "fill_container",
-          "stroke": {
-            "align": "inside",
-            "thickness": { "top": 1 },
-            "fill": "$--border"
-          },
-          "padding": [12, 0, 0, 0],
-          "justifyContent": "space_around",
-          "children": [
-            {
-              "type": "frame",
-              "id": "trendRisingLight",
-              "layout": "vertical",
-              "gap": 6,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "risingIconLight",
-                  "width": 32,
-                  "height": 32,
-                  "fill": "rgba(37, 99, 235, 0.12)",
-                  "cornerRadius": 8,
-                  "justifyContent": "center",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon_font",
-                      "id": "risingArrowLight",
-                      "width": 18,
-                      "height": 18,
-                      "iconFontName": "arrow-up",
-                      "iconFontFamily": "lucide",
-                      "fill": "#2563eb"
-                    }
-                  ]
-                },
-                {
-                  "type": "text",
-                  "id": "risingLabelLight",
-                  "fill": "$--text-muted",
-                  "content": "RISING",
-                  "fontFamily": "Inter",
-                  "fontSize": 9,
-                  "fontWeight": "500",
-                  "letterSpacing": 0.3
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "trendStableLight",
-              "layout": "vertical",
-              "gap": 6,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "stableIconLight",
-                  "width": 32,
-                  "height": 32,
-                  "fill": "rgba(22, 163, 74, 0.12)",
-                  "cornerRadius": 8,
-                  "justifyContent": "center",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon_font",
-                      "id": "stableArrowLight",
-                      "width": 18,
-                      "height": 18,
-                      "iconFontName": "minus",
-                      "iconFontFamily": "lucide",
-                      "fill": "#16a34a"
-                    }
-                  ]
-                },
-                {
-                  "type": "text",
-                  "id": "stableLabelLight",
-                  "fill": "$--text-muted",
-                  "content": "STABLE",
-                  "fontFamily": "Inter",
-                  "fontSize": 9,
-                  "fontWeight": "500",
-                  "letterSpacing": 0.3
-                }
-              ]
-            },
-            {
-              "type": "frame",
-              "id": "trendFallingLight",
-              "layout": "vertical",
-              "gap": 6,
-              "alignItems": "center",
-              "children": [
-                {
-                  "type": "frame",
-                  "id": "fallingIconLight",
-                  "width": 32,
-                  "height": 32,
-                  "fill": "rgba(220, 38, 38, 0.12)",
-                  "cornerRadius": 8,
-                  "justifyContent": "center",
-                  "alignItems": "center",
-                  "children": [
-                    {
-                      "type": "icon_font",
-                      "id": "fallingArrowLight",
-                      "width": 18,
-                      "height": 18,
-                      "iconFontName": "arrow-down",
-                      "iconFontFamily": "lucide",
-                      "fill": "#dc2626"
-                    }
-                  ]
-                },
-                {
-                  "type": "text",
-                  "id": "fallingLabelLight",
-                  "fill": "$--text-muted",
-                  "content": "FALLING",
-                  "fontFamily": "Inter",
-                  "fontSize": 9,
-                  "fontWeight": "500",
-                  "letterSpacing": 0.3
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    }
+}

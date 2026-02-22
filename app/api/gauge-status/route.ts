@@ -73,11 +73,17 @@ export async function GET() {
     }> = {};
     
     for (const [siteNo, data] of Object.entries(sites) as [string, any][]) {
-      // Map trend
+      // Map trend - only set if we have real data
       let trend: 'rising' | 'falling' | 'stable' | 'unknown' = 'unknown';
-      if (data.trend === 'rising' || data.trend_rate > 0.1) trend = 'rising';
-      else if (data.trend === 'falling' || data.trend_rate < -0.1) trend = 'falling';
-      else if (data.trend === 'stable' || (data.trend_rate !== null && Math.abs(data.trend_rate) <= 0.1)) trend = 'stable';
+      if (data.trend === 'rising') trend = 'rising';
+      else if (data.trend === 'falling') trend = 'falling';
+      else if (data.trend === 'stable') trend = 'stable';
+      // Only use trend_rate if trend is unknown AND rate is meaningful (not 0)
+      else if (data.trend === 'unknown' && data.trend_rate !== 0) {
+        if (data.trend_rate > 0.1) trend = 'rising';
+        else if (data.trend_rate < -0.1) trend = 'falling';
+      }
+      // If trend is 'unknown' and trend_rate is 0 or null, keep as 'unknown'
       
       result[siteNo] = {
         status: mapFlowStatus(data.flow_status, data.percentile),

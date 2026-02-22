@@ -165,8 +165,9 @@ export function updateGaugeTrendColors(
       case 'stable':
         colorMatch.push('#22c55e'); // Green
         break;
+      case 'unknown':
       default:
-        colorMatch.push(COLORS.gauge); // Default amber
+        colorMatch.push('#9ca3af'); // Gray for unknown trend
     }
   }
 

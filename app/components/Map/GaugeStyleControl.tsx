@@ -73,6 +73,10 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
               <span className={styles.dot} style={{ background: '#ef4444' }} />
               <span>Falling</span>
             </div>
+            <div className={styles.legendItem}>
+              <span className={styles.dot} style={{ background: '#9ca3af' }} />
+              <span>Unknown</span>
+            </div>
           </>
         )}
       </div>

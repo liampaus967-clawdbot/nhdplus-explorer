@@ -685,6 +685,10 @@ export async function GET(request: NextRequest) {
         }
       },
       warnings,
+      path: {
+        nodes: result.path,
+        comids: realComids,
+      },
       snap: {
         start: {
           edge_comid: startSnap.edge_comid,

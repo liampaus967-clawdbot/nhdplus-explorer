@@ -82,6 +82,7 @@ export function addGaugesLayers(map: mapboxgl.Map) {
 
 /**
  * Update gauge colors based on live flow status.
+ * Only shows gauges that have FGP data.
  * 
  * @param map - Mapbox map instance
  * @param flowData - Map of site_no to flow status ('very_low', 'low', 'normal', 'high', 'very_high')
@@ -91,6 +92,14 @@ export function updateGaugeColors(
   flowData: Record<string, string>
 ) {
   if (!map.getLayer('gauges-circles')) return;
+  
+  const siteNos = Object.keys(flowData);
+  
+  // Filter to only show gauges with FGP data
+  map.setFilter('gauges-circles', ['in', ['get', 'site_no'], ['literal', siteNos]]);
+  if (map.getLayer('gauges-labels')) {
+    map.setFilter('gauges-labels', ['in', ['get', 'site_no'], ['literal', siteNos]]);
+  }
   
   // Build match expression for colors
   const colorMatch: (string | string[])[] = ['match', ['get', 'site_no']];
@@ -118,7 +127,7 @@ export function updateGaugeColors(
     }
   }
   
-  // Default color for gauges without status
+  // Default color (shouldn't be visible due to filter, but just in case)
   colorMatch.push(COLORS.gauge);
   
   map.setPaintProperty('gauges-circles', 'circle-color', colorMatch as mapboxgl.Expression);
@@ -126,12 +135,21 @@ export function updateGaugeColors(
 
 /**
  * Update gauge colors based on trend (rising/falling/stable).
+ * Only shows gauges that have FGP data.
  */
 export function updateGaugeTrendColors(
   map: mapboxgl.Map,
   trendData: Record<string, string>
 ) {
   if (!map.getLayer('gauges-circles')) return;
+
+  const siteNos = Object.keys(trendData);
+  
+  // Filter to only show gauges with FGP data
+  map.setFilter('gauges-circles', ['in', ['get', 'site_no'], ['literal', siteNos]]);
+  if (map.getLayer('gauges-labels')) {
+    map.setFilter('gauges-labels', ['in', ['get', 'site_no'], ['literal', siteNos]]);
+  }
 
   const colorMatch: (string | string[])[] = ['match', ['get', 'site_no']];
 
@@ -152,7 +170,7 @@ export function updateGaugeTrendColors(
     }
   }
 
-  // Default color for gauges without trend data
+  // Default color (shouldn't be visible due to filter)
   colorMatch.push(COLORS.gauge);
 
   map.setPaintProperty('gauges-circles', 'circle-color', colorMatch as mapboxgl.Expression);

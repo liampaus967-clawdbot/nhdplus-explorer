@@ -206,3 +206,11 @@
   border: 1px solid var(--border);
   color: var(--text-muted);
 }
+
+.flowValue {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: center;
+}

@@ -4,6 +4,7 @@ import { MapPin, Flag } from 'lucide-react';
 import { RouteResult, SnapResult } from '../../types';
 import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
+import { useFlowStatus, getStatusLabel, getStatusColor } from '../../hooks/useFlowData';
 import styles from './FloaterSidebar.module.css';
 import sharedStyles from './shared/shared.module.css';
 
@@ -15,8 +16,12 @@ interface FloaterSidebarProps {
 }
 
 export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterSidebarProps) {
-  const { stats } = route;
+  const { stats, path } = route;
   const riverName = stats.waterways?.[0] || 'Unknown River';
+  
+  // Get flow data for the first COMID on the route
+  const primaryComid = path?.comids?.[0] ?? null;
+  const { data: flowData, loading: flowLoading } = useFlowStatus(primaryComid);
 
   const hours = Math.floor(stats.float_time_h);
   const minutes = Math.round((stats.float_time_h - hours) * 60);
@@ -91,16 +96,35 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
         <div className={styles.conditionItem}>
           <div className={styles.conditionHeader}>
             <span className={styles.conditionName}>Water Level</span>
-            <span className={`${styles.conditionBadge} ${styles.conditionGood}`}>Normal</span>
+            <span 
+              className={`${styles.conditionBadge}`}
+              style={{ 
+                backgroundColor: flowData ? getStatusColor(flowData.status) : 'var(--success)',
+                color: 'white'
+              }}
+            >
+              {flowLoading ? 'Loading...' : flowData ? getStatusLabel(flowData.status) : 'Normal'}
+            </span>
           </div>
           <div className={styles.conditionTrack}>
-            <div className={styles.conditionFill} style={{ width: '50%', background: 'var(--success)' }} />
+            <div 
+              className={styles.conditionFill} 
+              style={{ 
+                width: `${flowData?.percentile ?? 50}%`, 
+                background: flowData ? getStatusColor(flowData.status) : 'var(--success)' 
+              }} 
+            />
           </div>
           <div className={styles.conditionLabels}>
             <span>Low</span>
             <span>Normal</span>
             <span>High</span>
           </div>
+          {flowData?.flow_cfs && (
+            <div className={styles.flowValue}>
+              {Math.round(flowData.flow_cfs).toLocaleString()} CFS
+            </div>
+          )}
         </div>
 
         {/* Hazards */}

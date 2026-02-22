@@ -158,11 +158,38 @@ async function getFlowForComid(comid: number): Promise<FlowData> {
 }
 
 /**
+ * Find best gauge data from a list of COMIDs
+ * Returns the one with highest confidence
+ */
+async function getBestFlowFromComids(comids: number[]): Promise<FlowData | null> {
+  let bestData: FlowData | null = null;
+  
+  for (const comid of comids) {
+    const data = await getFlowForComid(comid);
+    
+    // Prefer data with actual readings
+    if (data.source !== 'none') {
+      if (!bestData || data.confidence > bestData.confidence) {
+        bestData = data;
+      }
+      // If we found USGS data, use it immediately
+      if (data.source === 'usgs' && data.flow_cfs !== null) {
+        return data;
+      }
+    }
+  }
+  
+  return bestData;
+}
+
+/**
  * GET /api/flow?comid=123
  * GET /api/flow?comids=123,456,789
+ * GET /api/flow?comids=123,456&best=true  (returns single best result)
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
+  const wantBest = searchParams.get('best') === 'true';
   
   // Single COMID
   const comidParam = searchParams.get('comid');
@@ -187,6 +214,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Max 100 COMIDs per request' }, { status: 400 });
     }
     
+    // Return single best result for route
+    if (wantBest) {
+      const best = await getBestFlowFromComids(comids);
+      return NextResponse.json(best || { source: 'none', confidence: 0 });
+    }
+    
+    // Return all results
     const results: Record<number, FlowData> = {};
     for (const comid of comids) {
       results[comid] = await getFlowForComid(comid);

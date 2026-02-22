@@ -6,7 +6,7 @@ import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
 import { FlowGaugeCard } from './shared/FlowGaugeCard';
 import { ElevationProfile } from '../Panel/ElevationProfile';
-import { useFlowStatus } from '../../hooks/useFlowData';
+import { useBestFlowForRoute } from '../../hooks/useFlowData';
 import styles from './WhitewaterSidebar.module.css';
 import sharedStyles from './shared/shared.module.css';
 
@@ -40,9 +40,9 @@ export function WhitewaterSidebar({
   const { stats, path } = route;
   const riverName = stats.waterways?.[0] || 'Unknown River';
   
-  // Get flow data for the first COMID on the route
-  const primaryComid = path?.comids?.[0] ?? null;
-  const { data: flowData, loading: flowLoading, error: flowError } = useFlowStatus(primaryComid);
+  // Get best flow data from ALL COMIDs on the route (finds nearest gauge)
+  const routeComids = path?.comids ?? null;
+  const { data: flowData, loading: flowLoading, error: flowError } = useBestFlowForRoute(routeComids);
 
   // Approximate rapids from steep sections
   const rapids = (stats.steep_sections || []).map((s, i) => {

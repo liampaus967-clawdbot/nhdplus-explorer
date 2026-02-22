@@ -4,7 +4,7 @@ import { MapPin, Flag } from 'lucide-react';
 import { RouteResult, SnapResult } from '../../types';
 import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
-import { useFlowStatus, getStatusLabel, getStatusColor } from '../../hooks/useFlowData';
+import { useBestFlowForRoute, getStatusLabel, getStatusColor } from '../../hooks/useFlowData';
 import styles from './FloaterSidebar.module.css';
 import sharedStyles from './shared/shared.module.css';
 
@@ -19,9 +19,9 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
   const { stats, path } = route;
   const riverName = stats.waterways?.[0] || 'Unknown River';
   
-  // Get flow data for the first COMID on the route
-  const primaryComid = path?.comids?.[0] ?? null;
-  const { data: flowData, loading: flowLoading } = useFlowStatus(primaryComid);
+  // Get best flow data from ALL COMIDs on the route (finds nearest gauge)
+  const routeComids = path?.comids ?? null;
+  const { data: flowData, loading: flowLoading } = useBestFlowForRoute(routeComids);
 
   const hours = Math.floor(stats.float_time_h);
   const minutes = Math.round((stats.float_time_h - hours) * 60);

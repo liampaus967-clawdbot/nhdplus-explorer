@@ -70,6 +70,38 @@ export function useFlowStatus(comid: number | null) {
 }
 
 /**
+ * Hook to fetch the BEST flow data from a list of COMIDs (for routes)
+ * Finds the COMID with the highest confidence data (prefers USGS gauges)
+ */
+export function useBestFlowForRoute(comids: number[] | null) {
+  const [data, setData] = useState<FlowData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!comids || comids.length === 0) {
+      setData(null);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const comidStr = comids.join(',');
+    fetch(`/api/flow?comids=${comidStr}&best=true`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(setData)
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false));
+  }, [comids?.join(',')]);
+
+  return { data, loading, error };
+}
+
+/**
  * Hook to fetch flow data for multiple COMIDs (e.g., a route)
  */
 export function useRouteFlowData(comids: number[]) {

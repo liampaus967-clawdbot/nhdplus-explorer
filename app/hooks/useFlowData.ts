@@ -33,8 +33,8 @@ export interface GaugeInfo {
   updated_at: string | null;
 }
 
-// API base URL - configure for production
-const API_BASE = process.env.NEXT_PUBLIC_FLOW_API_URL || 'http://localhost:8000';
+// API base URL - uses Next.js API routes
+const API_BASE = '';
 
 // S3 URL for FGP live data (via CloudFront when available)
 const FGP_LIVE_URL = 'https://driftwise-flowgauge-data.s3.amazonaws.com/live_output/current_status.json';
@@ -56,7 +56,7 @@ export function useFlowStatus(comid: number | null) {
     setLoading(true);
     setError(null);
 
-    fetch(`${API_BASE}/api/flow/${comid}`)
+    fetch(`/api/flow?comid=${comid}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -87,7 +87,7 @@ export function useRouteFlowData(comids: number[]) {
     setError(null);
 
     const comidStr = comids.join(',');
-    fetch(`${API_BASE}/api/flow/route?comids=${comidStr}`)
+    fetch(`/api/flow?comids=${comidStr}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
@@ -124,7 +124,7 @@ export function useGaugesInBbox(bounds: [number, number, number, number] | null)
     setLoading(true);
     setError(null);
 
-    fetch(`${API_BASE}/api/flow/bbox?min_lng=${minLng}&min_lat=${minLat}&max_lng=${maxLng}&max_lat=${maxLat}`)
+    fetch(`/api/flow/bbox?min_lng=${minLng}&min_lat=${minLat}&max_lng=${maxLng}&max_lat=${maxLat}`)
       .then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

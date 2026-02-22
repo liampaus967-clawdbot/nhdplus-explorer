@@ -4,7 +4,9 @@ import { RouteResult } from '../../types';
 import { ElevationPoint, SteepSection } from '../../types';
 import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
+import { FlowGaugeCard } from './shared/FlowGaugeCard';
 import { ElevationProfile } from '../Panel/ElevationProfile';
+import { useFlowStatus } from '../../hooks/useFlowData';
 import styles from './WhitewaterSidebar.module.css';
 import sharedStyles from './shared/shared.module.css';
 
@@ -35,8 +37,12 @@ export function WhitewaterSidebar({
   onMouseUp,
   onMouseLeave,
 }: WhitewaterSidebarProps) {
-  const { stats } = route;
+  const { stats, path } = route;
   const riverName = stats.waterways?.[0] || 'Unknown River';
+  
+  // Get flow data for the first COMID on the route
+  const primaryComid = path?.comids?.[0] ?? null;
+  const { data: flowData, loading: flowLoading, error: flowError } = useFlowStatus(primaryComid);
 
   // Approximate rapids from steep sections
   const rapids = (stats.steep_sections || []).map((s, i) => {
@@ -66,19 +72,12 @@ export function WhitewaterSidebar({
         Clear Route
       </button>
 
-      {/* Gauge Card - Zero State */}
-      <div className={`${styles.card} ${styles.gaugeCard}`}>
-        <div className={styles.gaugeHeader}>
-          <span className={styles.gaugeName}>USGS Gauge</span>
-          <span className={`${styles.gaugeBadge} ${styles.gaugeGood}`}>Coming Soon</span>
-        </div>
-        <div className={sharedStyles.zeroState}>
-          <span className={sharedStyles.zeroStateTitle}>Gauge Data Unavailable</span>
-          <span className={sharedStyles.zeroStateDesc}>
-            Real-time CFS readings from nearby USGS gauges will appear here in a future update
-          </span>
-        </div>
-      </div>
+      {/* Flow Gauge Card */}
+      <FlowGaugeCard 
+        flowData={flowData} 
+        loading={flowLoading} 
+        error={flowError} 
+      />
 
       {/* Trip Stats */}
       <div className={`${styles.card} ${styles.statsCard}`}>

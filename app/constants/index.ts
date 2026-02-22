@@ -42,6 +42,7 @@ export const TILESETS = {
   waterfalls: 'mapbox://lman967.waterfalls',
   blmLands: 'mapbox://lman967.blm_polygons',
   wilderness: 'mapbox://lman967.wilderness_areas',
+  gauges: 'mapbox://lman967.usgs_gauges',
 };
 
 // Source layer names
@@ -54,6 +55,7 @@ export const SOURCE_LAYERS = {
   waterfalls: 'waterfalls',
   blmLands: 'blm_polygons',
   wilderness: 'wilderness_areas',
+  gauges: 'usgs_gauges',
 };
 
 // Colors
@@ -73,4 +75,10 @@ export const COLORS = {
   takeOut: '#ef4444',
   blmLands: '#c9a227', // Yellow/tan for BLM lands
   wilderness: '#1a5d1a', // Deep green for wilderness areas
+  gauge: '#0ea5e9', // Sky blue for gauges
+  gaugeVeryLow: '#dc2626', // Red - very low flow
+  gaugeLow: '#f97316', // Orange - low flow
+  gaugeNormal: '#22c55e', // Green - normal flow
+  gaugeHigh: '#3b82f6', // Blue - high flow
+  gaugeVeryHigh: '#7c3aed', // Purple - very high flow
 };

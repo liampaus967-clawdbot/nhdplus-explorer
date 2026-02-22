@@ -8,6 +8,7 @@ import { addWaterfallsSource, addWaterfallsBackdrop } from './waterfalls';
 import { addRouteSource, addRouteLayers } from './routeLayer';
 import { addBlmLandsSource, addBlmLandsLayers } from './blmLands';
 import { addWildernessSource, addWildernessLayers } from './wilderness';
+import { addGaugesSource, addGaugesLayers } from './gauges';
 import { addPoiIcons } from './poiIcons';
 
 export * from './rivers';
@@ -19,6 +20,7 @@ export * from './waterfalls';
 export * from './routeLayer';
 export * from './blmLands';
 export * from './wilderness';
+export * from './gauges';
 
 /**
  * Add all map sources and layers
@@ -33,6 +35,7 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   addWaterfallsSource(map);
   addRapidsSource(map);
   addCampgroundsSource(map);
+  addGaugesSource(map);
   addRouteSource(map);
 
   // Add layers in order (bottom to top)
@@ -52,6 +55,9 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   addRapidsBackdrop(map);
   addCampgroundsBackdrop(map);
   addAccessPointsBackdrop(map);
+  
+  // Gauges (below route, above POIs)
+  addGaugesLayers(map);
   
   // Route on top
   addRouteLayers(map);

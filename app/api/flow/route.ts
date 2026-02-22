@@ -74,6 +74,46 @@ function getFlowStatus(percentile: number | null): FlowStatus {
 }
 
 /**
+ * Calculate percentile and status from flow using reference thresholds
+ */
+async function calculatePercentile(siteNo: string, flowCfs: number): Promise<{ percentile: number | null; status: FlowStatus }> {
+  const refResult = await query(`
+    SELECT p10, p25, p50, p75, p90
+    FROM flow_percentiles
+    WHERE site_id = $1
+  `, [siteNo]);
+  
+  const ref = refResult.rows[0];
+  if (!ref) return { percentile: null, status: 'unknown' };
+  
+  // Determine percentile bucket and interpolate
+  let percentile: number | null = null;
+  let status: FlowStatus = 'unknown';
+  
+  if (ref.p10 !== null && flowCfs <= ref.p10) {
+    percentile = Math.round((flowCfs / ref.p10) * 10);
+    status = 'very_low';
+  } else if (ref.p25 !== null && flowCfs <= ref.p25) {
+    percentile = 10 + Math.round(((flowCfs - (ref.p10 || 0)) / (ref.p25 - (ref.p10 || 0))) * 15);
+    status = 'low';
+  } else if (ref.p50 !== null && flowCfs <= ref.p50) {
+    percentile = 25 + Math.round(((flowCfs - (ref.p25 || 0)) / (ref.p50 - (ref.p25 || 0))) * 25);
+    status = 'normal';
+  } else if (ref.p75 !== null && flowCfs <= ref.p75) {
+    percentile = 50 + Math.round(((flowCfs - (ref.p50 || 0)) / (ref.p75 - (ref.p50 || 0))) * 25);
+    status = 'normal';
+  } else if (ref.p90 !== null && flowCfs <= ref.p90) {
+    percentile = 75 + Math.round(((flowCfs - (ref.p75 || 0)) / (ref.p90 - (ref.p75 || 0))) * 15);
+    status = 'high';
+  } else if (ref.p90 !== null) {
+    percentile = 90 + Math.min(10, Math.round(((flowCfs - ref.p90) / ref.p90) * 10));
+    status = 'very_high';
+  }
+  
+  return { percentile: percentile !== null ? Math.max(0, Math.min(100, percentile)) : null, status };
+}
+
+/**
  * Get flow data for a single COMID
  */
 async function getFlowForComid(comid: number): Promise<FlowData> {
@@ -88,12 +128,11 @@ async function getFlowForComid(comid: number): Promise<FlowData> {
   const gauge = gaugeResult.rows[0];
   
   if (gauge) {
-    // Check FGP for live data
+    // Check FGP for live data (has real-time percentiles)
     const fgpData = await loadFGPData();
     const fgp = fgpData[gauge.site_no];
     
     if (fgp) {
-      // Have live FGP data!
       return {
         comid,
         source: 'usgs',
@@ -122,18 +161,29 @@ async function getFlowForComid(comid: number): Promise<FlowData> {
   
   if (nwm) {
     const flow_cms = nwm.streamflow_cms;
+    const flow_cfs = flow_cms ? flow_cms * CMS_TO_CFS : null;
     const velocity_ms = nwm.velocity_ms;
+    
+    // Calculate percentile from reference table if we have a gauge
+    let percentile: number | null = null;
+    let status: FlowStatus = 'unknown';
+    
+    if (gauge && flow_cfs !== null) {
+      const calc = await calculatePercentile(gauge.site_no, flow_cfs);
+      percentile = calc.percentile;
+      status = calc.status;
+    }
     
     return {
       comid,
       source: 'nwm',
-      confidence: gauge ? 0.7 : 0.5, // Higher if gauge exists
-      flow_cfs: flow_cms ? flow_cms * CMS_TO_CFS : null,
+      confidence: gauge ? 0.7 : 0.5,
+      flow_cfs,
       flow_cms,
       velocity_fps: velocity_ms ? velocity_ms * MS_TO_FPS : null,
       velocity_ms,
-      status: 'unknown', // NWM doesn't have percentiles
-      percentile: null,
+      status,
+      percentile,
       gauge_id: gauge?.site_no || null,
       gauge_name: gauge?.site_name || null,
       updated_at: nwm.updated_at?.toISOString() || null,

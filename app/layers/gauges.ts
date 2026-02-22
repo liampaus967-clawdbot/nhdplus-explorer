@@ -28,19 +28,19 @@ export function addGaugesCircles(map: mapboxgl.Map) {
     paint: {
       'circle-radius': [
         'interpolate', ['linear'], ['zoom'],
-        6, 3,
-        10, 5,
-        14, 8,
+        6, 4,
+        10, 6,
+        14, 9,
       ],
       'circle-color': COLORS.gauge,
-      'circle-stroke-color': '#ffffff',
+      'circle-stroke-color': '#1e3a5f', // Dark navy stroke for visibility
       'circle-stroke-width': [
         'interpolate', ['linear'], ['zoom'],
-        6, 0.5,
-        10, 1,
-        14, 2,
+        6, 1.5,
+        10, 2,
+        14, 2.5,
       ],
-      'circle-opacity': 0.9,
+      'circle-opacity': 1,
     },
   });
 }

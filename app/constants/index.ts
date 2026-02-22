@@ -75,7 +75,7 @@ export const COLORS = {
   takeOut: '#ef4444',
   blmLands: '#c9a227', // Yellow/tan for BLM lands
   wilderness: '#1a5d1a', // Deep green for wilderness areas
-  gauge: '#0ea5e9', // Sky blue for gauges
+  gauge: '#f59e0b', // Amber/orange for gauges - visible against blue rivers
   gaugeVeryLow: '#dc2626', // Red - very low flow
   gaugeLow: '#f97316', // Orange - low flow
   gaugeNormal: '#22c55e', // Green - normal flow

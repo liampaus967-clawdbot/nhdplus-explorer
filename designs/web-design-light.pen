@@ -698,7 +698,7 @@
                               "id": "ZnGiy",
                               "name": "r1Dist",
                               "fill": "$--text-dim",
-                              "content": "12 mi away  \u2022  Normal flow",
+                              "content": "12 mi away  •  Normal flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -759,7 +759,7 @@
                               "id": "UD1tY",
                               "name": "r2Dist",
                               "fill": "$--text-dim",
-                              "content": "18 mi away  \u2022  Low flow",
+                              "content": "18 mi away  •  Low flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -820,7 +820,7 @@
                               "id": "fYOB2",
                               "name": "r3Dist",
                               "fill": "$--text-dim",
-                              "content": "34 mi away  \u2022  High flow",
+                              "content": "34 mi away  •  High flow",
                               "fontFamily": "Inter",
                               "fontSize": 11,
                               "fontWeight": "normal"
@@ -930,7 +930,7 @@
                   "type": "text",
                   "id": "iN5U9",
                   "fill": "$--text-muted",
-                  "content": "Upper Section \u2022 Class IV-V",
+                  "content": "Upper Section • Class IV-V",
                   "fontFamily": "Inter",
                   "fontSize": 13,
                   "fontWeight": "normal"
@@ -1079,7 +1079,7 @@
                       "type": "text",
                       "id": "UbSuO",
                       "fill": "#22c55e",
-                      "content": "\u25cf RUNNABLE",
+                      "content": "● RUNNABLE",
                       "fontFamily": "Inter",
                       "fontSize": 10,
                       "fontWeight": "600",
@@ -2138,7 +2138,7 @@
                       "id": "D4V3y",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68\u00b0F  Partly Cloudy",
+                      "content": "68°F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -2148,7 +2148,7 @@
                       "id": "uuq1n",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
+                      "content": "Feels like 72°F  •  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -2721,7 +2721,7 @@
                   "type": "text",
                   "id": "ANOPS",
                   "fill": "$--text-muted",
-                  "content": "Charlottesville \u2192 Palmyra",
+                  "content": "Charlottesville → Palmyra",
                   "fontFamily": "Inter",
                   "fontSize": 13,
                   "fontWeight": "normal"
@@ -2885,7 +2885,7 @@
                       "id": "vfIRl",
                       "name": "putCoords",
                       "fill": "$--text-dim",
-                      "content": "38.0293\u00b0N, 78.4767\u00b0W",
+                      "content": "38.0293°N, 78.4767°W",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -2933,7 +2933,7 @@
                       "id": "oj4C1",
                       "name": "takeCoords",
                       "fill": "$--text-dim",
-                      "content": "37.8612\u00b0N, 78.5134\u00b0W",
+                      "content": "37.8612°N, 78.5134°W",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -3753,7 +3753,7 @@
                         {
                           "type": "text",
                           "id": "FKQgb",
-                          "content": "\ud83c\udfd5\ufe0f",
+                          "content": "🏕️",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -3819,7 +3819,7 @@
                         {
                           "type": "text",
                           "id": "GxmCt",
-                          "content": "\ud83c\udf32",
+                          "content": "🌲",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -3885,7 +3885,7 @@
                         {
                           "type": "text",
                           "id": "mYh5E",
-                          "content": "\ud83d\udcf8",
+                          "content": "📸",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -3951,7 +3951,7 @@
                         {
                           "type": "text",
                           "id": "NHSZb",
-                          "content": "\u26a0\ufe0f",
+                          "content": "⚠️",
                           "fontFamily": "Inter",
                           "fontSize": 18,
                           "fontWeight": "normal"
@@ -4037,7 +4037,7 @@
               "type": "text",
               "id": "RcNGL",
               "fill": "$--text",
-              "content": "68\u00b0F",
+              "content": "68°F",
               "fontFamily": "Inter",
               "fontSize": 14,
               "fontWeight": "600"
@@ -4139,7 +4139,7 @@
                       "id": "khwsp",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68\u00b0F  Partly Cloudy",
+                      "content": "68°F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -4149,7 +4149,7 @@
                       "id": "F1Ao7",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
+                      "content": "Feels like 72°F  •  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -4975,7 +4975,7 @@
                       "type": "text",
                       "id": "ZG6sY",
                       "fill": "$--text-dim",
-                      "content": "Free parking \u2022 Restrooms \u2022 Easy entry",
+                      "content": "Free parking • Restrooms • Easy entry",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -5042,7 +5042,7 @@
                       "type": "text",
                       "id": "0Nk8L",
                       "fill": "$--text-dim",
-                      "content": "$5 parking \u2022 Food nearby \u2022 Shuttle available",
+                      "content": "$5 parking • Food nearby • Shuttle available",
                       "fontFamily": "Inter",
                       "fontSize": 12,
                       "fontWeight": "normal"
@@ -5766,7 +5766,7 @@
                       "id": "WCYnJ",
                       "name": "tempVal",
                       "fill": "$--text",
-                      "content": "68\u00b0F  Partly Cloudy",
+                      "content": "68°F  Partly Cloudy",
                       "fontFamily": "Inter",
                       "fontSize": 15,
                       "fontWeight": "600"
@@ -5776,7 +5776,7 @@
                       "id": "iTQCj",
                       "name": "feelsLike",
                       "fill": "$--text-dim",
-                      "content": "Feels like 72\u00b0F  \u2022  Humidity 54%",
+                      "content": "Feels like 72°F  •  Humidity 54%",
                       "fontFamily": "Inter",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -6648,7 +6648,7 @@
               "type": "text",
               "id": "paddleHint",
               "fill": "$--text-dim",
-              "content": "Avg kayak: 3 mph \u2022 Avg canoe: 2.5 mph",
+              "content": "Avg kayak: 3 mph • Avg canoe: 2.5 mph",
               "fontFamily": "Inter",
               "fontSize": 10,
               "fontWeight": "normal"
@@ -7015,7 +7015,7 @@
                       "type": "text",
                       "id": "windDegrees",
                       "fill": "$--text-dim",
-                      "content": "225\u00b0",
+                      "content": "225°",
                       "fontFamily": "$--font-mono",
                       "fontSize": 11,
                       "fontWeight": "normal"
@@ -8690,19 +8690,31 @@
           ]
         }
       ]
-    }
-    ,
+    },
     {
       "type": "frame",
       "id": "gaugeControlLight",
-      "x": 1500,
-      "y": 700,
+      "x": -294,
+      "y": 0,
       "name": "Gauge Style Control - Light",
       "width": 220,
       "fill": "$--bg-secondary",
       "cornerRadius": 16,
-      "stroke": {"align": "inside", "thickness": 1, "fill": "$--border"},
-      "effect": {"type": "shadow", "shadowType": "outer", "color": "#0000000F", "offset": {"x": 0, "y": 4}, "blur": 24},
+      "stroke": {
+        "align": "inside",
+        "thickness": 1,
+        "fill": "$--border"
+      },
+      "effect": {
+        "type": "shadow",
+        "shadowType": "outer",
+        "color": "#0000000F",
+        "offset": {
+          "x": 0,
+          "y": 4
+        },
+        "blur": 24
+      },
       "layout": "vertical",
       "gap": 12,
       "padding": 14,
@@ -8714,8 +8726,24 @@
           "gap": 8,
           "alignItems": "center",
           "children": [
-            {"type": "icon_font", "id": "gaugeIconLight", "width": 16, "height": 16, "iconFontName": "gauge", "iconFontFamily": "lucide", "fill": "$--accent"},
-            {"type": "text", "id": "gaugeTitleLight", "fill": "$--text", "content": "Flow Gauges", "fontFamily": "Inter", "fontSize": 13, "fontWeight": "600"}
+            {
+              "type": "icon_font",
+              "id": "gaugeIconLight",
+              "width": 16,
+              "height": 16,
+              "iconFontName": "gauge",
+              "iconFontFamily": "lucide",
+              "fill": "$--accent"
+            },
+            {
+              "type": "text",
+              "id": "gaugeTitleLight",
+              "fill": "$--text",
+              "content": "Flow Gauges",
+              "fontFamily": "Inter",
+              "fontSize": 13,
+              "fontWeight": "600"
+            }
           ]
         },
         {
@@ -8727,22 +8755,140 @@
           "cornerRadius": 10,
           "padding": 3,
           "children": [
-            {"type": "frame", "id": "toggleBtnLevelLight", "name": "Level", "width": "fill_container", "fill": "#ffffff", "cornerRadius": 8, "layout": "vertical", "gap": 2, "padding": [6, 4], "alignItems": "center", "children": [
-              {"type": "icon_font", "id": "levelIconLight", "width": 14, "height": 14, "iconFontName": "droplet", "iconFontFamily": "lucide", "fill": "$--text"},
-              {"type": "text", "id": "levelTextLight", "fill": "$--text", "content": "Level", "fontFamily": "Inter", "fontSize": 9, "fontWeight": "500"}
-            ]},
-            {"type": "frame", "id": "toggleBtnTrendLight", "name": "Trend", "width": "fill_container", "layout": "vertical", "gap": 2, "padding": [6, 4], "alignItems": "center", "children": [
-              {"type": "icon_font", "id": "trendIconLight", "width": 14, "height": 14, "iconFontName": "trending-up", "iconFontFamily": "lucide", "fill": "$--text-muted"},
-              {"type": "text", "id": "trendTextLight", "fill": "$--text-muted", "content": "Trend", "fontFamily": "Inter", "fontSize": 9, "fontWeight": "500"}
-            ]},
-            {"type": "frame", "id": "toggleBtnTempLight", "name": "Temp", "width": "fill_container", "layout": "vertical", "gap": 2, "padding": [6, 4], "alignItems": "center", "children": [
-              {"type": "icon_font", "id": "tempIconLight", "width": 14, "height": 14, "iconFontName": "thermometer", "iconFontFamily": "lucide", "fill": "$--text-muted"},
-              {"type": "text", "id": "tempTextLight", "fill": "$--text-muted", "content": "Temp", "fontFamily": "Inter", "fontSize": 9, "fontWeight": "500"}
-            ]},
-            {"type": "frame", "id": "toggleBtnTTrendLight", "name": "T-Trend", "width": "fill_container", "layout": "vertical", "gap": 2, "padding": [6, 4], "alignItems": "center", "children": [
-              {"type": "icon_font", "id": "ttrendIconLight", "width": 14, "height": 14, "iconFontName": "thermometer", "iconFontFamily": "lucide", "fill": "$--text-muted"},
-              {"type": "text", "id": "ttrendTextLight", "fill": "$--text-muted", "content": "T-Trend", "fontFamily": "Inter", "fontSize": 9, "fontWeight": "500"}
-            ]}
+            {
+              "type": "frame",
+              "id": "toggleBtnLevelLight",
+              "name": "Level",
+              "width": "fill_container",
+              "fill": "#ffffff",
+              "cornerRadius": 8,
+              "layout": "vertical",
+              "gap": 2,
+              "padding": [
+                6,
+                4
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "levelIconLight",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "droplet",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text"
+                },
+                {
+                  "type": "text",
+                  "id": "levelTextLight",
+                  "fill": "$--text",
+                  "content": "Level",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "toggleBtnTrendLight",
+              "name": "Trend",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 2,
+              "padding": [
+                6,
+                4
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "trendIconLight",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "trending-up",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "id": "trendTextLight",
+                  "fill": "$--text-muted",
+                  "content": "Trend",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "toggleBtnTempLight",
+              "name": "Temp",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 2,
+              "padding": [
+                6,
+                4
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "tempIconLight",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "thermometer",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "id": "tempTextLight",
+                  "fill": "$--text-muted",
+                  "content": "Temp",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "toggleBtnTTrendLight",
+              "name": "T-Trend",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 2,
+              "padding": [
+                6,
+                4
+              ],
+              "alignItems": "center",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "ttrendIconLight",
+                  "width": 14,
+                  "height": 14,
+                  "iconFontName": "thermometer",
+                  "iconFontFamily": "lucide",
+                  "fill": "$--text-muted"
+                },
+                {
+                  "type": "text",
+                  "id": "ttrendTextLight",
+                  "fill": "$--text-muted",
+                  "content": "T-Trend",
+                  "fontFamily": "Inter",
+                  "fontSize": 9,
+                  "fontWeight": "500"
+                }
+              ]
+            }
           ]
         },
         {
@@ -8750,20 +8896,124 @@
           "id": "gaugeLegendLight",
           "name": "Legend",
           "width": "fill_container",
-          "stroke": {"align": "inside", "thickness": {"top": 1}, "fill": "$--border"},
+          "stroke": {
+            "align": "inside",
+            "thickness": {
+              "top": 1
+            },
+            "fill": "$--border"
+          },
           "layout": "vertical",
           "gap": 6,
-          "padding": [12, 0, 0, 0],
+          "padding": [
+            12,
+            0,
+            0,
+            0
+          ],
           "children": [
-            {"type": "frame", "id": "gradientBarLight", "name": "Gradient", "width": "fill_container", "height": 8, "fill": {"type": "gradient", "gradientType": "linear", "enabled": true, "rotation": 90, "colors": [{"color": "#dc2626", "position": 0}, {"color": "#f97316", "position": 0.2}, {"color": "#22c55e", "position": 0.5}, {"color": "#3b82f6", "position": 0.8}, {"color": "#7c3aed", "position": 1}]}, "cornerRadius": 4},
-            {"type": "frame", "id": "gradientLabelsLight", "width": "fill_container", "justifyContent": "space_between", "children": [
-              {"type": "text", "id": "l1", "fill": "$--text-muted", "content": "V.Low", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"},
-              {"type": "text", "id": "l2", "fill": "$--text-muted", "content": "Low", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"},
-              {"type": "text", "id": "l3", "fill": "$--text-muted", "content": "Normal", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"},
-              {"type": "text", "id": "l4", "fill": "$--text-muted", "content": "High", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"},
-              {"type": "text", "id": "l5", "fill": "$--text-muted", "content": "V.High", "fontFamily": "Inter", "fontSize": 8, "fontWeight": "500"}
-            ]},
-            {"type": "text", "id": "legendHintLight", "fill": "$--text-dim", "content": "Based on historical percentile", "fontFamily": "Inter", "fontSize": 10, "fontStyle": "italic"}
+            {
+              "type": "frame",
+              "id": "gradientBarLight",
+              "name": "Gradient",
+              "width": "fill_container",
+              "height": 8,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "linear",
+                "enabled": true,
+                "rotation": 90,
+                "size": {
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#dc2626",
+                    "position": 0
+                  },
+                  {
+                    "color": "#f97316",
+                    "position": 0.2
+                  },
+                  {
+                    "color": "#22c55e",
+                    "position": 0.5
+                  },
+                  {
+                    "color": "#3b82f6",
+                    "position": 0.8
+                  },
+                  {
+                    "color": "#7c3aed",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 4
+            },
+            {
+              "type": "frame",
+              "id": "gradientLabelsLight",
+              "width": "fill_container",
+              "justifyContent": "space_between",
+              "children": [
+                {
+                  "type": "text",
+                  "id": "l1",
+                  "fill": "$--text-muted",
+                  "content": "V.Low",
+                  "fontFamily": "Inter",
+                  "fontSize": 8,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "l2",
+                  "fill": "$--text-muted",
+                  "content": "Low",
+                  "fontFamily": "Inter",
+                  "fontSize": 8,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "l3",
+                  "fill": "$--text-muted",
+                  "content": "Normal",
+                  "fontFamily": "Inter",
+                  "fontSize": 8,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "l4",
+                  "fill": "$--text-muted",
+                  "content": "High",
+                  "fontFamily": "Inter",
+                  "fontSize": 8,
+                  "fontWeight": "500"
+                },
+                {
+                  "type": "text",
+                  "id": "l5",
+                  "fill": "$--text-muted",
+                  "content": "V.High",
+                  "fontFamily": "Inter",
+                  "fontSize": 8,
+                  "fontWeight": "500"
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "id": "legendHintLight",
+              "fill": "$--text-dim",
+              "content": "Based on historical percentile",
+              "fontFamily": "Inter",
+              "fontSize": 10,
+              "fontWeight": "normal",
+              "fontStyle": "italic"
+            }
           ]
         }
       ]

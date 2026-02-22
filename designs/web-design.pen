@@ -7816,6 +7816,105 @@
                 },
                 {
                   "type": "frame",
+                  "id": "waterMonSection",
+                  "name": "waterMonitoringSection",
+                  "width": "fill_container",
+                  "layout": "vertical",
+                  "gap": 6,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "waterMonLabel",
+                      "name": "waterMonLabel",
+                      "fill": "$--text-dim",
+                      "content": "WATER MONITORING",
+                      "fontFamily": "Inter",
+                      "fontSize": 10,
+                      "fontWeight": "600",
+                      "letterSpacing": 1
+                    },
+                    {
+                      "type": "frame",
+                      "id": "togGauges",
+                      "name": "togGauges",
+                      "width": "fill_container",
+                      "height": 34,
+                      "fill": "$--bg",
+                      "cornerRadius": 8,
+                      "padding": [0, 10],
+                      "justifyContent": "space_between",
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "gaugesLeft",
+                          "name": "gaugesLeft",
+                          "gap": 10,
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "gaugesIconBg",
+                              "name": "gaugesIconBg",
+                              "width": 24,
+                              "height": 24,
+                              "fill": "rgba(14,165,233,0.15)",
+                              "cornerRadius": 6,
+                              "justifyContent": "center",
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "icon_font",
+                                  "id": "gaugesIcon",
+                                  "name": "gaugesIcon",
+                                  "width": 14,
+                                  "height": 14,
+                                  "iconFontName": "gauge",
+                                  "iconFontFamily": "lucide",
+                                  "fill": "#0ea5e9"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "text",
+                              "id": "gaugesText",
+                              "name": "gaugesText",
+                              "fill": "$--text",
+                              "content": "Flow Gauges",
+                              "fontFamily": "Inter",
+                              "fontSize": 12,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "gaugesSwitch",
+                          "name": "gaugesSwitch",
+                          "width": 32,
+                          "height": 18,
+                          "fill": "$--accent",
+                          "cornerRadius": 9,
+                          "layout": "none",
+                          "children": [
+                            {
+                              "type": "ellipse",
+                              "id": "gaugesKnob",
+                              "x": 16,
+                              "y": 2,
+                              "name": "gaugesKnob",
+                              "fill": "#ffffff",
+                              "width": 14,
+                              "height": 14
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
                   "id": "1UsYr",
                   "name": "poiSection",
                   "width": "fill_container",

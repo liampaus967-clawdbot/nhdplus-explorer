@@ -50,7 +50,10 @@ const POINTS_OF_INTEREST: LayerDef[] = [
   { key: 'campgrounds', label: 'Campgrounds', icon: <Tent size={14} />, iconBg: 'rgba(34,197,94,0.15)' },
   { key: 'rapids', label: 'Rapids', icon: <Zap size={14} />, iconBg: 'rgba(239,68,68,0.15)' },
   { key: 'waterfalls', label: 'Waterfalls', icon: <ArrowDownToLine size={14} />, iconBg: 'rgba(103,232,249,0.15)' },
-  { key: 'gauges', label: 'Stream Gauges', icon: <Gauge size={14} />, iconBg: 'rgba(14,165,233,0.15)' },
+];
+
+const WATER_MONITORING: LayerDef[] = [
+  { key: 'gauges', label: 'Flow Gauges', icon: <Gauge size={14} />, iconBg: 'rgba(14,165,233,0.15)' },
 ];
 
 /* ─── Basemap definitions ─── */
@@ -192,6 +195,7 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange }
           <div className={styles.panelContent}>
             <Section title="PUBLIC LANDS" layers={PUBLIC_LANDS} visibility={layers} onToggle={updateLayer} />
             <Section title="WATER FEATURES" layers={WATER_FEATURES} visibility={layers} onToggle={updateLayer} />
+            <Section title="WATER MONITORING" layers={WATER_MONITORING} visibility={layers} onToggle={updateLayer} />
             <Section title="POINTS OF INTEREST" layers={POINTS_OF_INTEREST} visibility={layers} onToggle={updateLayer} />
           </div>
         </div>

@@ -8,9 +8,9 @@ import { NextResponse } from 'next/server';
 
 const FGP_LIVE_URL = 'https://driftwise-flowgauge-data.s3.amazonaws.com/live_output/current_status.json';
 
-// Cache for 5 minutes
+// Cache for 2 minutes (reduced from 5)
 let cache: { data: any; timestamp: number } | null = null;
-const CACHE_TTL = 5 * 60 * 1000;
+const CACHE_TTL = 2 * 60 * 1000;
 
 type FlowStatus = 'very_low' | 'low' | 'normal' | 'high' | 'very_high';
 
@@ -52,8 +52,9 @@ export async function GET() {
   }
   
   try {
-    const response = await fetch(FGP_LIVE_URL, { 
-      next: { revalidate: 300 }
+    // Add cache-busting timestamp and disable Next.js cache
+    const response = await fetch(`${FGP_LIVE_URL}?t=${Date.now()}`, { 
+      cache: 'no-store'
     });
     
     if (!response.ok) {

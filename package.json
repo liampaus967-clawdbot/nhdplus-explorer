@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.995.0",
     "@turf/turf": "^7.3.4",
     "lucide-react": "^0.574.0",
     "mapbox-gl": "^3.3.0",

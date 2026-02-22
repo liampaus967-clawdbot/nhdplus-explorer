@@ -15,7 +15,7 @@ const CACHE_TTL = 5 * 60 * 1000;
 type FlowStatus = 'very_low' | 'low' | 'normal' | 'high' | 'very_high';
 
 /**
- * Map FGP flow_status to our status
+ * Map FGP percentile to our status
  */
 function mapFlowStatus(fgpStatus: string | null, percentile: number | null): FlowStatus {
   if (percentile !== null) {
@@ -85,6 +85,6 @@ export async function GET() {
     return NextResponse.json(responseData);
   } catch (error) {
     console.error('Failed to fetch gauge status:', error);
-    return NextResponse.json({ error: 'Failed to fetch gauge status' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to fetch gauge status', details: String(error) }, { status: 500 });
   }
 }

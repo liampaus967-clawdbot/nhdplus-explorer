@@ -3,7 +3,7 @@
 import React from 'react';
 import styles from './GaugeStyleControl.module.css';
 
-export type GaugeStyleMode = 'percentile' | 'trend' | 'temperature';
+export type GaugeStyleMode = 'percentile' | 'trend' | 'temperature' | 'temp_trend';
 
 interface GaugeStyleControlProps {
   mode: GaugeStyleMode;
@@ -15,6 +15,7 @@ const MODES: { id: GaugeStyleMode; label: string; shortLabel: string }[] = [
   { id: 'percentile', label: 'Flow Level', shortLabel: 'Level' },
   { id: 'trend', label: 'Flow Trend', shortLabel: 'Trend' },
   { id: 'temperature', label: 'Water Temp', shortLabel: 'Temp' },
+  { id: 'temp_trend', label: 'Temp Trend', shortLabel: 'T-Trend' },
 ];
 
 export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeStyleControlProps) {
@@ -31,14 +32,14 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
         <span>Flow Gauges</span>
       </div>
 
-      {/* 3-way Segmented Toggle */}
-      <div className={styles.toggle3}>
+      {/* 4-way Segmented Toggle */}
+      <div className={styles.toggle4}>
         <div 
-          className={styles.toggleSlider3} 
+          className={styles.toggleSlider4} 
           style={{ transform: `translateX(${modeIndex * 100}%)` }} 
         />
         <button
-          className={`${styles.toggleButton3} ${mode === 'percentile' ? styles.toggleActive : ''}`}
+          className={`${styles.toggleButton4} ${mode === 'percentile' ? styles.toggleActive : ''}`}
           onClick={() => onModeChange('percentile')}
           title="Flow Level"
         >
@@ -48,7 +49,7 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
           <span>Level</span>
         </button>
         <button
-          className={`${styles.toggleButton3} ${mode === 'trend' ? styles.toggleActive : ''}`}
+          className={`${styles.toggleButton4} ${mode === 'trend' ? styles.toggleActive : ''}`}
           onClick={() => onModeChange('trend')}
           title="Flow Trend"
         >
@@ -59,7 +60,7 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
           <span>Trend</span>
         </button>
         <button
-          className={`${styles.toggleButton3} ${mode === 'temperature' ? styles.toggleActive : ''}`}
+          className={`${styles.toggleButton4} ${mode === 'temperature' ? styles.toggleActive : ''}`}
           onClick={() => onModeChange('temperature')}
           title="Water Temperature"
         >
@@ -67,6 +68,17 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
             <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z" />
           </svg>
           <span>Temp</span>
+        </button>
+        <button
+          className={`${styles.toggleButton4} ${mode === 'temp_trend' ? styles.toggleActive : ''}`}
+          onClick={() => onModeChange('temp_trend')}
+          title="Temperature Trend"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z" />
+            <path d="M18 6l3 3-3 3" strokeWidth="2" />
+          </svg>
+          <span>T-Trend</span>
         </button>
       </div>
 
@@ -135,6 +147,35 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
               Water temperature (°F)
             </div>
           </>
+        )}
+
+        {mode === 'temp_trend' && (
+          <div className={styles.trendLegend}>
+            <div className={styles.trendItem}>
+              <div className={styles.trendIcon} data-trend="warming">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 19V5M5 12l7-7 7 7" />
+                </svg>
+              </div>
+              <span>Warming</span>
+            </div>
+            <div className={styles.trendItem}>
+              <div className={styles.trendIcon} data-trend="temp-stable">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M5 12h14" />
+                </svg>
+              </div>
+              <span>Stable</span>
+            </div>
+            <div className={styles.trendItem}>
+              <div className={styles.trendIcon} data-trend="cooling">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 5v14M5 12l7 7 7-7" />
+                </svg>
+              </div>
+              <span>Cooling</span>
+            </div>
+          </div>
         )}
       </div>
     </div>

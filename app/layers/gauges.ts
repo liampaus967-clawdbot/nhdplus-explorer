@@ -178,6 +178,91 @@ export function updateGaugeTrendColors(
 }
 
 /**
+ * Update gauge colors based on water temperature.
+ * Only shows gauges that have temperature data.
+ */
+export function updateGaugeTemperatureColors(
+  map: mapboxgl.Map,
+  tempData: Record<string, number>  // site_no -> temperature in °F
+) {
+  if (!map.getLayer('gauges-circles')) return;
+
+  const siteNos = Object.keys(tempData);
+  
+  // Filter to only show gauges with temperature data
+  map.setFilter('gauges-circles', ['in', ['get', 'site_no'], ['literal', siteNos]]);
+  if (map.getLayer('gauges-labels')) {
+    map.setFilter('gauges-labels', ['in', ['get', 'site_no'], ['literal', siteNos]]);
+  }
+
+  const colorMatch: (string | number | string[])[] = ['match', ['get', 'site_no']];
+
+  for (const [siteNo, tempF] of Object.entries(tempData)) {
+    colorMatch.push(siteNo);
+    // Color by temperature ranges (°F)
+    // Cold: < 45°F (blue), Cool: 45-55°F (cyan), Moderate: 55-65°F (green)
+    // Warm: 65-75°F (orange), Hot: > 75°F (red)
+    if (tempF < 45) {
+      colorMatch.push('#3b82f6'); // Blue - cold
+    } else if (tempF < 55) {
+      colorMatch.push('#22d3ee'); // Cyan - cool
+    } else if (tempF < 65) {
+      colorMatch.push('#22c55e'); // Green - moderate
+    } else if (tempF < 75) {
+      colorMatch.push('#f97316'); // Orange - warm
+    } else {
+      colorMatch.push('#dc2626'); // Red - hot
+    }
+  }
+
+  // Default color
+  colorMatch.push(COLORS.gauge);
+
+  map.setPaintProperty('gauges-circles', 'circle-color', colorMatch as mapboxgl.Expression);
+}
+
+/**
+ * Update gauge colors based on temperature trend (warming/cooling).
+ * Only shows gauges that have temperature trend data.
+ */
+export function updateGaugeTempTrendColors(
+  map: mapboxgl.Map,
+  tempTrendData: Record<string, string>
+) {
+  if (!map.getLayer('gauges-circles')) return;
+
+  const siteNos = Object.keys(tempTrendData);
+  
+  map.setFilter('gauges-circles', ['in', ['get', 'site_no'], ['literal', siteNos]]);
+  if (map.getLayer('gauges-labels')) {
+    map.setFilter('gauges-labels', ['in', ['get', 'site_no'], ['literal', siteNos]]);
+  }
+
+  const colorMatch: (string | string[])[] = ['match', ['get', 'site_no']];
+
+  for (const [siteNo, trend] of Object.entries(tempTrendData)) {
+    colorMatch.push(siteNo);
+    switch (trend) {
+      case 'rising':
+        colorMatch.push('#ef4444'); // Red - warming
+        break;
+      case 'falling':
+        colorMatch.push('#3b82f6'); // Blue - cooling
+        break;
+      case 'stable':
+        colorMatch.push('#22c55e'); // Green - stable
+        break;
+      case 'unknown':
+      default:
+        colorMatch.push('#9ca3af'); // Gray
+    }
+  }
+
+  colorMatch.push(COLORS.gauge);
+  map.setPaintProperty('gauges-circles', 'circle-color', colorMatch as mapboxgl.Expression);
+}
+
+/**
  * Reset gauge colors to default (amber).
  */
 export function resetGaugeColors(map: mapboxgl.Map) {

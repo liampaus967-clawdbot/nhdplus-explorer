@@ -9,6 +9,10 @@ interface GaugeStatus {
   flow: number | null;
   trend: 'rising' | 'falling' | 'stable' | 'unknown';
   trend_rate: number | null;
+  temperature_c: number | null;
+  temperature_f: number | null;
+  temp_trend: 'rising' | 'falling' | 'stable' | 'unknown';
+  temp_trend_rate: number | null;
 }
 
 interface GaugeStatusResponse {
@@ -61,5 +65,30 @@ export function useGaugeStatus() {
       )
     : null;
 
-  return { data, statusMap, trendMap, loading, error, refresh: fetchStatuses };
+  // Convert to temperature trend map for warming/cooling coloring
+  const tempTrendMap = data?.sites
+    ? Object.fromEntries(
+        Object.entries(data.sites).map(([siteNo, info]) => [siteNo, info.temp_trend])
+      )
+    : null;
+
+  // Convert to temperature map (Fahrenheit for display)
+  const temperatureMap = data?.sites
+    ? Object.fromEntries(
+        Object.entries(data.sites)
+          .filter(([, info]) => info.temperature_f !== null)
+          .map(([siteNo, info]) => [siteNo, info.temperature_f as number])
+      )
+    : null;
+
+  return { 
+    data, 
+    statusMap, 
+    trendMap, 
+    tempTrendMap,
+    temperatureMap,
+    loading, 
+    error, 
+    refresh: fetchStatuses 
+  };
 }

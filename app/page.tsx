@@ -17,7 +17,7 @@ import { Sidebar, IconRail } from './components/Sidebar';
 import { MapControls, NavigationControls, LayerVisibility, DrawingControls, GaugeStyleControl, GaugeStyleMode } from './components/Map';
 
 // Layers
-import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight, updateGaugeColors, updateGaugeTrendColors } from './layers';
+import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight, updateGaugeColors, updateGaugeTrendColors, updateGaugeTemperatureColors } from './layers';
 
 // Constants
 import { MAP_CONFIG, BASEMAP_STYLES, COLORS } from './constants';
@@ -106,7 +106,7 @@ export default function Home() {
   } = useLakeRoute();
 
   // Gauge status for coloring gauges by flow
-  const { statusMap: gaugeStatusMap, trendMap: gaugeTrendMap } = useGaugeStatus();
+  const { statusMap: gaugeStatusMap, trendMap: gaugeTrendMap, temperatureMap: gaugeTemperatureMap } = useGaugeStatus();
   const [gaugeStyleMode, setGaugeStyleMode] = useState<GaugeStyleMode>('percentile');
 
   // Lake wind data state
@@ -548,8 +548,10 @@ export default function Home() {
       updateGaugeColors(map.current, gaugeStatusMap);
     } else if (gaugeStyleMode === 'trend' && gaugeTrendMap) {
       updateGaugeTrendColors(map.current, gaugeTrendMap);
+    } else if (gaugeStyleMode === 'temperature' && gaugeTemperatureMap) {
+      updateGaugeTemperatureColors(map.current, gaugeTemperatureMap);
     }
-  }, [gaugeStatusMap, gaugeTrendMap, gaugeStyleMode]);
+  }, [gaugeStatusMap, gaugeTrendMap, gaugeTemperatureMap, gaugeStyleMode]);
 
   // Update profile highlight on map
   useEffect(() => {

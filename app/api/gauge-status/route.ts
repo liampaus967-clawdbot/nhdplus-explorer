@@ -64,27 +64,35 @@ export async function GET() {
     const fgpData = await response.json();
     const sites = fgpData.sites || {};
     
-    // Transform to our format: { site_no: { status, trend, ... } }
+    // Transform to our format: { site_no: { status, trend, temp, ... } }
     const result: Record<string, { 
       status: FlowStatus; 
       percentile: number | null; 
       flow: number | null;
       trend: 'rising' | 'falling' | 'stable' | 'unknown';
       trend_rate: number | null;
+      temperature_c: number | null;
+      temperature_f: number | null;
+      temp_trend: 'rising' | 'falling' | 'stable' | 'unknown';
+      temp_trend_rate: number | null;
     }> = {};
     
     for (const [siteNo, data] of Object.entries(sites) as [string, any][]) {
-      // Map trend - only set if we have real data
+      // Map flow trend
       let trend: 'rising' | 'falling' | 'stable' | 'unknown' = 'unknown';
       if (data.trend === 'rising') trend = 'rising';
       else if (data.trend === 'falling') trend = 'falling';
       else if (data.trend === 'stable') trend = 'stable';
-      // Only use trend_rate if trend is unknown AND rate is meaningful (not 0)
       else if (data.trend === 'unknown' && data.trend_rate !== 0) {
         if (data.trend_rate > 0.1) trend = 'rising';
         else if (data.trend_rate < -0.1) trend = 'falling';
       }
-      // If trend is 'unknown' and trend_rate is 0 or null, keep as 'unknown'
+
+      // Map temperature trend
+      let temp_trend: 'rising' | 'falling' | 'stable' | 'unknown' = 'unknown';
+      if (data.temp_trend === 'rising') temp_trend = 'rising';
+      else if (data.temp_trend === 'falling') temp_trend = 'falling';
+      else if (data.temp_trend === 'stable') temp_trend = 'stable';
       
       result[siteNo] = {
         status: mapFlowStatus(data.flow_status, data.percentile),
@@ -92,6 +100,10 @@ export async function GET() {
         flow: data.flow,
         trend,
         trend_rate: data.trend_rate,
+        temperature_c: data.temperature_c ?? null,
+        temperature_f: data.temperature_f ?? null,
+        temp_trend,
+        temp_trend_rate: data.temp_trend_rate ?? null,
       };
     }
     

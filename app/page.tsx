@@ -544,6 +544,19 @@ export default function Home() {
   useEffect(() => {
     if (!map.current) return;
     
+    console.log('[GaugeStyle] mode:', gaugeStyleMode);
+    console.log('[GaugeStyle] statusMap size:', gaugeStatusMap ? Object.keys(gaugeStatusMap).length : 'null');
+    console.log('[GaugeStyle] trendMap size:', gaugeTrendMap ? Object.keys(gaugeTrendMap).length : 'null');
+    if (gaugeTrendMap) {
+      const sample = Object.entries(gaugeTrendMap).slice(0, 5);
+      console.log('[GaugeStyle] sample trends:', sample);
+      const trendCounts = Object.values(gaugeTrendMap).reduce((acc, t) => {
+        acc[t] = (acc[t] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      console.log('[GaugeStyle] trend distribution:', trendCounts);
+    }
+    
     if (gaugeStyleMode === 'percentile' && gaugeStatusMap) {
       updateGaugeColors(map.current, gaugeStatusMap);
     } else if (gaugeStyleMode === 'trend' && gaugeTrendMap) {

@@ -12,44 +12,81 @@
     }
     
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 40px;
       padding: 40px;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
     }
     
     .demo-label {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
       font-size: 12px;
       font-weight: 600;
-      color: #6366f1;
+      color: #60a5fa;
       text-transform: uppercase;
       letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+    
+    .theme-row {
+      display: flex;
+      gap: 40px;
+      align-items: flex-start;
+    }
+    
+    .theme-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    
+    .theme-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* ========== CSS VARIABLES ========== */
+    :root {
+      /* Dark theme (default) */
+      --bg: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --border: #334155;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --accent: #60a5fa;
+    }
+    
+    .light {
+      --bg: #ffffff;
+      --bg-secondary: #f1f5f9;
+      --bg-tertiary: #e2e8f0;
+      --border: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --text-dim: #64748b;
+      --accent: #2563eb;
     }
     
     /* ========== GAUGE CONTROL COMPONENT ========== */
     .gauge-control {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(0, 0, 0, 0.08);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 14px;
       min-width: 200px;
       box-shadow: 
-        0 4px 24px rgba(0, 0, 0, 0.08),
-        0 1px 2px rgba(0, 0, 0, 0.04);
-    }
-    
-    .gauge-control.dark {
-      background: rgba(30, 30, 35, 0.95);
-      border-color: rgba(255, 255, 255, 0.08);
+        0 4px 24px rgba(0, 0, 0, 0.12),
+        0 1px 2px rgba(0, 0, 0, 0.06);
     }
     
     .header {
@@ -58,32 +95,24 @@
       gap: 8px;
       font-size: 13px;
       font-weight: 600;
-      color: #1a1a2e;
+      color: var(--text);
       margin-bottom: 12px;
-    }
-    
-    .dark .header {
-      color: #f0f0f5;
     }
     
     .header-icon {
       width: 16px;
       height: 16px;
-      color: #3b82f6;
+      color: var(--accent);
     }
     
     /* Segmented Toggle */
     .toggle {
       position: relative;
       display: flex;
-      background: rgba(0, 0, 0, 0.06);
+      background: var(--bg-tertiary);
       border-radius: 10px;
       padding: 3px;
       margin-bottom: 14px;
-    }
-    
-    .dark .toggle {
-      background: rgba(255, 255, 255, 0.08);
     }
     
     .toggle-slider {
@@ -92,14 +121,15 @@
       left: 3px;
       width: calc(50% - 3px);
       height: calc(100% - 6px);
-      background: white;
+      background: var(--bg-secondary);
       border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
       transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
-    .dark .toggle-slider {
-      background: rgba(255, 255, 255, 0.15);
+    .light .toggle-slider {
+      background: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
     .toggle-slider.trend {
@@ -116,7 +146,7 @@
       border: none;
       border-radius: 8px;
       background: transparent;
-      color: #6b7280;
+      color: var(--text-muted);
       font-size: 12px;
       font-weight: 500;
       cursor: pointer;
@@ -131,25 +161,13 @@
     }
     
     .toggle-btn.active {
-      color: #1a1a2e;
-    }
-    
-    .dark .toggle-btn {
-      color: #9ca3af;
-    }
-    
-    .dark .toggle-btn.active {
-      color: #f0f0f5;
+      color: var(--text);
     }
     
     /* Legend */
     .legend {
       padding-top: 12px;
-      border-top: 1px solid rgba(0, 0, 0, 0.06);
-    }
-    
-    .dark .legend {
-      border-color: rgba(255, 255, 255, 0.08);
+      border-top: 1px solid var(--border);
     }
     
     /* Gradient Bar */
@@ -178,7 +196,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 9px;
-      color: #9ca3af;
+      color: var(--text-muted);
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.3px;
@@ -199,7 +217,7 @@
     
     .hint {
       font-size: 10px;
-      color: #9ca3af;
+      color: var(--text-dim);
       text-align: center;
       margin-top: 8px;
       font-style: italic;
@@ -248,136 +266,63 @@
       color: #ef4444;
     }
     
+    .light .trend-icon.rising {
+      background: rgba(37, 99, 235, 0.12);
+      color: #2563eb;
+    }
+    
+    .light .trend-icon.stable {
+      background: rgba(22, 163, 74, 0.12);
+      color: #16a34a;
+    }
+    
+    .light .trend-icon.falling {
+      background: rgba(220, 38, 38, 0.12);
+      color: #dc2626;
+    }
+    
     .trend-item span {
       font-size: 10px;
       font-weight: 500;
-      color: #6b7280;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 0.3px;
-    }
-    
-    .dark .trend-item span {
-      color: #9ca3af;
     }
   </style>
 </head>
 <body>
   <div class="demo-label">Flow Gauge Control Component</div>
   
-  <!-- Light Mode - Percentile View -->
-  <div class="gauge-control" id="percentile-demo">
-    <div class="header">
-      <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24" />
-      </svg>
-      <span>Flow Gauges</span>
-    </div>
-    
-    <div class="toggle">
-      <div class="toggle-slider" id="slider1"></div>
-      <button class="toggle-btn active" id="level-btn1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-        </svg>
-        <span>Level</span>
-      </button>
-      <button class="toggle-btn" id="trend-btn1">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-          <polyline points="17 6 23 6 23 12" />
-        </svg>
-        <span>Trend</span>
-      </button>
-    </div>
-    
-    <div class="legend" id="legend1">
-      <div class="gradient-bar">
-        <div class="gradient-track"></div>
-      </div>
-      <div class="gradient-labels">
-        <span>Very Low</span>
-        <span>Low</span>
-        <span>Normal</span>
-        <span>High</span>
-        <span>Very High</span>
-      </div>
-      <div class="hint">Based on historical percentile</div>
-    </div>
-  </div>
-  
-  <!-- Dark Mode - Trend View -->
-  <div class="gauge-control dark" id="trend-demo">
-    <div class="header">
-      <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24" />
-      </svg>
-      <span>Flow Gauges</span>
-    </div>
-    
-    <div class="toggle">
-      <div class="toggle-slider trend"></div>
-      <button class="toggle-btn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-        </svg>
-        <span>Level</span>
-      </button>
-      <button class="toggle-btn active">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
-          <polyline points="17 6 23 6 23 12" />
-        </svg>
-        <span>Trend</span>
-      </button>
-    </div>
-    
-    <div class="legend">
-      <div class="trend-legend">
-        <div class="trend-item">
-          <div class="trend-icon rising">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 19V5M5 12l7-7 7 7" />
-            </svg>
-          </div>
-          <span>Rising</span>
+  <div class="theme-row">
+    <!-- DARK MODE - Level View -->
+    <div class="theme-section">
+      <div class="theme-label">Dark Mode — Level</div>
+      <div class="gauge-control">
+        <div class="header">
+          <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24" />
+          </svg>
+          <span>Flow Gauges</span>
         </div>
-        <div class="trend-item">
-          <div class="trend-icon stable">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M5 12h14" />
+        
+        <div class="toggle">
+          <div class="toggle-slider"></div>
+          <button class="toggle-btn active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
             </svg>
-          </div>
-          <span>Stable</span>
-        </div>
-        <div class="trend-item">
-          <div class="trend-icon falling">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M12 5v14M5 12l7 7 7-7" />
+            <span>Level</span>
+          </button>
+          <button class="toggle-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
             </svg>
-          </div>
-          <span>Falling</span>
+            <span>Trend</span>
+          </button>
         </div>
-      </div>
-    </div>
-  </div>
-  
-  <script>
-    // Interactive toggle for demo
-    const slider1 = document.getElementById('slider1');
-    const levelBtn1 = document.getElementById('level-btn1');
-    const trendBtn1 = document.getElementById('trend-btn1');
-    const legend1 = document.getElementById('legend1');
-    
-    let isPercentile = true;
-    
-    function toggleMode() {
-      isPercentile = !isPercentile;
-      slider1.classList.toggle('trend', !isPercentile);
-      levelBtn1.classList.toggle('active', isPercentile);
-      trendBtn1.classList.toggle('active', !isPercentile);
-      
-      if (isPercentile) {
-        legend1.innerHTML = `
+        
+        <div class="legend">
           <div class="gradient-bar">
             <div class="gradient-track"></div>
           </div>
@@ -389,9 +334,39 @@
             <span>Very High</span>
           </div>
           <div class="hint">Based on historical percentile</div>
-        `;
-      } else {
-        legend1.innerHTML = `
+        </div>
+      </div>
+    </div>
+    
+    <!-- DARK MODE - Trend View -->
+    <div class="theme-section">
+      <div class="theme-label">Dark Mode — Trend</div>
+      <div class="gauge-control">
+        <div class="header">
+          <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24" />
+          </svg>
+          <span>Flow Gauges</span>
+        </div>
+        
+        <div class="toggle">
+          <div class="toggle-slider trend"></div>
+          <button class="toggle-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+            </svg>
+            <span>Level</span>
+          </button>
+          <button class="toggle-btn active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+            <span>Trend</span>
+          </button>
+        </div>
+        
+        <div class="legend">
           <div class="trend-legend">
             <div class="trend-item">
               <div class="trend-icon rising">
@@ -418,12 +393,114 @@
               <span>Falling</span>
             </div>
           </div>
-        `;
-      }
-    }
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="theme-row">
+    <!-- LIGHT MODE - Level View -->
+    <div class="theme-section">
+      <div class="theme-label">Light Mode — Level</div>
+      <div class="gauge-control light">
+        <div class="header">
+          <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24" />
+          </svg>
+          <span>Flow Gauges</span>
+        </div>
+        
+        <div class="toggle">
+          <div class="toggle-slider"></div>
+          <button class="toggle-btn active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+            </svg>
+            <span>Level</span>
+          </button>
+          <button class="toggle-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+            <span>Trend</span>
+          </button>
+        </div>
+        
+        <div class="legend">
+          <div class="gradient-bar">
+            <div class="gradient-track"></div>
+          </div>
+          <div class="gradient-labels">
+            <span>Very Low</span>
+            <span>Low</span>
+            <span>Normal</span>
+            <span>High</span>
+            <span>Very High</span>
+          </div>
+          <div class="hint">Based on historical percentile</div>
+        </div>
+      </div>
+    </div>
     
-    levelBtn1.addEventListener('click', () => { if (!isPercentile) toggleMode(); });
-    trendBtn1.addEventListener('click', () => { if (isPercentile) toggleMode(); });
-  </script>
+    <!-- LIGHT MODE - Trend View -->
+    <div class="theme-section">
+      <div class="theme-label">Light Mode — Trend</div>
+      <div class="gauge-control light">
+        <div class="header">
+          <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v6m0 8v6M4.93 4.93l4.24 4.24m5.66 5.66l4.24 4.24M2 12h6m8 0h6M4.93 19.07l4.24-4.24m5.66-5.66l4.24-4.24" />
+          </svg>
+          <span>Flow Gauges</span>
+        </div>
+        
+        <div class="toggle">
+          <div class="toggle-slider trend"></div>
+          <button class="toggle-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+            </svg>
+            <span>Level</span>
+          </button>
+          <button class="toggle-btn active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18" />
+              <polyline points="17 6 23 6 23 12" />
+            </svg>
+            <span>Trend</span>
+          </button>
+        </div>
+        
+        <div class="legend">
+          <div class="trend-legend">
+            <div class="trend-item">
+              <div class="trend-icon rising">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 19V5M5 12l7-7 7 7" />
+                </svg>
+              </div>
+              <span>Rising</span>
+            </div>
+            <div class="trend-item">
+              <div class="trend-icon stable">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14" />
+                </svg>
+              </div>
+              <span>Stable</span>
+            </div>
+            <div class="trend-item">
+              <div class="trend-icon falling">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M12 5v14M5 12l7 7 7-7" />
+                </svg>
+              </div>
+              <span>Falling</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

@@ -135,7 +135,7 @@ export function updateGaugeColors(
 
 /**
  * Update gauge colors based on trend (rising/falling/stable).
- * Only shows gauges that have FGP data.
+ * Only shows gauges that have known trend data (hides unknown).
  */
 export function updateGaugeTrendColors(
   map: mapboxgl.Map,
@@ -143,9 +143,11 @@ export function updateGaugeTrendColors(
 ) {
   if (!map.getLayer('gauges-circles')) return;
 
-  const siteNos = Object.keys(trendData);
+  // Filter out unknown trends - only show gauges with real trend data
+  const knownTrends = Object.entries(trendData).filter(([, trend]) => trend !== 'unknown');
+  const siteNos = knownTrends.map(([siteNo]) => siteNo);
   
-  // Filter to only show gauges with FGP data
+  // Filter to only show gauges with known trends
   map.setFilter('gauges-circles', ['in', ['get', 'site_no'], ['literal', siteNos]]);
   if (map.getLayer('gauges-labels')) {
     map.setFilter('gauges-labels', ['in', ['get', 'site_no'], ['literal', siteNos]]);
@@ -153,7 +155,7 @@ export function updateGaugeTrendColors(
 
   const colorMatch: (string | string[])[] = ['match', ['get', 'site_no']];
 
-  for (const [siteNo, trend] of Object.entries(trendData)) {
+  for (const [siteNo, trend] of knownTrends) {
     colorMatch.push(siteNo);
     switch (trend) {
       case 'rising':
@@ -165,13 +167,12 @@ export function updateGaugeTrendColors(
       case 'stable':
         colorMatch.push('#22c55e'); // Green
         break;
-      case 'unknown':
       default:
-        colorMatch.push('#9ca3af'); // Gray for unknown trend
+        colorMatch.push(COLORS.gauge);
     }
   }
 
-  // Default color (shouldn't be visible due to filter)
+  // Default color
   colorMatch.push(COLORS.gauge);
 
   map.setPaintProperty('gauges-circles', 'circle-color', colorMatch as mapboxgl.Expression);
@@ -223,7 +224,7 @@ export function updateGaugeTemperatureColors(
 
 /**
  * Update gauge colors based on temperature trend (warming/cooling).
- * Only shows gauges that have temperature trend data.
+ * Only shows gauges that have known temperature trend data (hides unknown).
  */
 export function updateGaugeTempTrendColors(
   map: mapboxgl.Map,
@@ -231,7 +232,9 @@ export function updateGaugeTempTrendColors(
 ) {
   if (!map.getLayer('gauges-circles')) return;
 
-  const siteNos = Object.keys(tempTrendData);
+  // Filter out unknown trends
+  const knownTrends = Object.entries(tempTrendData).filter(([, trend]) => trend !== 'unknown');
+  const siteNos = knownTrends.map(([siteNo]) => siteNo);
   
   map.setFilter('gauges-circles', ['in', ['get', 'site_no'], ['literal', siteNos]]);
   if (map.getLayer('gauges-labels')) {
@@ -240,7 +243,7 @@ export function updateGaugeTempTrendColors(
 
   const colorMatch: (string | string[])[] = ['match', ['get', 'site_no']];
 
-  for (const [siteNo, trend] of Object.entries(tempTrendData)) {
+  for (const [siteNo, trend] of knownTrends) {
     colorMatch.push(siteNo);
     switch (trend) {
       case 'rising':
@@ -252,9 +255,8 @@ export function updateGaugeTempTrendColors(
       case 'stable':
         colorMatch.push('#22c55e'); // Green - stable
         break;
-      case 'unknown':
       default:
-        colorMatch.push('#9ca3af'); // Gray
+        colorMatch.push(COLORS.gauge);
     }
   }
 

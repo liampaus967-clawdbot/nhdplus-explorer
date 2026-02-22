@@ -16,6 +16,7 @@ export function addRapidsBackdrop(map: mapboxgl.Map) {
     type: 'symbol',
     source: 'rapids',
     'source-layer': SOURCE_LAYERS.rapids,
+    minzoom: 8,
     layout: {
       'icon-image': 'poi-rapid',
       'icon-size': [

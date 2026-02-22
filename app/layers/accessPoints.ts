@@ -16,6 +16,7 @@ export function addAccessPointsBackdrop(map: mapboxgl.Map) {
     type: 'symbol',
     source: 'access-points',
     'source-layer': SOURCE_LAYERS.accessPoints,
+    minzoom: 8,
     layout: {
       'icon-image': 'poi-access-point',
       'icon-size': [

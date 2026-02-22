@@ -16,6 +16,7 @@ export function addWaterfallsBackdrop(map: mapboxgl.Map) {
     type: 'symbol',
     source: 'waterfalls',
     'source-layer': SOURCE_LAYERS.waterfalls,
+    minzoom: 8,
     layout: {
       'icon-image': 'poi-waterfall',
       'icon-size': [

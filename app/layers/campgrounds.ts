@@ -16,6 +16,7 @@ export function addCampgroundsBackdrop(map: mapboxgl.Map) {
     type: 'symbol',
     source: 'campgrounds',
     'source-layer': SOURCE_LAYERS.campgrounds,
+    minzoom: 8,
     layout: {
       'icon-image': 'poi-campground',
       'icon-size': [

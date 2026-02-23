@@ -425,6 +425,15 @@ export default function Home() {
     [basemap],
   );
 
+  // All river layer IDs for visibility toggling (all 5 regions)
+  const allRiverLayerIds = [
+    "rivers-line", "rivers-arrows", "rivers-labels",
+    "rivers-southeast-line", "rivers-southeast-arrows", "rivers-southeast-labels",
+    "rivers-midwest-line", "rivers-midwest-arrows", "rivers-midwest-labels",
+    "rivers-plains-line", "rivers-plains-arrows", "rivers-plains-labels",
+    "rivers-west-line", "rivers-west-arrows", "rivers-west-labels",
+  ];
+
   // Handle layer visibility change
   const handleLayerVisibilityChange = useCallback(
     (newVisibility: LayerVisibility) => {
@@ -434,7 +443,7 @@ export default function Home() {
       const layerMapping: Record<keyof LayerVisibility, string[]> = {
         blmLands: ["blm-lands-fill", "blm-lands-outline"],
         wilderness: ["wilderness-fill", "wilderness-outline"],
-        rivers: ["rivers-line", "rivers-glow", "rivers-labels"],
+        rivers: allRiverLayerIds,
         lakes: ["lakes-fill", "lakes-outline", "lakes-labels"],
         wildScenicRivers: ["wsr-line", "wsr-labels"],
         accessPoints: ["access-points-backdrop"],
@@ -458,7 +467,7 @@ export default function Home() {
         });
       });
     },
-    [],
+    [allRiverLayerIds],
   );
 
   // Handle persona mode change
@@ -718,7 +727,7 @@ export default function Home() {
       const layerMapping: Record<keyof LayerVisibility, string[]> = {
         blmLands: ["blm-lands-fill", "blm-lands-outline"],
         wilderness: ["wilderness-fill", "wilderness-outline"],
-        rivers: ["rivers-line", "rivers-glow", "rivers-labels"],
+        rivers: allRiverLayerIds,
         lakes: ["lakes-fill", "lakes-outline", "lakes-labels"],
         wildScenicRivers: ["wsr-line", "wsr-labels"],
         accessPoints: ["access-points-backdrop"],

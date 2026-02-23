@@ -35,6 +35,10 @@ export const GRADIENT_COLORS: Record<string, string> = {
 // Tileset URLs
 export const TILESETS = {
   rivers: 'mapbox://lman967.east-coast-rivers',
+  riversSoutheast: 'mapbox://lman967.southeast-rivers',
+  riversMidwest: 'mapbox://lman967.midwest-rivers',
+  riversPlains: 'mapbox://lman967.plains-rivers',
+  riversWest: 'mapbox://lman967.west-rivers',
   lakes: 'mapbox://lman967.ne-waterbodies',
   accessPoints: 'mapbox://lman967.access-points-clean',
   campgrounds: 'mapbox://lman967.campgrounds-near-water',
@@ -49,6 +53,10 @@ export const TILESETS = {
 // Source layer names
 export const SOURCE_LAYERS = {
   rivers: 'eastCoastRivers',
+  riversSoutheast: 'southeastRivers',
+  riversMidwest: 'midwestRivers',
+  riversPlains: 'plainsRivers',
+  riversWest: 'westRivers',
   lakes: 'New England Waterbodies',
   accessPoints: 'access_points_clean',
   campgrounds: 'campgrounds',

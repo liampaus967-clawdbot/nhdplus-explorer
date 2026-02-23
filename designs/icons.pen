@@ -648,6 +648,89 @@
               }
             }
           ]
+        },
+        {
+          "type": "frame",
+          "id": "DAM01",
+          "name": "Icon / Dam v5",
+          "reusable": true,
+          "layout": "vertical",
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "frame",
+              "id": "DAM02",
+              "name": "circle",
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FBBF24",
+                    "position": 0
+                  },
+                  {
+                    "color": "#D97706",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 22,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#D9770650",
+                "offset": {
+                  "x": 0,
+                  "y": 3
+                },
+                "blur": 8
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "DAM03",
+                  "x": 8,
+                  "y": 8,
+                  "name": "dm5i",
+                  "width": 28,
+                  "height": 28,
+                  "iconFontName": "construction",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "polygon",
+              "polygonCount": 3,
+              "id": "DAM04",
+              "name": "pointer",
+              "rotation": 180,
+              "fill": "#D97706",
+              "width": 16,
+              "height": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              }
+            }
+          ]
         }
       ]
     },

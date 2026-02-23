@@ -21,6 +21,7 @@ const POI_COLORS: Record<string, PinColors> = {
   campground:     { inner: '#4ADE80', outer: '#16A34A' },
   rapid:          { inner: '#F87171', outer: '#DC2626' },
   waterfall:      { inner: '#22D3EE', outer: '#0891B2' },
+  dam:            { inner: '#FBBF24', outer: '#D97706' }, // Amber/Orange for hazard
 };
 
 // Simple icon path drawers (black, centered in circle)
@@ -91,11 +92,36 @@ const drawWaves: IconDrawer = (ctx, cx, cy, s) => {
   }
 };
 
+// Dam icon: horizontal barrier/wall with water flowing over
+const drawDam: IconDrawer = (ctx, cx, cy, s) => {
+  const w = s * 0.42;
+  const h = s * 0.35;
+  // Main dam wall (trapezoid shape)
+  ctx.beginPath();
+  ctx.moveTo(cx - w, cy - h * 0.3);
+  ctx.lineTo(cx - w * 0.85, cy + h * 0.5);
+  ctx.lineTo(cx + w * 0.85, cy + h * 0.5);
+  ctx.lineTo(cx + w, cy - h * 0.3);
+  ctx.closePath();
+  ctx.stroke();
+  // Top horizontal line (dam crest)
+  ctx.beginPath();
+  ctx.moveTo(cx - w * 1.1, cy - h * 0.3);
+  ctx.lineTo(cx + w * 1.1, cy - h * 0.3);
+  ctx.stroke();
+  // Water line (small wave at bottom)
+  ctx.beginPath();
+  ctx.moveTo(cx - w * 0.5, cy + h * 0.7);
+  ctx.quadraticCurveTo(cx, cy + h * 0.55, cx + w * 0.5, cy + h * 0.7);
+  ctx.stroke();
+};
+
 const ICON_DRAWERS: Record<string, IconDrawer> = {
   'access-point': drawBoat,
   campground: drawTent,
   rapid: drawTriangleAlert,
   waterfall: drawWaves,
+  dam: drawDam,
 };
 
 function createPinIcon(key: string): ImageData {

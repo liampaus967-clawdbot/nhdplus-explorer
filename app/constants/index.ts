@@ -40,6 +40,7 @@ export const TILESETS = {
   campgrounds: 'mapbox://lman967.campgrounds-near-water',
   rapids: 'mapbox://lman967.rapids',
   waterfalls: 'mapbox://lman967.waterfalls',
+  dams: 'mapbox://lman967.hazards_dams',
   blmLands: 'mapbox://lman967.blm_polygons',
   wilderness: 'mapbox://lman967.wilderness_areas',
   gauges: 'mapbox://lman967.usgs_gauges',
@@ -53,6 +54,7 @@ export const SOURCE_LAYERS = {
   campgrounds: 'campgrounds',
   rapids: 'rapids',
   waterfalls: 'waterfalls',
+  dams: 'hazards_dams',
   blmLands: 'blm_polygons',
   wilderness: 'wilderness_areas',
   gauges: 'usgs_gauges',
@@ -69,6 +71,7 @@ export const COLORS = {
   campground: '#22c55e',
   rapid: '#ef4444',
   waterfall: '#67e8f9',
+  dam: '#d97706', // Amber/orange for dams
   route: '#f59e0b',
   routeGlow: '#fbbf24',
   putIn: '#22c55e',

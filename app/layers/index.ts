@@ -5,6 +5,7 @@ import { addAccessPointsSource, addAccessPointsBackdrop } from './accessPoints';
 import { addCampgroundsSource, addCampgroundsBackdrop } from './campgrounds';
 import { addRapidsSource, addRapidsBackdrop } from './rapids';
 import { addWaterfallsSource, addWaterfallsBackdrop } from './waterfalls';
+import { addDamsSource, addDamsBackdrop } from './dams';
 import { addRouteSource, addRouteLayers } from './routeLayer';
 import { addBlmLandsSource, addBlmLandsLayers } from './blmLands';
 import { addWildernessSource, addWildernessLayers } from './wilderness';
@@ -17,6 +18,7 @@ export * from './accessPoints';
 export * from './campgrounds';
 export * from './rapids';
 export * from './waterfalls';
+export * from './dams';
 export * from './routeLayer';
 export * from './blmLands';
 export * from './wilderness';
@@ -34,6 +36,7 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   addAccessPointsSource(map);
   addWaterfallsSource(map);
   addRapidsSource(map);
+  addDamsSource(map);
   addCampgroundsSource(map);
   addGaugesSource(map);
   addRouteSource(map);
@@ -53,6 +56,7 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   await addPoiIcons(map);
   addWaterfallsBackdrop(map);
   addRapidsBackdrop(map);
+  addDamsBackdrop(map);
   addCampgroundsBackdrop(map);
   addAccessPointsBackdrop(map);
   

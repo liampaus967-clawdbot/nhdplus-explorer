@@ -5,6 +5,7 @@ import { RouteResult, SnapResult } from '../../types';
 import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
 import { useBestFlowForRoute, getStatusLabel, getStatusColor } from '../../hooks/useFlowData';
+import { useRouteHazards, getHazardIcon, getHazardColor } from '../../hooks/useRouteHazards';
 import styles from './FloaterSidebar.module.css';
 import sharedStyles from './shared/shared.module.css';
 
@@ -22,6 +23,9 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
   // Get best flow data from ALL COMIDs on the route (finds nearest gauge)
   const routeComids = path?.comids ?? null;
   const { data: flowData, loading: flowLoading } = useBestFlowForRoute(routeComids);
+  
+  // Get hazards along the route
+  const { hazards, loading: hazardsLoading } = useRouteHazards(routeComids);
 
   const hours = Math.floor(stats.float_time_h);
   const minutes = Math.round((stats.float_time_h - hours) * 60);
@@ -131,10 +135,42 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
         <div className={styles.conditionItem}>
           <div className={styles.conditionHeader}>
             <span className={styles.conditionName}>Hazards</span>
-            <span className={`${styles.conditionBadge} ${styles.conditionGood}`}>Clear</span>
+            <span 
+              className={`${styles.conditionBadge}`}
+              style={{
+                backgroundColor: hazards.length > 0 
+                  ? (hazards.some(h => h.hazard_potential?.toLowerCase() === 'high') ? '#dc2626' : '#f97316')
+                  : '#22c55e',
+                color: 'white'
+              }}
+            >
+              {hazardsLoading ? 'Loading...' : hazards.length > 0 ? `${hazards.length} Found` : 'Clear'}
+            </span>
           </div>
           <div className={styles.hazardRow}>
-            <span className={styles.hazardChip}>No advisories</span>
+            {hazards.length === 0 ? (
+              <span className={styles.hazardChip}>No advisories</span>
+            ) : (
+              <div className={styles.hazardList}>
+                {hazards.slice(0, 5).map((hazard) => (
+                  <div key={hazard.id} className={styles.hazardItem}>
+                    <span className={styles.hazardIcon}>{getHazardIcon(hazard)}</span>
+                    <div className={styles.hazardInfo}>
+                      <span className={styles.hazardName}>{hazard.name}</span>
+                      {hazard.type === 'dam' && hazard.dam_height_ft && (
+                        <span className={styles.hazardDetail}>
+                          {Math.round(hazard.dam_height_ft)}ft
+                          {hazard.hazard_potential && ` · ${hazard.hazard_potential}`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {hazards.length > 5 && (
+                  <span className={styles.hazardMore}>+{hazards.length - 5} more</span>
+                )}
+              </div>
+            )}
           </div>
         </div>
 

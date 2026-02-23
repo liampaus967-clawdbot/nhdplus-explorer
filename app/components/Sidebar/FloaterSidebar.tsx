@@ -1,11 +1,13 @@
 'use client';
 
-import { MapPin, Flag } from 'lucide-react';
+import { useMemo } from 'react';
+import { MapPin, Flag, Tent, Anchor } from 'lucide-react';
 import { RouteResult, SnapResult } from '../../types';
 import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
 import { useBestFlowForRoute, getStatusLabel, getStatusColor } from '../../hooks/useFlowData';
 import { useRouteHazards, getHazardIcon, getHazardColor } from '../../hooks/useRouteHazards';
+import { useRouteDiscovery } from '../../hooks/useRouteDiscovery';
 import styles from './FloaterSidebar.module.css';
 import sharedStyles from './shared/shared.module.css';
 
@@ -26,6 +28,9 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
   
   // Get hazards along the route
   const { hazards, loading: hazardsLoading } = useRouteHazards(routeComids);
+  
+  // Get POI discoveries for multi-day trip planning
+  const { discovery, loading: discoveryLoading } = useRouteDiscovery(routeComids, 1500);
 
   const hours = Math.floor(stats.float_time_h);
   const minutes = Math.round((stats.float_time_h - hours) * 60);
@@ -157,10 +162,21 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
                     <span className={styles.hazardIcon}>{getHazardIcon(hazard)}</span>
                     <div className={styles.hazardInfo}>
                       <span className={styles.hazardName}>{hazard.name}</span>
-                      {hazard.type === 'dam' && hazard.dam_height_ft && (
+                      {hazard.type === 'dam' && (
                         <span className={styles.hazardDetail}>
-                          {Math.round(hazard.dam_height_ft)}ft
-                          {hazard.hazard_potential && ` · ${hazard.hazard_potential}`}
+                          <strong style={{ color: '#ef4444' }}>⚠️ Portage Required</strong>
+                          {hazard.dam_height_ft && ` · ${Math.round(hazard.dam_height_ft)}ft`}
+                        </span>
+                      )}
+                      {hazard.type === 'waterfall' && (
+                        <span className={styles.hazardDetail}>
+                          <strong style={{ color: '#ef4444' }}>⚠️ Portage Required</strong>
+                          {hazard.height && ` · ${hazard.height}`}
+                        </span>
+                      )}
+                      {hazard.type === 'rapid' && hazard.rapid_class && (
+                        <span className={styles.hazardDetail}>
+                          Class {hazard.rapid_class} · Scout before running
                         </span>
                       )}
                     </div>
@@ -198,6 +214,67 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
           </div>
         </div>
       </div>
+
+      {/* Trip Planning - Campgrounds & Access Points */}
+      {(discovery.campgrounds.count > 0 || discovery.access_points.count > 0) && (
+        <div className={`${styles.card} ${styles.conditionsCard}`}>
+          <span className={styles.sectionLabel}>TRIP PLANNING</span>
+          
+          {discovery.campgrounds.count > 0 && (
+            <div className={styles.conditionItem}>
+              <div className={styles.conditionHeader}>
+                <span className={styles.conditionName}>
+                  <Tent size={14} style={{ marginRight: 6, color: '#22c55e' }} />
+                  Campgrounds
+                </span>
+                <span className={styles.conditionBadge} style={{ backgroundColor: '#22c55e', color: 'white' }}>
+                  {discovery.campgrounds.count} nearby
+                </span>
+              </div>
+              <div className={styles.hazardList}>
+                {discovery.campgrounds.items.slice(0, 3).map((camp) => (
+                  <div key={camp.id} className={styles.hazardItem}>
+                    <span className={styles.hazardIcon}>🏕️</span>
+                    <div className={styles.hazardInfo}>
+                      <span className={styles.hazardName}>{camp.name}</span>
+                      <span className={styles.hazardDetail}>
+                        {camp.distance_m ? `${(camp.distance_m / 1000).toFixed(1)}km from route` : 'Along route'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {discovery.access_points.count > 0 && (
+            <div className={styles.conditionItem}>
+              <div className={styles.conditionHeader}>
+                <span className={styles.conditionName}>
+                  <Anchor size={14} style={{ marginRight: 6, color: '#3b82f6' }} />
+                  Put-in/Take-out Options
+                </span>
+                <span className={styles.conditionBadge} style={{ backgroundColor: '#3b82f6', color: 'white' }}>
+                  {discovery.access_points.count} nearby
+                </span>
+              </div>
+              <div className={styles.hazardList}>
+                {discovery.access_points.items.slice(0, 3).map((ap) => (
+                  <div key={ap.id} className={styles.hazardItem}>
+                    <span className={styles.hazardIcon}>🚣</span>
+                    <div className={styles.hazardInfo}>
+                      <span className={styles.hazardName}>{ap.name}</span>
+                      <span className={styles.hazardDetail}>
+                        {ap.distance_m ? `${(ap.distance_m / 1000).toFixed(1)}km from route` : 'Along route'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Weather */}
       <WeatherConditions 

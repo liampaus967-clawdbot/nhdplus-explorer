@@ -42,15 +42,24 @@ export interface DiscoverySummary {
 
 /**
  * GET /api/discover?comids=123,456,789&buffer=1000
+ * GET /api/discover?lat=44.5&lng=-72.5&radius=2000
  */
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const comidsParam = searchParams.get('comids');
+  const lat = parseFloat(searchParams.get('lat') || '');
+  const lng = parseFloat(searchParams.get('lng') || '');
+  const radius = parseFloat(searchParams.get('radius') || '2000');
   const bufferM = parseFloat(searchParams.get('buffer') || '1000');
+  
+  // Support lat/lng point query for Lake mode
+  if (!isNaN(lat) && !isNaN(lng)) {
+    return handlePointQuery(lat, lng, radius);
+  }
   
   if (!comidsParam) {
     return NextResponse.json(
-      { error: 'comids parameter required' },
+      { error: 'Provide either comids or lat/lng parameters' },
       { status: 400 }
     );
   }
@@ -283,6 +292,105 @@ export async function GET(request: NextRequest) {
     
   } catch (error) {
     console.error('Discover API error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch discoveries', details: String(error) },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * Handle point-based query (for Lake mode)
+ * Queries POIs within radius of a lat/lng point
+ */
+async function handlePointQuery(lat: number, lng: number, radiusM: number) {
+  const result: DiscoverySummary = {
+    campgrounds: { count: 0, items: [] },
+    hazards: { count: 0, dams: 0, waterfalls: 0, rapids: 0, items: [] },
+    access_points: { count: 0, items: [] },
+  };
+  
+  try {
+    // === CAMPGROUNDS ===
+    const campgroundResult = await query(`
+      SELECT 
+        c.id,
+        c.name,
+        c.lat as latitude,
+        c.lon as longitude,
+        c.operator,
+        c.website,
+        c.drinking_water,
+        c.toilets,
+        ST_Distance(
+          c.geom::geography,
+          ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+        ) as distance_m
+      FROM water_access.campgrounds c
+      WHERE ST_DWithin(
+        c.geom::geography,
+        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
+        $3
+      )
+        AND c.is_duplicate = false
+      ORDER BY distance_m
+      LIMIT 10
+    `, [lng, lat, radiusM]);
+    
+    for (const row of campgroundResult.rows) {
+      result.campgrounds.items.push({
+        id: row.id,
+        type: 'campground',
+        name: row.name || 'Unnamed Campground',
+        latitude: row.latitude,
+        longitude: row.longitude,
+        distance_m: Math.round(row.distance_m),
+        operator: row.operator,
+        website: row.website,
+        has_water: row.drinking_water === 'yes',
+        has_toilets: row.toilets === 'yes',
+      });
+    }
+    result.campgrounds.count = result.campgrounds.items.length;
+    
+    // === ACCESS POINTS ===
+    const accessResult = await query(`
+      SELECT 
+        a.id,
+        a.name,
+        a.lat as latitude,
+        a.lon as longitude,
+        ST_Distance(
+          a.geom::geography,
+          ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+        ) as distance_m
+      FROM water_access.access_points_clean a
+      WHERE ST_DWithin(
+        a.geom::geography,
+        ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
+        $3
+      )
+        AND a.is_duplicate = false
+      ORDER BY distance_m
+      LIMIT 10
+    `, [lng, lat, radiusM]);
+    
+    for (const row of accessResult.rows) {
+      result.access_points.items.push({
+        id: row.id,
+        type: 'access_point',
+        name: row.name || 'Water Access',
+        latitude: row.latitude,
+        longitude: row.longitude,
+        distance_m: Math.round(row.distance_m),
+      });
+    }
+    result.access_points.count = result.access_points.items.length;
+    
+    return NextResponse.json(result);
+    
+  } catch (error) {
+    console.error('Discover API point query error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch discoveries', details: String(error) },
       { status: 500 }

@@ -1,9 +1,10 @@
 'use client';
 
-import { Anchor, MapPin, Pencil, Undo2, Save, X } from 'lucide-react';
+import { Anchor, MapPin, Pencil, Undo2, Save, X, Tent } from 'lucide-react';
 import { LakeDrawingMode, LakeRoute, LakeWaypoint } from '../../types';
 import { WeatherData, ChopAssessment } from '../../services/weather';
 import { WindConditionsCard, ExposureBar } from './shared';
+import { useLocationDiscovery } from '../../hooks/useRouteDiscovery';
 import styles from './LakeSidebar.module.css';
 
 interface LakeSidebarProps {
@@ -45,6 +46,11 @@ export function LakeSidebar({
   const paddleTimeFormatted = paddleTimeMin > 0 
     ? `${Math.floor(paddleTimeMin / 60)}:${String(Math.floor(paddleTimeMin % 60)).padStart(2, '0')}`
     : '0:00';
+  
+  // Get POIs around the lake (use first waypoint as center)
+  const centerLat = waypoints.length > 0 ? waypoints[0].lat : null;
+  const centerLng = waypoints.length > 0 ? waypoints[0].lng : null;
+  const { discovery } = useLocationDiscovery(centerLat, centerLng, 3000);
 
   return (
     <div className={styles.sidebar}>
@@ -125,6 +131,73 @@ export function LakeSidebar({
         <ExposureBar
           exposure={{ sheltered: 30, moderate: 40, exposed: 30 }}
         />
+      )}
+
+      {/* Nearby POIs */}
+      {(discovery.campgrounds.count > 0 || discovery.access_points.count > 0) && (
+        <div className={styles.card}>
+          <div className={styles.sectionLabel}>NEARBY</div>
+          
+          {/* Access Points / Launch Sites */}
+          {discovery.access_points.count > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <Anchor size={14} style={{ color: '#3b82f6' }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
+                  Launch Sites ({discovery.access_points.count})
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {discovery.access_points.items.slice(0, 3).map((ap) => (
+                  <div key={ap.id} style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '8px 10px',
+                    background: 'rgba(59, 130, 246, 0.08)',
+                    borderRadius: 8,
+                    fontSize: 12
+                  }}>
+                    <span style={{ color: 'var(--text)' }}>{ap.name}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
+                      {ap.distance_m ? `${(ap.distance_m / 1000).toFixed(1)}km` : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {/* Campgrounds */}
+          {discovery.campgrounds.count > 0 && (
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 8 }}>
+                <Tent size={14} style={{ color: '#22c55e' }} />
+                <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text)' }}>
+                  Campgrounds ({discovery.campgrounds.count})
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {discovery.campgrounds.items.slice(0, 3).map((camp) => (
+                  <div key={camp.id} style={{ 
+                    display: 'flex', 
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '8px 10px',
+                    background: 'rgba(34, 197, 94, 0.08)',
+                    borderRadius: 8,
+                    fontSize: 12
+                  }}>
+                    <span style={{ color: 'var(--text)' }}>{camp.name}</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: 11 }}>
+                      {camp.distance_m ? `${(camp.distance_m / 1000).toFixed(1)}km` : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       )}
     </div>
   );

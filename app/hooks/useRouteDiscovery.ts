@@ -83,3 +83,43 @@ export function formatHazardSummary(hazards: DiscoverySummary['hazards']): strin
   if (hazards.rapids > 0) parts.push(`${hazards.rapids} rapid${hazards.rapids > 1 ? 's' : ''}`);
   return parts.length > 0 ? parts.join(', ') : 'None detected';
 }
+
+/**
+ * Hook to fetch POIs around a point (for Lake mode)
+ */
+export function useLocationDiscovery(
+  lat: number | null, 
+  lng: number | null, 
+  radiusM: number = 2000
+) {
+  const [discovery, setDiscovery] = useState<DiscoverySummary>(EMPTY_RESULT);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (lat === null || lng === null) {
+      setDiscovery(EMPTY_RESULT);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    fetch(`/api/discover?lat=${lat}&lng=${lng}&radius=${radiusM}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json() as Promise<DiscoverySummary>;
+      })
+      .then(data => {
+        setDiscovery(data);
+      })
+      .catch(err => {
+        console.error('Failed to fetch location discoveries:', err);
+        setError(err.message);
+        setDiscovery(EMPTY_RESULT);
+      })
+      .finally(() => setLoading(false));
+  }, [lat, lng, radiusM]);
+
+  return { discovery, loading, error };
+}

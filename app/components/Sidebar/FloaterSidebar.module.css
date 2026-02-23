@@ -150,39 +150,38 @@
   align-items: center;
 }
 
-.conditionName {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
+.conditionLabelGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.conditionBadge {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 2px 8px;
-  border-radius: 4px;
+.conditionIcon {
+  color: var(--accent);
 }
 
-.conditionGood {
-  background: rgba(34, 197, 94, 0.15);
-  color: var(--success);
-}
-
-.conditionWarn {
-  background: rgba(251, 191, 36, 0.15);
+.hazardIcon {
   color: var(--warning);
 }
 
-.conditionTrack {
-  height: 8px;
-  background: var(--bg-tertiary);
-  border-radius: 4px;
-  overflow: hidden;
+.difficultyIcon {
+  color: var(--success);
 }
 
-.conditionFill {
-  height: 100%;
-  border-radius: 4px;
+.conditionName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.statusBadge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: var(--success);
 }
 
 .conditionLabels {
@@ -192,127 +191,97 @@
   color: var(--text-dim);
 }
 
-.hazardRow {
-  display: flex;
-  gap: 8px;
-}
-
-.hazardChip {
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
+.labelActive {
+  color: var(--success);
   font-weight: 500;
-  background: var(--bg);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
 }
 
-.flowValue {
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-  text-align: center;
+/* Water Level Track - Gradient Fill */
+.waterLevelTrack {
+  position: relative;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: visible;
 }
 
-.hazardList {
+.waterLevelFill {
+  height: 100%;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #22c55e 0%, #3b82f6 100%);
+}
+
+.trackThumb {
+  position: absolute;
+  top: -3px;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-radius: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Hazards Stats - 3 Column Layout */
+.hazardStats {
   display: flex;
-  flex-direction: column;
   gap: 8px;
   width: 100%;
 }
 
-.hazardItem {
+.hazardStatBox {
+  flex: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  background: var(--bg);
-  border: 1px solid var(--border);
+  gap: 2px;
+  padding: 10px;
   border-radius: 8px;
 }
 
-.hazardIcon {
-  font-size: 16px;
-  flex-shrink: 0;
+.hazardStatGreen {
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.15);
 }
 
-.hazardInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
+.hazardStatYellow {
+  background: rgba(251, 191, 36, 0.08);
+  border: 1px solid rgba(251, 191, 36, 0.15);
 }
 
-.hazardName {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.hazardDetail {
-  font-size: 10px;
-  color: var(--text-dim);
-}
-
-.hazardMore {
-  font-size: 11px;
-  color: var(--text-muted);
-  font-style: italic;
-  padding-left: 4px;
-}
-
-/* Difficulty Track - Segmented Design */
-.difficultyTrackContainer {
-  position: relative;
-  height: 10px;
-  margin: 4px 0;
-}
-
-.difficultyTrack {
-  display: flex;
-  gap: 3px;
-  height: 8px;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.difficultySegment {
-  flex: 1;
-  border-radius: 2px;
-  transition: opacity 0.2s ease;
-}
-
-.difficultySegment[data-level="easy"] {
-  background: linear-gradient(90deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.35) 100%);
-}
-
-.difficultySegment[data-level="moderate"] {
-  background: linear-gradient(90deg, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.35) 100%);
-}
-
-.difficultySegment[data-level="difficult"] {
-  background: linear-gradient(90deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.35) 100%);
-}
-
-.difficultyIndicator {
-  position: absolute;
-  top: 0;
-  width: 4px;
-  height: 10px;
-  border-radius: 2px;
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
-  transform: translateX(-50%);
-}
-
-.gradientValue {
-  font-size: 11px;
-  font-weight: 500;
-  color: var(--text-dim);
-  text-align: center;
-  margin-top: 4px;
+.hazardStatNum {
+  font-size: 20px;
+  font-weight: 700;
   font-family: var(--font-mono);
+  color: var(--success);
+}
+
+.hazardStatYellow .hazardStatNum {
+  color: var(--warning);
+}
+
+.hazardStatLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--danger);
+  text-align: center;
+}
+
+.hazardStatGreen .hazardStatLabel {
+  color: var(--text-dim);
+  font-weight: normal;
+}
+
+/* Difficulty Track - With Thumb */
+.difficultyTrackWrapper {
+  position: relative;
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: visible;
+}
+
+.difficultyFill {
+  height: 100%;
+  border-radius: 4px;
 }

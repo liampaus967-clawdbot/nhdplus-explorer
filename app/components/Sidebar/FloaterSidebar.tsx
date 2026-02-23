@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { MapPin, Flag, Tent, Anchor } from 'lucide-react';
+import { MapPin, Flag, Tent, Anchor, Waves, TriangleAlert, Gauge } from 'lucide-react';
 import { RouteResult, SnapResult } from '../../types';
 import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
@@ -97,151 +97,100 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
         </div>
       </div>
 
-      {/* Conditions - Zero States */}
+      {/* Conditions */}
       <div className={`${styles.card} ${styles.conditionsCard}`}>
         <span className={styles.sectionLabel}>CONDITIONS</span>
 
         {/* Water Level */}
         <div className={styles.conditionItem}>
           <div className={styles.conditionHeader}>
-            <span className={styles.conditionName}>Water Level</span>
-            <span 
-              className={`${styles.conditionBadge}`}
-              style={{ 
-                backgroundColor: flowData ? getStatusColor(flowData.status) : 'var(--success)',
-                color: 'white'
-              }}
-            >
+            <div className={styles.conditionLabelGroup}>
+              <Waves size={16} className={styles.conditionIcon} />
+              <span className={styles.conditionName}>Water Level</span>
+            </div>
+            <span className={styles.statusBadge}>
               {flowLoading ? 'Loading...' : flowData ? getStatusLabel(flowData.status) : 'Normal'}
             </span>
           </div>
-          <div className={styles.conditionTrack}>
+          <div className={styles.waterLevelTrack}>
             <div 
-              className={styles.conditionFill} 
-              style={{ 
-                width: `${flowData?.percentile ?? 50}%`, 
-                background: flowData ? getStatusColor(flowData.status) : 'var(--success)' 
-              }} 
+              className={styles.waterLevelFill} 
+              style={{ width: `${flowData?.percentile ?? 50}%` }} 
+            />
+            <div 
+              className={styles.trackThumb}
+              style={{ left: `${flowData?.percentile ?? 50}%` }}
             />
           </div>
           <div className={styles.conditionLabels}>
             <span>Low</span>
-            <span>Normal</span>
+            <span className={styles.labelActive}>Normal</span>
             <span>High</span>
           </div>
-          {flowData?.flow_cfs && (
-            <div className={styles.flowValue}>
-              {Math.round(flowData.flow_cfs).toLocaleString()} CFS
-            </div>
-          )}
         </div>
 
-        {/* Hazards */}
+        {/* Hazards Along Route */}
         <div className={styles.conditionItem}>
           <div className={styles.conditionHeader}>
-            <span className={styles.conditionName}>Hazards</span>
-            <span 
-              className={`${styles.conditionBadge}`}
-              style={{
-                backgroundColor: hazards.length > 0 
-                  ? (hazards.some(h => h.hazard_potential?.toLowerCase() === 'high') ? '#dc2626' : '#f97316')
-                  : '#22c55e',
-                color: 'white'
-              }}
-            >
-              {hazardsLoading ? 'Loading...' : hazards.length > 0 ? `${hazards.length} Found` : 'Clear'}
-            </span>
+            <div className={styles.conditionLabelGroup}>
+              <TriangleAlert size={16} className={styles.hazardIcon} />
+              <span className={styles.conditionName}>Hazards Along Route</span>
+            </div>
           </div>
-          <div className={styles.hazardRow}>
-            {hazards.length === 0 ? (
-              <span className={styles.hazardChip}>No advisories</span>
-            ) : (
-              <div className={styles.hazardList}>
-                {hazards.slice(0, 5).map((hazard) => (
-                  <div key={hazard.id} className={styles.hazardItem}>
-                    <span className={styles.hazardIcon}>{getHazardIcon(hazard)}</span>
-                    <div className={styles.hazardInfo}>
-                      <span className={styles.hazardName}>{hazard.name}</span>
-                      {hazard.type === 'dam' && (
-                        <span className={styles.hazardDetail}>
-                          <strong style={{ color: '#ef4444' }}>⚠️ Portage Required</strong>
-                          {hazard.dam_height_ft && ` · ${Math.round(hazard.dam_height_ft)}ft`}
-                        </span>
-                      )}
-                      {hazard.type === 'waterfall' && (
-                        <span className={styles.hazardDetail}>
-                          <strong style={{ color: '#ef4444' }}>⚠️ Portage Required</strong>
-                          {hazard.height && ` · ${hazard.height}`}
-                        </span>
-                      )}
-                      {hazard.type === 'rapid' && hazard.rapid_class && (
-                        <span className={styles.hazardDetail}>
-                          Class {hazard.rapid_class} · Scout before running
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-                {hazards.length > 5 && (
-                  <span className={styles.hazardMore}>+{hazards.length - 5} more</span>
-                )}
-              </div>
-            )}
+          <div className={styles.hazardStats}>
+            <div className={`${styles.hazardStatBox} ${styles.hazardStatGreen}`}>
+              <span className={styles.hazardStatNum}>
+                {hazards.filter(h => h.type === 'dam').length}
+              </span>
+              <span className={styles.hazardStatLabel}>Dams (Portage)</span>
+            </div>
+            <div className={`${styles.hazardStatBox} ${styles.hazardStatYellow}`}>
+              <span className={styles.hazardStatNum}>
+                {hazards.filter(h => h.type === 'waterfall').length}
+              </span>
+              <span className={styles.hazardStatLabel}>Waterfalls (Portage)</span>
+            </div>
+            <div className={`${styles.hazardStatBox} ${styles.hazardStatGreen}`}>
+              <span className={styles.hazardStatNum}>
+                {hazards.filter(h => h.type === 'rapid').length}
+              </span>
+              <span className={styles.hazardStatLabel}>Rapids</span>
+            </div>
           </div>
         </div>
 
-        {/* Difficulty */}
+        {/* Difficulty Rating */}
         <div className={styles.conditionItem}>
           <div className={styles.conditionHeader}>
-            <span className={styles.conditionName}>Difficulty</span>
-            <span 
-              className={styles.conditionBadge}
-              style={{
-                backgroundColor: stats.gradient_ft_mi < 5 
-                  ? 'rgba(34, 197, 94, 0.15)' 
-                  : stats.gradient_ft_mi < 15 
-                    ? 'rgba(251, 191, 36, 0.15)' 
-                    : 'rgba(239, 68, 68, 0.15)',
-                color: stats.gradient_ft_mi < 5 
-                  ? 'var(--success)' 
-                  : stats.gradient_ft_mi < 15 
-                    ? 'var(--warning)' 
-                    : 'var(--danger)',
-                border: `1px solid ${stats.gradient_ft_mi < 5 
-                  ? 'rgba(34, 197, 94, 0.3)' 
-                  : stats.gradient_ft_mi < 15 
-                    ? 'rgba(251, 191, 36, 0.3)' 
-                    : 'rgba(239, 68, 68, 0.3)'}`
-              }}
-            >
-              {stats.gradient_ft_mi < 5 ? 'Easy' : stats.gradient_ft_mi < 15 ? 'Moderate' : 'Difficult'}
+            <div className={styles.conditionLabelGroup}>
+              <Gauge size={16} className={styles.difficultyIcon} />
+              <span className={styles.conditionName}>Difficulty Rating</span>
+            </div>
+            <span className={styles.statusBadge}>
+              {stats.gradient_ft_mi < 5 ? 'Beginner' : stats.gradient_ft_mi < 15 ? 'Intermediate' : 'Advanced'}
             </span>
           </div>
-          <div className={styles.difficultyTrackContainer}>
-            <div className={styles.difficultyTrack}>
-              <div className={styles.difficultySegment} data-level="easy" />
-              <div className={styles.difficultySegment} data-level="moderate" />
-              <div className={styles.difficultySegment} data-level="difficult" />
-            </div>
+          <div className={styles.difficultyTrackWrapper}>
             <div 
-              className={styles.difficultyIndicator}
-              style={{
-                left: `${Math.min(stats.gradient_ft_mi / 30 * 100, 97)}%`,
-                backgroundColor: stats.gradient_ft_mi < 5 
+              className={styles.difficultyFill} 
+              style={{ 
+                width: `${Math.min(stats.gradient_ft_mi / 30 * 100, 100)}%`,
+                background: stats.gradient_ft_mi < 5 
                   ? 'var(--success)' 
                   : stats.gradient_ft_mi < 15 
                     ? 'var(--warning)' 
-                    : 'var(--danger)',
-              }}
+                    : 'var(--danger)'
+              }} 
+            />
+            <div 
+              className={styles.trackThumb}
+              style={{ left: `${Math.min(stats.gradient_ft_mi / 30 * 100, 97)}%` }}
             />
           </div>
           <div className={styles.conditionLabels}>
-            <span>Easy</span>
-            <span>Moderate</span>
-            <span>Difficult</span>
-          </div>
-          <div className={styles.gradientValue}>
-            {stats.gradient_ft_mi.toFixed(1)} ft/mi gradient
+            <span className={stats.gradient_ft_mi < 5 ? styles.labelActive : ''}>Beginner</span>
+            <span className={stats.gradient_ft_mi >= 5 && stats.gradient_ft_mi < 15 ? styles.labelActive : ''}>Intermediate</span>
+            <span className={stats.gradient_ft_mi >= 15 ? styles.labelActive : ''}>Advanced</span>
           </div>
         </div>
       </div>

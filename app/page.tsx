@@ -206,6 +206,61 @@ export default function Home() {
     submitLakeRoute();
   }, [clearLakeMarkers, submitLakeRoute]);
 
+  // Track currently highlighted POI for cleanup
+  const highlightedPoi = useRef<{
+    source: string;
+    sourceLayer: string;
+    id: number;
+  } | null>(null);
+
+  // Handle POI highlight from sidebar
+  const handleHighlightPoi = useCallback(
+    (
+      poiType: "campground" | "access_point",
+      id: number
+    ) => {
+      if (!map.current) return;
+
+      // Clear previous highlight
+      if (highlightedPoi.current) {
+        map.current.removeFeatureState({
+          source: highlightedPoi.current.source,
+          sourceLayer: highlightedPoi.current.sourceLayer,
+          id: highlightedPoi.current.id,
+        });
+      }
+
+      // Map POI type to source/layer names
+      const sourceMap = {
+        campground: { source: "campgrounds", sourceLayer: "campgrounds" },
+        access_point: { source: "access-points", sourceLayer: "access_points_clean" },
+      };
+
+      const { source, sourceLayer } = sourceMap[poiType];
+
+      // Set new highlight
+      map.current.setFeatureState(
+        { source, sourceLayer, id },
+        { highlighted: true }
+      );
+
+      // Track for cleanup
+      highlightedPoi.current = { source, sourceLayer, id };
+
+      // Auto-clear after 4 seconds
+      setTimeout(() => {
+        if (
+          highlightedPoi.current?.source === source &&
+          highlightedPoi.current?.id === id
+        ) {
+          map.current?.removeFeatureState({ source, sourceLayer, id });
+          highlightedPoi.current = null;
+        }
+      }, 4000);
+    },
+    []
+  );
+
   // Handle map click
   const handleMapClick = useCallback(
     async (lng: number, lat: number) => {
@@ -834,6 +889,7 @@ export default function Home() {
             lakeChopAssessment={lakeChopAssessment}
             lakeWindLoading={lakeWindLoading}
             lakeName={lakeName}
+            onHighlightPoi={handleHighlightPoi}
           />
         </div>
       </div>

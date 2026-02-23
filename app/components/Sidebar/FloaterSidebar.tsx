@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { MapPin, Flag, Tent, Anchor, Waves, TriangleAlert, Gauge } from 'lucide-react';
+import { MapPin, Flag, Tent, Anchor, Waves, TriangleAlert, Gauge, Locate } from 'lucide-react';
 import { RouteResult, SnapResult } from '../../types';
 import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
@@ -16,9 +16,10 @@ interface FloaterSidebarProps {
   putIn: SnapResult | null;
   takeOut: SnapResult | null;
   onClearRoute: () => void;
+  onHighlightPoi?: (poiType: 'campground' | 'access_point', id: number) => void;
 }
 
-export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterSidebarProps) {
+export function FloaterSidebar({ route, putIn, takeOut, onClearRoute, onHighlightPoi }: FloaterSidebarProps) {
   const { stats, path } = route;
   const riverName = stats.waterways?.[0] || 'Unknown River';
   
@@ -213,6 +214,13 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
                 {discovery.campgrounds.items.slice(0, 3).map((camp) => (
                   <div key={camp.id} className={styles.tripItem}>
                     <span className={styles.tripItemName}>{camp.name || 'Campground'}</span>
+                    <button
+                      className={styles.locateBtn}
+                      onClick={() => onHighlightPoi?.('campground', camp.id)}
+                      title="Highlight on map"
+                    >
+                      <Locate size={14} />
+                    </button>
                   </div>
                 ))}
               </div>
@@ -232,6 +240,13 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
                 {discovery.access_points.items.slice(0, 3).map((ap) => (
                   <div key={ap.id} className={styles.tripItem}>
                     <span className={styles.tripItemName}>{ap.name || 'Water Access'}</span>
+                    <button
+                      className={styles.locateBtn}
+                      onClick={() => onHighlightPoi?.('access_point', ap.id)}
+                      title="Highlight on map"
+                    >
+                      <Locate size={14} />
+                    </button>
                   </div>
                 ))}
               </div>

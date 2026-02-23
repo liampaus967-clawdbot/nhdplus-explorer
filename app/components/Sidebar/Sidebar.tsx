@@ -41,6 +41,8 @@ interface SidebarProps {
   lakeChopAssessment?: ChopAssessment | null;
   lakeWindLoading?: boolean;
   lakeName?: string | null;
+  // POI highlight
+  onHighlightPoi?: (poiType: 'campground' | 'access_point', id: number) => void;
 }
 
 export function Sidebar({
@@ -75,6 +77,7 @@ export function Sidebar({
   lakeChopAssessment = null,
   lakeWindLoading = false,
   lakeName = null,
+  onHighlightPoi,
 }: SidebarProps) {
   // Home mode - always show welcome/explore sidebar
   if (mode === 'home') {
@@ -151,6 +154,7 @@ export function Sidebar({
           putIn={putIn}
           takeOut={takeOut}
           onClearRoute={onClearRoute}
+          onHighlightPoi={onHighlightPoi}
         />
       );
     default:

@@ -6,11 +6,38 @@ export function addAccessPointsSource(map: mapboxgl.Map) {
   map.addSource('access-points', {
     type: 'vector',
     url: TILESETS.accessPoints,
+    promoteId: 'id',
   });
 }
 
 export function addAccessPointsBackdrop(map: mapboxgl.Map) {
   if (map.getLayer('access-points-backdrop')) return;
+  
+  // Highlight glow layer (behind main icon)
+  map.addLayer({
+    id: 'access-points-highlight',
+    type: 'circle',
+    source: 'access-points',
+    'source-layer': SOURCE_LAYERS.accessPoints,
+    minzoom: 8,
+    paint: {
+      'circle-radius': [
+        'case',
+        ['boolean', ['feature-state', 'highlighted'], false],
+        24,
+        0
+      ],
+      'circle-color': '#3b82f6',
+      'circle-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'highlighted'], false],
+        0.4,
+        0
+      ],
+      'circle-blur': 0.5,
+    },
+  });
+  
   map.addLayer({
     id: 'access-points-backdrop',
     type: 'symbol',

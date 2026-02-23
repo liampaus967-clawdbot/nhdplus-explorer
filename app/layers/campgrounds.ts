@@ -6,11 +6,38 @@ export function addCampgroundsSource(map: mapboxgl.Map) {
   map.addSource('campgrounds', {
     type: 'vector',
     url: TILESETS.campgrounds,
+    promoteId: 'id',
   });
 }
 
 export function addCampgroundsBackdrop(map: mapboxgl.Map) {
   if (map.getLayer('campgrounds-backdrop')) return;
+  
+  // Highlight glow layer (behind main icon)
+  map.addLayer({
+    id: 'campgrounds-highlight',
+    type: 'circle',
+    source: 'campgrounds',
+    'source-layer': SOURCE_LAYERS.campgrounds,
+    minzoom: 8,
+    paint: {
+      'circle-radius': [
+        'case',
+        ['boolean', ['feature-state', 'highlighted'], false],
+        24,
+        0
+      ],
+      'circle-color': '#22c55e',
+      'circle-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'highlighted'], false],
+        0.4,
+        0
+      ],
+      'circle-blur': 0.5,
+    },
+  });
+  
   map.addLayer({
     id: 'campgrounds-backdrop',
     type: 'symbol',

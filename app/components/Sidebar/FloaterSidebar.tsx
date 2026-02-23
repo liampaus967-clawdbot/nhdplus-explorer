@@ -197,30 +197,22 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
 
       {/* Trip Planning - Campgrounds & Access Points */}
       {(discovery.campgrounds.count > 0 || discovery.access_points.count > 0) && (
-        <div className={`${styles.card} ${styles.conditionsCard}`}>
+        <div className={`${styles.card} ${styles.tripPlanningCard}`}>
           <span className={styles.sectionLabel}>TRIP PLANNING</span>
           
           {discovery.campgrounds.count > 0 && (
-            <div className={styles.conditionItem}>
-              <div className={styles.conditionHeader}>
-                <span className={styles.conditionName}>
-                  <Tent size={14} style={{ marginRight: 6, color: '#22c55e' }} />
-                  Campgrounds
-                </span>
-                <span className={styles.conditionBadge} style={{ backgroundColor: '#22c55e', color: 'white' }}>
-                  {discovery.campgrounds.count} nearby
-                </span>
+            <div className={styles.tripSection}>
+              <div className={styles.tripHeader}>
+                <div className={styles.tripHeaderLeft}>
+                  <Tent size={14} className={styles.tripIconGreen} />
+                  <span className={styles.tripTitle}>Campgrounds</span>
+                </div>
+                <span className={styles.tripCount}>{discovery.campgrounds.count}</span>
               </div>
-              <div className={styles.hazardList}>
+              <div className={styles.tripList}>
                 {discovery.campgrounds.items.slice(0, 3).map((camp) => (
-                  <div key={camp.id} className={styles.hazardItem}>
-                    <span className={styles.hazardIcon}>🏕️</span>
-                    <div className={styles.hazardInfo}>
-                      <span className={styles.hazardName}>{camp.name}</span>
-                      <span className={styles.hazardDetail}>
-                        {camp.distance_m ? `${(camp.distance_m / 1000).toFixed(1)}km from route` : 'Along route'}
-                      </span>
-                    </div>
+                  <div key={camp.id} className={styles.tripItem}>
+                    <span className={styles.tripItemName}>{camp.name || 'Campground'}</span>
                   </div>
                 ))}
               </div>
@@ -228,26 +220,18 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
           )}
           
           {discovery.access_points.count > 0 && (
-            <div className={styles.conditionItem}>
-              <div className={styles.conditionHeader}>
-                <span className={styles.conditionName}>
-                  <Anchor size={14} style={{ marginRight: 6, color: '#3b82f6' }} />
-                  Put-in/Take-out Options
-                </span>
-                <span className={styles.conditionBadge} style={{ backgroundColor: '#3b82f6', color: 'white' }}>
-                  {discovery.access_points.count} nearby
-                </span>
+            <div className={styles.tripSection}>
+              <div className={styles.tripHeader}>
+                <div className={styles.tripHeaderLeft}>
+                  <Anchor size={14} className={styles.tripIconBlue} />
+                  <span className={styles.tripTitle}>Access Points</span>
+                </div>
+                <span className={styles.tripCount}>{discovery.access_points.count}</span>
               </div>
-              <div className={styles.hazardList}>
+              <div className={styles.tripList}>
                 {discovery.access_points.items.slice(0, 3).map((ap) => (
-                  <div key={ap.id} className={styles.hazardItem}>
-                    <span className={styles.hazardIcon}>🚣</span>
-                    <div className={styles.hazardInfo}>
-                      <span className={styles.hazardName}>{ap.name}</span>
-                      <span className={styles.hazardDetail}>
-                        {ap.distance_m ? `${(ap.distance_m / 1000).toFixed(1)}km from route` : 'Along route'}
-                      </span>
-                    </div>
+                  <div key={ap.id} className={styles.tripItem}>
+                    <span className={styles.tripItemName}>{ap.name || 'Water Access'}</span>
                   </div>
                 ))}
               </div>

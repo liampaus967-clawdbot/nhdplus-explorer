@@ -285,3 +285,77 @@
   height: 100%;
   border-radius: 4px;
 }
+
+/* Trip Planning - Clean Minimal Design */
+.tripPlanningCard {
+  gap: 12px;
+}
+
+.tripSection {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.tripHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tripHeaderLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tripIconGreen {
+  color: var(--success);
+}
+
+.tripIconBlue {
+  color: #3b82f6;
+}
+
+.tripTitle {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.tripCount {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-tertiary);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.tripList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tripItem {
+  display: flex;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.tripItem:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.tripItemName {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

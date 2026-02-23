@@ -1717,7 +1717,7 @@
                   "type": "text",
                   "id": "MAdFp",
                   "fill": "$--text-muted",
-                  "content": "KEY RAPIDS",
+                  "content": "🌊 KEY RAPIDS",
                   "fontFamily": "Inter",
                   "fontSize": 11,
                   "fontWeight": "600",
@@ -1741,8 +1741,8 @@
                     {
                       "type": "text",
                       "id": "93dT6",
-                      "fill": "#fbbf24",
-                      "content": "Coming Soon",
+                      "fill": "#22c55e",
+                      "content": "3 Known",
                       "fontFamily": "Inter",
                       "fontSize": 10,
                       "fontWeight": "600"
@@ -5409,11 +5409,11 @@
                           "type": "text",
                           "id": "MKIle",
                           "name": "hzLbl1",
-                          "fill": "$--text-dim",
-                          "content": "Dams",
+                          "fill": "$--danger",
+                          "content": "Dams (Portage)",
                           "fontFamily": "Inter",
                           "fontSize": 10,
-                          "fontWeight": "normal"
+                          "fontWeight": "600"
                         }
                       ]
                     },
@@ -5448,11 +5448,11 @@
                           "type": "text",
                           "id": "tjzvX",
                           "name": "hzLbl2",
-                          "fill": "$--text-dim",
-                          "content": "Waterfalls",
+                          "fill": "$--danger",
+                          "content": "Waterfalls (Portage)",
                           "fontFamily": "Inter",
                           "fontSize": 10,
-                          "fontWeight": "normal"
+                          "fontWeight": "600"
                         }
                       ]
                     },
@@ -7214,6 +7214,166 @@
                       "fontFamily": "Inter",
                       "fontSize": 10,
                       "fontWeight": "normal"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "lakeNearbyLight",
+          "name": "Nearby POIs",
+          "width": "fill_container",
+          "fill": "$--bg",
+          "cornerRadius": 12,
+          "stroke": {
+            "align": "inside",
+            "thickness": 1,
+            "fill": "$--border"
+          },
+          "layout": "vertical",
+          "gap": 12,
+          "padding": 16,
+          "children": [
+            {
+              "type": "text",
+              "id": "nearbyLabelLight",
+              "fill": "$--text-muted",
+              "content": "NEARBY",
+              "fontFamily": "Inter",
+              "fontSize": 11,
+              "fontWeight": "600",
+              "letterSpacing": 1
+            },
+            {
+              "type": "frame",
+              "id": "launchSitesLight",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "launchHeaderLight",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "launchIconLight",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "anchor",
+                      "iconFontFamily": "lucide",
+                      "fill": "#3b82f6"
+                    },
+                    {
+                      "type": "text",
+                      "id": "launchTitleLight",
+                      "fill": "$--text",
+                      "content": "Launch Sites (3)",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "launchItem1Light",
+                  "width": "fill_container",
+                  "fill": "rgba(59,130,246,0.08)",
+                  "cornerRadius": 8,
+                  "padding": [
+                    8,
+                    10
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "launchName1Light",
+                      "fill": "$--text",
+                      "content": "North Beach Boat Launch",
+                      "fontFamily": "Inter",
+                      "fontSize": 12
+                    },
+                    {
+                      "type": "text",
+                      "id": "launchDist1Light",
+                      "fill": "$--text-muted",
+                      "content": "0.3km",
+                      "fontFamily": "Inter",
+                      "fontSize": 11
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "campgroundsLight",
+              "width": "fill_container",
+              "layout": "vertical",
+              "gap": 6,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "campHeaderLight",
+                  "gap": 6,
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "icon_font",
+                      "id": "campIconLight",
+                      "width": 14,
+                      "height": 14,
+                      "iconFontName": "tent",
+                      "iconFontFamily": "lucide",
+                      "fill": "#22c55e"
+                    },
+                    {
+                      "type": "text",
+                      "id": "campTitleLight",
+                      "fill": "$--text",
+                      "content": "Campgrounds (2)",
+                      "fontFamily": "Inter",
+                      "fontSize": 12,
+                      "fontWeight": "600"
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "campItem1Light",
+                  "width": "fill_container",
+                  "fill": "rgba(34,197,94,0.08)",
+                  "cornerRadius": 8,
+                  "padding": [
+                    8,
+                    10
+                  ],
+                  "justifyContent": "space_between",
+                  "alignItems": "center",
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "campName1Light",
+                      "fill": "$--text",
+                      "content": "North Beach Campground",
+                      "fontFamily": "Inter",
+                      "fontSize": 12
+                    },
+                    {
+                      "type": "text",
+                      "id": "campDist1Light",
+                      "fill": "$--text-muted",
+                      "content": "0.5km",
+                      "fontFamily": "Inter",
+                      "fontSize": 11
                     }
                   ]
                 }

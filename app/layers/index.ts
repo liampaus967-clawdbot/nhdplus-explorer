@@ -9,6 +9,7 @@ import { addDamsSource, addDamsBackdrop } from './dams';
 import { addRouteSource, addRouteLayers } from './routeLayer';
 import { addBlmLandsSource, addBlmLandsLayers } from './blmLands';
 import { addWildernessSource, addWildernessLayers } from './wilderness';
+import { addNationalForestsSource, addNationalForestsLayers } from './nationalForests';
 import { addGaugesSource, addGaugesLayers } from './gauges';
 import { addPoiIcons } from './poiIcons';
 
@@ -22,6 +23,7 @@ export * from './dams';
 export * from './routeLayer';
 export * from './blmLands';
 export * from './wilderness';
+export * from './nationalForests';
 export * from './gauges';
 
 /**
@@ -31,6 +33,7 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   // Add sources
   addBlmLandsSource(map);
   addWildernessSource(map);
+  addNationalForestsSource(map);
   addLakesSource(map);
   addRiversSource(map);
   addAccessPointsSource(map);
@@ -45,6 +48,7 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   // Land layers first (below everything)
   addBlmLandsLayers(map);
   addWildernessLayers(map);
+  addNationalForestsLayers(map);
   
   // Lakes (below rivers)
   addLakesLayers(map);

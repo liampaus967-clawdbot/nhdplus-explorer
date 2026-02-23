@@ -65,6 +65,7 @@ export default function Home() {
   const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
     blmLands: true,
     wilderness: true,
+    nationalForests: true,
     rivers: true,
     lakes: true,
     wildScenicRivers: false,
@@ -444,6 +445,7 @@ export default function Home() {
       const layerMapping: Record<keyof LayerVisibility, string[]> = {
         blmLands: ["blm-lands-fill", "blm-lands-outline"],
         wilderness: ["wilderness-fill", "wilderness-outline"],
+        nationalForests: ["national-forests-fill", "national-forests-outline"],
         rivers: allRiverLayerIds,
         lakes: ["lakes-fill", "lakes-outline", "lakes-labels"],
         wildScenicRivers: ["wsr-line", "wsr-labels"],
@@ -770,6 +772,7 @@ export default function Home() {
       const layerMapping: Record<keyof LayerVisibility, string[]> = {
         blmLands: ["blm-lands-fill", "blm-lands-outline"],
         wilderness: ["wilderness-fill", "wilderness-outline"],
+        nationalForests: ["national-forests-fill", "national-forests-outline"],
         rivers: allRiverLayerIds,
         lakes: ["lakes-fill", "lakes-outline", "lakes-labels"],
         wildScenicRivers: ["wsr-line", "wsr-labels"],

@@ -15,6 +15,7 @@ import styles from './MapControls.module.css';
 export interface LayerVisibility {
   blmLands: boolean;
   wilderness: boolean;
+  nationalForests: boolean;
   rivers: boolean;
   lakes: boolean;
   wildScenicRivers: boolean;
@@ -38,6 +39,7 @@ interface LayerDef {
 const PUBLIC_LANDS: LayerDef[] = [
   { key: 'blmLands', label: 'BLM Lands', icon: <LandPlot size={14} />, iconBg: 'rgba(201,162,39,0.15)' },
   { key: 'wilderness', label: 'Wilderness Areas', icon: <TreePine size={14} />, iconBg: 'rgba(26,93,26,0.25)' },
+  { key: 'nationalForests', label: 'National Forests', icon: <Trees size={14} />, iconBg: 'rgba(34,139,34,0.2)' },
 ];
 
 const WATER_FEATURES: LayerDef[] = [

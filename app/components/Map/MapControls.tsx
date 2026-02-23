@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import {
   Layers, Map, X, Check,
   LandPlot, TreePine, Waves, Droplets, Sparkles,
-  MapPin, Tent, Zap, ArrowDownToLine, Gauge,
+  MapPin, Tent, Zap, ArrowDownToLine, Gauge, Construction,
   Trees, Satellite, Moon,
 } from 'lucide-react';
 import { BasemapStyle } from '../../types';
@@ -22,6 +22,7 @@ export interface LayerVisibility {
   campgrounds: boolean;
   rapids: boolean;
   waterfalls: boolean;
+  dams: boolean;
   gauges: boolean;
 }
 
@@ -50,6 +51,7 @@ const POINTS_OF_INTEREST: LayerDef[] = [
   { key: 'campgrounds', label: 'Campgrounds', icon: <Tent size={14} />, iconBg: 'rgba(34,197,94,0.15)' },
   { key: 'rapids', label: 'Rapids', icon: <Zap size={14} />, iconBg: 'rgba(239,68,68,0.15)' },
   { key: 'waterfalls', label: 'Waterfalls', icon: <ArrowDownToLine size={14} />, iconBg: 'rgba(103,232,249,0.15)' },
+  { key: 'dams', label: 'Dams', icon: <Construction size={14} />, iconBg: 'rgba(217,119,6,0.15)' },
 ];
 
 const WATER_MONITORING: LayerDef[] = [

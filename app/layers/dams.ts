@@ -18,7 +18,15 @@ export function addDamsBackdrop(map: mapboxgl.Map) {
     'source-layer': SOURCE_LAYERS.dams,
     minzoom: 8,
     layout: {
-      'icon-image': 'poi-dam',
+      // Color icon based on hazard_potential: Low (green), Significant (orange), High (red)
+      'icon-image': [
+        'match',
+        ['downcase', ['coalesce', ['get', 'hazard_potential'], '']],
+        'low', 'poi-dam-low',
+        'significant', 'poi-dam-significant',
+        'high', 'poi-dam-high',
+        'poi-dam', // default (undetermined)
+      ],
       'icon-size': [
         'interpolate', ['linear'], ['zoom'],
         6, 0.3,

@@ -21,7 +21,10 @@ const POI_COLORS: Record<string, PinColors> = {
   campground:     { inner: '#4ADE80', outer: '#16A34A' },
   rapid:          { inner: '#F87171', outer: '#DC2626' },
   waterfall:      { inner: '#22D3EE', outer: '#0891B2' },
-  dam:            { inner: '#FBBF24', outer: '#D97706' }, // Amber/Orange for hazard
+  dam:            { inner: '#FBBF24', outer: '#D97706' }, // Default amber (undetermined)
+  'dam-low':      { inner: '#86EFAC', outer: '#22C55E' }, // Green for low hazard
+  'dam-significant': { inner: '#FDBA74', outer: '#EA580C' }, // Orange for significant
+  'dam-high':     { inner: '#FCA5A5', outer: '#DC2626' }, // Red for high hazard
 };
 
 // Simple icon path drawers (black, centered in circle)
@@ -122,6 +125,9 @@ const ICON_DRAWERS: Record<string, IconDrawer> = {
   rapid: drawTriangleAlert,
   waterfall: drawWaves,
   dam: drawDam,
+  'dam-low': drawDam,
+  'dam-significant': drawDam,
+  'dam-high': drawDam,
 };
 
 function createPinIcon(key: string): ImageData {

@@ -72,6 +72,7 @@ export default function Home() {
     campgrounds: true,
     rapids: true,
     waterfalls: true,
+    dams: true,
     gauges: false,
   });
 
@@ -385,6 +386,7 @@ export default function Home() {
         campgrounds: ["campgrounds-backdrop"],
         rapids: ["rapids-backdrop"],
         waterfalls: ["waterfalls-backdrop"],
+        dams: ["dams-backdrop"],
         gauges: ["gauges-circles", "gauges-labels"],
       };
 
@@ -668,6 +670,7 @@ export default function Home() {
         campgrounds: ["campgrounds-backdrop"],
         rapids: ["rapids-backdrop"],
         waterfalls: ["waterfalls-backdrop"],
+        dams: ["dams-backdrop"],
         gauges: ["gauges-circles", "gauges-labels"],
       };
 

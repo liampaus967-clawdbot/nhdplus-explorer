@@ -50,46 +50,33 @@ export async function GET(request: NextRequest) {
   
   try {
     if (comidsParam) {
-      // Query hazards near river segments by COMID
+      // Query hazards by COMID using indexed nearest_comid lookup (FAST)
       const comids = comidsParam.split(',').map(c => parseInt(c.trim(), 10)).filter(c => !isNaN(c));
       
       if (comids.length === 0) {
         return NextResponse.json({ error: 'Invalid comids' }, { status: 400 });
       }
       
-      if (comids.length > 200) {
-        return NextResponse.json({ error: 'Max 200 COMIDs per request' }, { status: 400 });
+      if (comids.length > 500) {
+        return NextResponse.json({ error: 'Max 500 COMIDs per request' }, { status: 400 });
       }
-      
-      // Build route geometry once for all queries
-      const routeGeomCTE = `
-        WITH route_geom AS (
-          SELECT ST_Union(geom) as geom
-          FROM river_edges
-          WHERE comid = ANY($1::bigint[])
-        )
-      `;
 
-      // Find dams within buffer distance of the route segments
+      // Find dams linked to route COMIDs (fast index lookup)
       const damResult = await query(`
-        ${routeGeomCTE}
         SELECT 
-          d.id,
-          d.dam_name as name,
-          d.latitude,
-          d.longitude,
-          d.dam_height_ft,
-          d.hazard_potential,
-          d.river_name,
-          ST_Distance(
-            d.geom::geography,
-            (SELECT geom::geography FROM route_geom)
-          ) as distance_m
-        FROM hazards_dams d, route_geom r
-        WHERE ST_DWithin(d.geom::geography, r.geom::geography, $2)
-        ORDER BY distance_m
+          id,
+          dam_name as name,
+          latitude,
+          longitude,
+          dam_height_ft,
+          hazard_potential,
+          river_name,
+          nearest_comid
+        FROM hazards_dams
+        WHERE nearest_comid = ANY($1::bigint[])
+        ORDER BY dam_height_ft DESC NULLS LAST
         LIMIT 20
-      `, [comids, bufferM]);
+      `, [comids]);
       
       for (const row of damResult.rows) {
         hazards.push({
@@ -98,32 +85,27 @@ export async function GET(request: NextRequest) {
           name: row.name || 'Unnamed Dam',
           latitude: row.latitude,
           longitude: row.longitude,
-          distance_m: Math.round(row.distance_m),
+          distance_m: 0,
           dam_height_ft: row.dam_height_ft,
           hazard_potential: row.hazard_potential,
           river_name: row.river_name,
         });
       }
 
-      // Find waterfalls within buffer distance
+      // Find waterfalls linked to route COMIDs
       const waterfallResult = await query(`
-        ${routeGeomCTE}
         SELECT 
-          w.id,
-          w.name,
-          w.lat as latitude,
-          w.lon as longitude,
-          w.height,
-          w.description,
-          ST_Distance(
-            w.geom::geography,
-            (SELECT geom::geography FROM route_geom)
-          ) as distance_m
-        FROM water_access.waterfalls w, route_geom r
-        WHERE ST_DWithin(w.geom::geography, r.geom::geography, $2)
-        ORDER BY distance_m
+          id,
+          name,
+          lat as latitude,
+          lon as longitude,
+          height,
+          description,
+          nearest_comid
+        FROM water_access.waterfalls
+        WHERE nearest_comid = ANY($1::bigint[])
         LIMIT 20
-      `, [comids, bufferM]);
+      `, [comids]);
       
       for (const row of waterfallResult.rows) {
         hazards.push({
@@ -132,30 +114,25 @@ export async function GET(request: NextRequest) {
           name: row.name || 'Unnamed Waterfall',
           latitude: row.latitude,
           longitude: row.longitude,
-          distance_m: Math.round(row.distance_m),
+          distance_m: 0,
           height: row.height,
           description: row.description,
         });
       }
 
-      // Find rapids (OSM data with class ratings) within buffer distance
+      // Find rapids linked to route COMIDs
       const rapidResult = await query(`
-        ${routeGeomCTE}
         SELECT 
-          r.id,
-          r.name,
-          r.lat as latitude,
-          r.lon as longitude,
-          r.rapid_class,
-          ST_Distance(
-            r.geom::geography,
-            (SELECT geom::geography FROM route_geom)
-          ) as distance_m
-        FROM water_access.rapids r, route_geom rg
-        WHERE ST_DWithin(r.geom::geography, rg.geom::geography, $2)
-        ORDER BY distance_m
+          id,
+          name,
+          lat as latitude,
+          lon as longitude,
+          rapid_class,
+          nearest_comid
+        FROM water_access.rapids
+        WHERE nearest_comid = ANY($1::bigint[])
         LIMIT 30
-      `, [comids, bufferM]);
+      `, [comids]);
       
       for (const row of rapidResult.rows) {
         hazards.push({
@@ -164,7 +141,7 @@ export async function GET(request: NextRequest) {
           name: row.name || 'Unnamed Rapid',
           latitude: row.latitude,
           longitude: row.longitude,
-          distance_m: Math.round(row.distance_m),
+          distance_m: 0,
           rapid_class: row.rapid_class,
         });
       }
@@ -192,7 +169,7 @@ export async function GET(request: NextRequest) {
           name: row.name || `Rapid (${Math.round(row.predicted_probability * 100)}% confidence)`,
           latitude: row.latitude,
           longitude: row.longitude,
-          distance_m: 0, // On the actual route
+          distance_m: 0,
           rapid_class: row.predicted_probability > 0.8 ? 'High confidence' : 'Detected',
           comid: row.comid,
         });

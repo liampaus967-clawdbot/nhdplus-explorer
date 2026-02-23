@@ -70,8 +70,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid comids' }, { status: 400 });
   }
   
-  if (comids.length > 200) {
-    return NextResponse.json({ error: 'Max 200 COMIDs per request' }, { status: 400 });
+  if (comids.length > 500) {
+    return NextResponse.json({ error: 'Max 500 COMIDs per request' }, { status: 400 });
   }
   
   const result: DiscoverySummary = {
@@ -81,37 +81,23 @@ export async function GET(request: NextRequest) {
   };
   
   try {
-    // Route geometry CTE - reused across queries
-    const routeGeomCTE = `
-      WITH route_geom AS (
-        SELECT ST_Union(geom) as geom
-        FROM river_edges
-        WHERE comid = ANY($1::bigint[])
-      )
-    `;
-    
-    // === CAMPGROUNDS ===
+    // === CAMPGROUNDS (fast index lookup) ===
     const campgroundResult = await query(`
-      ${routeGeomCTE}
       SELECT 
-        c.id,
-        c.name,
-        c.lat as latitude,
-        c.lon as longitude,
-        c.operator,
-        c.website,
-        c.drinking_water,
-        c.toilets,
-        ST_Distance(
-          c.geom::geography,
-          (SELECT geom::geography FROM route_geom)
-        ) as distance_m
-      FROM water_access.campgrounds c, route_geom r
-      WHERE ST_DWithin(c.geom::geography, r.geom::geography, $2)
-        AND c.is_duplicate = false
-      ORDER BY distance_m
+        id,
+        name,
+        lat as latitude,
+        lon as longitude,
+        operator,
+        website,
+        drinking_water,
+        toilets,
+        nearest_comid
+      FROM water_access.campgrounds
+      WHERE nearest_comid = ANY($1::bigint[])
+        AND is_duplicate = false
       LIMIT 10
-    `, [comids, bufferM]);
+    `, [comids]);
     
     for (const row of campgroundResult.rows) {
       result.campgrounds.items.push({
@@ -120,7 +106,7 @@ export async function GET(request: NextRequest) {
         name: row.name || 'Unnamed Campground',
         latitude: row.latitude,
         longitude: row.longitude,
-        distance_m: Math.round(row.distance_m),
+        distance_m: 0,
         operator: row.operator,
         website: row.website,
         has_water: row.drinking_water === 'yes',
@@ -129,25 +115,21 @@ export async function GET(request: NextRequest) {
     }
     result.campgrounds.count = result.campgrounds.items.length;
     
-    // === DAMS ===
+    // === DAMS (fast index lookup) ===
     const damResult = await query(`
-      ${routeGeomCTE}
       SELECT 
-        d.id,
-        d.dam_name as name,
-        d.latitude,
-        d.longitude,
-        d.dam_height_ft,
-        d.hazard_potential,
-        ST_Distance(
-          d.geom::geography,
-          (SELECT geom::geography FROM route_geom)
-        ) as distance_m
-      FROM hazards_dams d, route_geom r
-      WHERE ST_DWithin(d.geom::geography, r.geom::geography, $2)
-      ORDER BY distance_m
+        id,
+        dam_name as name,
+        latitude,
+        longitude,
+        dam_height_ft,
+        hazard_potential,
+        nearest_comid
+      FROM hazards_dams
+      WHERE nearest_comid = ANY($1::bigint[])
+      ORDER BY dam_height_ft DESC NULLS LAST
       LIMIT 10
-    `, [comids, bufferM]);
+    `, [comids]);
     
     for (const row of damResult.rows) {
       result.hazards.items.push({
@@ -156,31 +138,26 @@ export async function GET(request: NextRequest) {
         name: row.name || 'Unnamed Dam',
         latitude: row.latitude,
         longitude: row.longitude,
-        distance_m: Math.round(row.distance_m),
+        distance_m: 0,
         dam_height_ft: row.dam_height_ft,
         hazard_potential: row.hazard_potential,
       });
       result.hazards.dams++;
     }
     
-    // === WATERFALLS ===
+    // === WATERFALLS (fast index lookup) ===
     const waterfallResult = await query(`
-      ${routeGeomCTE}
       SELECT 
-        w.id,
-        w.name,
-        w.lat as latitude,
-        w.lon as longitude,
-        w.height,
-        ST_Distance(
-          w.geom::geography,
-          (SELECT geom::geography FROM route_geom)
-        ) as distance_m
-      FROM water_access.waterfalls w, route_geom r
-      WHERE ST_DWithin(w.geom::geography, r.geom::geography, $2)
-      ORDER BY distance_m
+        id,
+        name,
+        lat as latitude,
+        lon as longitude,
+        height,
+        nearest_comid
+      FROM water_access.waterfalls
+      WHERE nearest_comid = ANY($1::bigint[])
       LIMIT 10
-    `, [comids, bufferM]);
+    `, [comids]);
     
     for (const row of waterfallResult.rows) {
       result.hazards.items.push({
@@ -189,30 +166,25 @@ export async function GET(request: NextRequest) {
         name: row.name || 'Unnamed Waterfall',
         latitude: row.latitude,
         longitude: row.longitude,
-        distance_m: Math.round(row.distance_m),
+        distance_m: 0,
         height: row.height,
       });
       result.hazards.waterfalls++;
     }
     
-    // === RAPIDS (OSM) ===
+    // === RAPIDS (fast index lookup) ===
     const rapidResult = await query(`
-      ${routeGeomCTE}
       SELECT 
-        r.id,
-        r.name,
-        r.lat as latitude,
-        r.lon as longitude,
-        r.rapid_class,
-        ST_Distance(
-          r.geom::geography,
-          (SELECT geom::geography FROM route_geom)
-        ) as distance_m
-      FROM water_access.rapids r, route_geom rg
-      WHERE ST_DWithin(r.geom::geography, rg.geom::geography, $2)
-      ORDER BY distance_m
+        id,
+        name,
+        lat as latitude,
+        lon as longitude,
+        rapid_class,
+        nearest_comid
+      FROM water_access.rapids
+      WHERE nearest_comid = ANY($1::bigint[])
       LIMIT 15
-    `, [comids, bufferM]);
+    `, [comids]);
     
     for (const row of rapidResult.rows) {
       result.hazards.items.push({
@@ -221,13 +193,13 @@ export async function GET(request: NextRequest) {
         name: row.name || 'Unnamed Rapid',
         latitude: row.latitude,
         longitude: row.longitude,
-        distance_m: Math.round(row.distance_m),
+        distance_m: 0,
         rapid_class: row.rapid_class,
       });
       result.hazards.rapids++;
     }
     
-    // === USGS RAPIDS (COMID-linked) ===
+    // === USGS RAPIDS (already COMID-linked) ===
     const usgsRapidResult = await query(`
       SELECT 
         id,
@@ -257,24 +229,19 @@ export async function GET(request: NextRequest) {
     
     result.hazards.count = result.hazards.items.length;
     
-    // === ACCESS POINTS ===
+    // === ACCESS POINTS (fast index lookup) ===
     const accessResult = await query(`
-      ${routeGeomCTE}
       SELECT 
-        a.id,
-        a.name,
-        a.lat as latitude,
-        a.lon as longitude,
-        ST_Distance(
-          a.geom::geography,
-          (SELECT geom::geography FROM route_geom)
-        ) as distance_m
-      FROM water_access.access_points_clean a, route_geom r
-      WHERE ST_DWithin(a.geom::geography, r.geom::geography, $2)
-        AND a.is_duplicate = false
-      ORDER BY distance_m
+        id,
+        name,
+        lat as latitude,
+        lon as longitude,
+        nearest_comid
+      FROM water_access.access_points_clean
+      WHERE nearest_comid = ANY($1::bigint[])
+        AND is_duplicate = false
       LIMIT 10
-    `, [comids, bufferM]);
+    `, [comids]);
     
     for (const row of accessResult.rows) {
       result.access_points.items.push({
@@ -283,7 +250,7 @@ export async function GET(request: NextRequest) {
         name: row.name || 'Water Access',
         latitude: row.latitude,
         longitude: row.longitude,
-        distance_m: Math.round(row.distance_m),
+        distance_m: 0,
       });
     }
     result.access_points.count = result.access_points.items.length;

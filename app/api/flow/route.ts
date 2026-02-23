@@ -44,19 +44,23 @@ async function loadFGPData(): Promise<Record<string, any>> {
   
   // Check cache
   if (fgpCache && (now - fgpCache.timestamp) < FGP_CACHE_TTL) {
+    console.log('[FGP] Using cached data:', Object.keys(fgpCache.data).length, 'sites');
     return fgpCache.data;
   }
   
   try {
+    console.log('[FGP] Fetching fresh data from S3...');
     const response = await fetch(FGP_LIVE_URL, { 
-      next: { revalidate: 300 } // Cache for 5 min
+      cache: 'no-store' // Don't use Next.js cache, we manage our own
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    fgpCache = { data: data.sites || {}, timestamp: now };
-    return fgpCache.data;
+    const sites = data.sites || {};
+    console.log('[FGP] Loaded', Object.keys(sites).length, 'sites from S3');
+    fgpCache = { data: sites, timestamp: now };
+    return sites;
   } catch (error) {
-    console.warn('Could not load FGP data:', error);
+    console.error('[FGP] Failed to load FGP data:', error);
     return {};
   }
 }
@@ -128,11 +132,14 @@ async function getFlowForComid(comid: number): Promise<FlowData> {
   const gauge = gaugeResult.rows[0];
   
   if (gauge) {
+    console.log(`[Flow] Found gauge ${gauge.site_no} (${gauge.site_name}) for COMID ${comid}`);
+    
     // Check FGP for live data (has real-time percentiles)
     const fgpData = await loadFGPData();
     const fgp = fgpData[gauge.site_no];
     
     if (fgp) {
+      console.log(`[Flow] FGP data found for ${gauge.site_no}: ${fgp.flow} CFS, ${fgp.percentile}%`);
       return {
         comid,
         source: 'usgs',
@@ -147,6 +154,8 @@ async function getFlowForComid(comid: number): Promise<FlowData> {
         gauge_name: gauge.site_name,
         updated_at: new Date().toISOString(),
       };
+    } else {
+      console.log(`[Flow] No FGP data for ${gauge.site_no}, falling back to NWM`);
     }
   }
   

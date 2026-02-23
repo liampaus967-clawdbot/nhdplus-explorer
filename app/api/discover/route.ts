@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
   try {
     // === CAMPGROUNDS (fast index lookup) ===
     const campgroundResult = await query(`
-      SELECT 
+      SELECT DISTINCT ON (id)
         id,
         name,
         lat as latitude,
@@ -96,6 +96,7 @@ export async function GET(request: NextRequest) {
       FROM water_access.campgrounds
       WHERE nearest_comid = ANY($1::bigint[])
         AND is_duplicate = false
+      ORDER BY id
       LIMIT 10
     `, [comids]);
     
@@ -117,7 +118,7 @@ export async function GET(request: NextRequest) {
     
     // === DAMS (fast index lookup) ===
     const damResult = await query(`
-      SELECT 
+      SELECT DISTINCT ON (id)
         id,
         dam_name as name,
         latitude,
@@ -127,7 +128,7 @@ export async function GET(request: NextRequest) {
         nearest_comid
       FROM hazards_dams
       WHERE nearest_comid = ANY($1::bigint[])
-      ORDER BY dam_height_ft DESC NULLS LAST
+      ORDER BY id
       LIMIT 10
     `, [comids]);
     
@@ -147,7 +148,7 @@ export async function GET(request: NextRequest) {
     
     // === WATERFALLS (fast index lookup) ===
     const waterfallResult = await query(`
-      SELECT 
+      SELECT DISTINCT ON (id)
         id,
         name,
         lat as latitude,
@@ -156,6 +157,7 @@ export async function GET(request: NextRequest) {
         nearest_comid
       FROM water_access.waterfalls
       WHERE nearest_comid = ANY($1::bigint[])
+      ORDER BY id
       LIMIT 10
     `, [comids]);
     
@@ -174,7 +176,7 @@ export async function GET(request: NextRequest) {
     
     // === RAPIDS (fast index lookup) ===
     const rapidResult = await query(`
-      SELECT 
+      SELECT DISTINCT ON (id)
         id,
         name,
         lat as latitude,
@@ -183,6 +185,7 @@ export async function GET(request: NextRequest) {
         nearest_comid
       FROM water_access.rapids
       WHERE nearest_comid = ANY($1::bigint[])
+      ORDER BY id
       LIMIT 15
     `, [comids]);
     
@@ -201,7 +204,7 @@ export async function GET(request: NextRequest) {
     
     // === USGS RAPIDS (already COMID-linked) ===
     const usgsRapidResult = await query(`
-      SELECT 
+      SELECT DISTINCT ON (id)
         id,
         site_name as name,
         latitude,
@@ -210,7 +213,7 @@ export async function GET(request: NextRequest) {
       FROM water_access.usgs_rapids
       WHERE comid = ANY($1::bigint[])
         AND has_rapids = true
-      ORDER BY predicted_probability DESC
+      ORDER BY id
       LIMIT 10
     `, [comids]);
     
@@ -231,7 +234,7 @@ export async function GET(request: NextRequest) {
     
     // === ACCESS POINTS (fast index lookup) ===
     const accessResult = await query(`
-      SELECT 
+      SELECT DISTINCT ON (id)
         id,
         name,
         lat as latitude,
@@ -240,6 +243,7 @@ export async function GET(request: NextRequest) {
       FROM water_access.access_points_clean
       WHERE nearest_comid = ANY($1::bigint[])
         AND is_duplicate = false
+      ORDER BY id
       LIMIT 10
     `, [comids]);
     

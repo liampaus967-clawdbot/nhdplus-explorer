@@ -1,10 +1,12 @@
 'use client';
 
-import { Tent, Bird, Fish, AlertTriangle } from 'lucide-react';
+import { useMemo } from 'react';
+import { Tent, AlertTriangle, Anchor } from 'lucide-react';
 import { RouteResult, SnapResult, ElevationPoint, SteepSection } from '../../types';
 import { ModeTag } from './shared/ModeTag';
 import { WeatherConditions } from './shared/WeatherConditions';
 import { ElevationProfile } from '../Panel/ElevationProfile';
+import { useRouteDiscovery, formatHazardSummary } from '../../hooks/useRouteDiscovery';
 import styles from './ExplorerSidebar.module.css';
 import sharedStyles from './shared/shared.module.css';
 
@@ -24,37 +26,6 @@ interface ExplorerSidebarProps {
   onMouseUp: () => void;
   onMouseLeave: () => void;
 }
-
-const POI_CATEGORIES = [
-  {
-    icon: <Tent size={16} color="#22c55e" />,
-    name: 'Campgrounds',
-    desc: '3 sites along route',
-    bg: 'rgba(34, 197, 94, 0.06)',
-    border: 'rgba(34, 197, 94, 0.15)',
-  },
-  {
-    icon: <Bird size={16} color="#6366f1" />,
-    name: 'Wildlife Areas',
-    desc: '2 sanctuaries nearby',
-    bg: 'rgba(99, 102, 241, 0.06)',
-    border: 'rgba(99, 102, 241, 0.15)',
-  },
-  {
-    icon: <Fish size={16} color="#fbbf24" />,
-    name: 'Fishing Spots',
-    desc: '5 popular areas',
-    bg: 'rgba(251, 191, 36, 0.06)',
-    border: 'rgba(251, 191, 36, 0.15)',
-  },
-  {
-    icon: <AlertTriangle size={16} color="#ef4444" />,
-    name: 'Hazard Zones',
-    desc: '1 low-head dam',
-    bg: 'rgba(239, 68, 68, 0.06)',
-    border: 'rgba(239, 68, 68, 0.15)',
-  },
-];
 
 function getDifficulty(gradient: number): { label: string; desc: string } {
   if (gradient < 5) return { label: 'Easy', desc: 'Suitable for beginners' };
@@ -81,6 +52,17 @@ export function ExplorerSidebar({
   const { stats } = route;
   const riverName = stats.waterways?.[0] || 'Unknown River';
   const difficulty = getDifficulty(stats.gradient_ft_mi);
+
+  // Extract COMIDs from route for discovery query
+  const comids = useMemo(() => {
+    if (!route.route?.features) return null;
+    return route.route.features
+      .map((f) => (f.properties as { comid?: number } | null)?.comid)
+      .filter((c): c is number => c !== undefined && c !== null);
+  }, [route.route?.features]);
+
+  // Fetch discoveries along route (1km buffer)
+  const { discovery, loading: discoveryLoading } = useRouteDiscovery(comids, 1000);
 
   const formatTime = (h: number) => {
     const hrs = Math.floor(h);
@@ -206,22 +188,64 @@ export function ExplorerSidebar({
       <div className={`${styles.card} ${styles.discoverCard}`}>
         <div className={sharedStyles.sectionHeader}>
           <span className={styles.sectionLabel}>DISCOVER ALONG THE WAY</span>
-          <span className={sharedStyles.comingSoonBadge}>Coming Soon</span>
+          {discoveryLoading && <span className={sharedStyles.loadingDot}>●</span>}
         </div>
         <div className={styles.poiList}>
-          {POI_CATEGORIES.map((poi) => (
-            <div
-              key={poi.name}
-              className={styles.poiItem}
-              style={{ background: poi.bg, border: `1px solid ${poi.border}`, borderRadius: 10 }}
-            >
-              <span className={styles.poiIcon}>{poi.icon}</span>
-              <div className={styles.poiInfo}>
-                <div className={styles.poiName}>{poi.name}</div>
-                <div className={styles.poiDesc}>{poi.desc}</div>
+          {/* Campgrounds */}
+          <div
+            className={styles.poiItem}
+            style={{ 
+              background: 'rgba(34, 197, 94, 0.06)', 
+              border: '1px solid rgba(34, 197, 94, 0.15)', 
+              borderRadius: 10 
+            }}
+          >
+            <span className={styles.poiIcon}><Tent size={16} color="#22c55e" /></span>
+            <div className={styles.poiInfo}>
+              <div className={styles.poiName}>Campgrounds</div>
+              <div className={styles.poiDesc}>
+                {discovery.campgrounds.count > 0 
+                  ? `${discovery.campgrounds.count} site${discovery.campgrounds.count > 1 ? 's' : ''} along route`
+                  : 'None nearby'}
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* Access Points */}
+          <div
+            className={styles.poiItem}
+            style={{ 
+              background: 'rgba(99, 102, 241, 0.06)', 
+              border: '1px solid rgba(99, 102, 241, 0.15)', 
+              borderRadius: 10 
+            }}
+          >
+            <span className={styles.poiIcon}><Anchor size={16} color="#6366f1" /></span>
+            <div className={styles.poiInfo}>
+              <div className={styles.poiName}>Water Access</div>
+              <div className={styles.poiDesc}>
+                {discovery.access_points.count > 0 
+                  ? `${discovery.access_points.count} access point${discovery.access_points.count > 1 ? 's' : ''}`
+                  : 'None nearby'}
+              </div>
+            </div>
+          </div>
+
+          {/* Hazards */}
+          <div
+            className={styles.poiItem}
+            style={{ 
+              background: 'rgba(239, 68, 68, 0.06)', 
+              border: '1px solid rgba(239, 68, 68, 0.15)', 
+              borderRadius: 10 
+            }}
+          >
+            <span className={styles.poiIcon}><AlertTriangle size={16} color="#ef4444" /></span>
+            <div className={styles.poiInfo}>
+              <div className={styles.poiName}>Hazards</div>
+              <div className={styles.poiDesc}>{formatHazardSummary(discovery.hazards)}</div>
+            </div>
+          </div>
         </div>
       </div>
 

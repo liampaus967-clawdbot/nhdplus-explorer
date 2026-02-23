@@ -70,7 +70,7 @@ export default function Home() {
     wildScenicRivers: false,
     accessPoints: true,
     campgrounds: true,
-    rapids: true,
+    rapids: false,
     waterfalls: true,
     dams: true,
     gauges: false,

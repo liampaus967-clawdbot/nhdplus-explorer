@@ -254,14 +254,15 @@ export async function GET(request: NextRequest) {
       SELECT 
         a.id,
         a.name,
-        a.latitude,
-        a.longitude,
+        a.lat as latitude,
+        a.lon as longitude,
         ST_Distance(
           a.geom::geography,
           (SELECT geom::geography FROM route_geom)
         ) as distance_m
       FROM water_access.access_points_clean a, route_geom r
       WHERE ST_DWithin(a.geom::geography, r.geom::geography, $2)
+        AND a.is_duplicate = false
       ORDER BY distance_m
       LIMIT 10
     `, [comids, bufferM]);

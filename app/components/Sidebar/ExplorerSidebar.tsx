@@ -57,8 +57,12 @@ export function ExplorerSidebar({
   const comids = useMemo(() => {
     if (!route.route?.features) return null;
     return route.route.features
-      .map((f) => (f.properties as { comid?: number } | null)?.comid)
-      .filter((c): c is number => c !== undefined && c !== null);
+      .map((f) => {
+        const comid = (f.properties as { comid?: string | number } | null)?.comid;
+        if (comid === undefined || comid === null) return undefined;
+        return typeof comid === 'string' ? parseInt(comid, 10) : comid;
+      })
+      .filter((c): c is number => c !== undefined && !isNaN(c));
   }, [route.route?.features]);
 
   // Fetch discoveries along route (1km buffer)

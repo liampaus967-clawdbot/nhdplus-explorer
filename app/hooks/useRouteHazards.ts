@@ -7,9 +7,16 @@ export interface Hazard {
   latitude: number;
   longitude: number;
   distance_m?: number;
+  // Dam-specific
   dam_height_ft?: number;
   hazard_potential?: string;
   river_name?: string;
+  // Waterfall-specific
+  height?: string;
+  description?: string;
+  // Rapid-specific
+  rapid_class?: string;
+  comid?: number;
 }
 
 interface HazardsResponse {

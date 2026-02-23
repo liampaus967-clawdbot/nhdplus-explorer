@@ -18,6 +18,12 @@ export interface Hazard {
   dam_height_ft?: number;
   hazard_potential?: string;
   river_name?: string;
+  // Waterfall-specific fields
+  height?: string;
+  description?: string;
+  // Rapid-specific fields
+  rapid_class?: string;
+  comid?: number;
 }
 
 /**
@@ -55,13 +61,18 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Max 200 COMIDs per request' }, { status: 400 });
       }
       
-      // Find dams within buffer distance of the route segments
-      const damResult = await query(`
+      // Build route geometry once for all queries
+      const routeGeomCTE = `
         WITH route_geom AS (
           SELECT ST_Union(geom) as geom
           FROM river_edges
           WHERE comid = ANY($1::bigint[])
         )
+      `;
+
+      // Find dams within buffer distance of the route segments
+      const damResult = await query(`
+        ${routeGeomCTE}
         SELECT 
           d.id,
           d.dam_name as name,
@@ -93,9 +104,102 @@ export async function GET(request: NextRequest) {
           river_name: row.river_name,
         });
       }
+
+      // Find waterfalls within buffer distance
+      const waterfallResult = await query(`
+        ${routeGeomCTE}
+        SELECT 
+          w.id,
+          w.name,
+          w.lat as latitude,
+          w.lon as longitude,
+          w.height,
+          w.description,
+          ST_Distance(
+            w.geom::geography,
+            (SELECT geom::geography FROM route_geom)
+          ) as distance_m
+        FROM water_access.waterfalls w, route_geom r
+        WHERE ST_DWithin(w.geom::geography, r.geom::geography, $2)
+        ORDER BY distance_m
+        LIMIT 20
+      `, [comids, bufferM]);
+      
+      for (const row of waterfallResult.rows) {
+        hazards.push({
+          id: row.id,
+          type: 'waterfall',
+          name: row.name || 'Unnamed Waterfall',
+          latitude: row.latitude,
+          longitude: row.longitude,
+          distance_m: Math.round(row.distance_m),
+          height: row.height,
+          description: row.description,
+        });
+      }
+
+      // Find rapids (OSM data with class ratings) within buffer distance
+      const rapidResult = await query(`
+        ${routeGeomCTE}
+        SELECT 
+          r.id,
+          r.name,
+          r.lat as latitude,
+          r.lon as longitude,
+          r.rapid_class,
+          ST_Distance(
+            r.geom::geography,
+            (SELECT geom::geography FROM route_geom)
+          ) as distance_m
+        FROM water_access.rapids r, route_geom rg
+        WHERE ST_DWithin(r.geom::geography, rg.geom::geography, $2)
+        ORDER BY distance_m
+        LIMIT 30
+      `, [comids, bufferM]);
+      
+      for (const row of rapidResult.rows) {
+        hazards.push({
+          id: row.id,
+          type: 'rapid',
+          name: row.name || 'Unnamed Rapid',
+          latitude: row.latitude,
+          longitude: row.longitude,
+          distance_m: Math.round(row.distance_m),
+          rapid_class: row.rapid_class,
+        });
+      }
+
+      // Find USGS rapids (ML-detected, tied to COMIDs) - direct COMID match
+      const usgsRapidResult = await query(`
+        SELECT 
+          id,
+          site_name as name,
+          latitude,
+          longitude,
+          predicted_probability,
+          comid
+        FROM water_access.usgs_rapids
+        WHERE comid = ANY($1::bigint[])
+          AND has_rapids = true
+        ORDER BY predicted_probability DESC
+        LIMIT 30
+      `, [comids]);
+      
+      for (const row of usgsRapidResult.rows) {
+        hazards.push({
+          id: row.id + 1000000, // Offset to avoid ID collision
+          type: 'rapid',
+          name: row.name || `Rapid (${Math.round(row.predicted_probability * 100)}% confidence)`,
+          latitude: row.latitude,
+          longitude: row.longitude,
+          distance_m: 0, // On the actual route
+          rapid_class: row.predicted_probability > 0.8 ? 'High confidence' : 'Detected',
+          comid: row.comid,
+        });
+      }
       
     } else if (!isNaN(minLng) && !isNaN(minLat) && !isNaN(maxLng) && !isNaN(maxLat)) {
-      // Query by bounding box
+      // Query by bounding box - dams
       const damResult = await query(`
         SELECT 
           id,
@@ -121,6 +225,56 @@ export async function GET(request: NextRequest) {
           dam_height_ft: row.dam_height_ft,
           hazard_potential: row.hazard_potential,
           river_name: row.river_name,
+        });
+      }
+
+      // Query by bounding box - waterfalls
+      const waterfallResult = await query(`
+        SELECT 
+          id,
+          name,
+          lat as latitude,
+          lon as longitude,
+          height,
+          description
+        FROM water_access.waterfalls
+        WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)::geography::geometry
+        LIMIT 50
+      `, [minLng, minLat, maxLng, maxLat]);
+      
+      for (const row of waterfallResult.rows) {
+        hazards.push({
+          id: row.id,
+          type: 'waterfall',
+          name: row.name || 'Unnamed Waterfall',
+          latitude: row.latitude,
+          longitude: row.longitude,
+          height: row.height,
+          description: row.description,
+        });
+      }
+
+      // Query by bounding box - rapids
+      const rapidResult = await query(`
+        SELECT 
+          id,
+          name,
+          lat as latitude,
+          lon as longitude,
+          rapid_class
+        FROM water_access.rapids
+        WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)::geography::geometry
+        LIMIT 50
+      `, [minLng, minLat, maxLng, maxLat]);
+      
+      for (const row of rapidResult.rows) {
+        hazards.push({
+          id: row.id,
+          type: 'rapid',
+          name: row.name || 'Unnamed Rapid',
+          latitude: row.latitude,
+          longitude: row.longitude,
+          rapid_class: row.rapid_class,
         });
       }
       

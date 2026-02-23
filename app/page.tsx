@@ -589,10 +589,42 @@ export default function Home() {
   useEffect(() => {
     if (!map.current) return;
     
-    // Home mode: regular grab cursor for panning
-    // Other modes: crosshair for selecting points
-    const cursor = personaMode === "home" ? "grab" : "crosshair";
-    map.current.getCanvas().style.cursor = cursor;
+    const canvas = map.current.getCanvas();
+    
+    // Custom larger crosshair cursor (32x32 SVG)
+    const crosshairSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+      <line x1="16" y1="0" x2="16" y2="12" stroke="white" stroke-width="2"/>
+      <line x1="16" y1="20" x2="16" y2="32" stroke="white" stroke-width="2"/>
+      <line x1="0" y1="16" x2="12" y2="16" stroke="white" stroke-width="2"/>
+      <line x1="20" y1="16" x2="32" y2="16" stroke="white" stroke-width="2"/>
+      <line x1="16" y1="0" x2="16" y2="12" stroke="black" stroke-width="1"/>
+      <line x1="16" y1="20" x2="16" y2="32" stroke="black" stroke-width="1"/>
+      <line x1="0" y1="16" x2="12" y2="16" stroke="black" stroke-width="1"/>
+      <line x1="20" y1="16" x2="32" y2="16" stroke="black" stroke-width="1"/>
+      <circle cx="16" cy="16" r="2" fill="white" stroke="black" stroke-width="1"/>
+    </svg>`;
+    const crosshairDataUri = `url("data:image/svg+xml,${encodeURIComponent(crosshairSvg)}") 16 16, crosshair`;
+    
+    if (personaMode === "home") {
+      // Home mode: grab cursor, grabbing when mouse down
+      canvas.style.cursor = "grab";
+      
+      const onMouseDown = () => { canvas.style.cursor = "grabbing"; };
+      const onMouseUp = () => { canvas.style.cursor = "grab"; };
+      
+      canvas.addEventListener("mousedown", onMouseDown);
+      canvas.addEventListener("mouseup", onMouseUp);
+      canvas.addEventListener("mouseleave", onMouseUp);
+      
+      return () => {
+        canvas.removeEventListener("mousedown", onMouseDown);
+        canvas.removeEventListener("mouseup", onMouseUp);
+        canvas.removeEventListener("mouseleave", onMouseUp);
+      };
+    } else {
+      // Other modes: larger crosshair for selecting points
+      canvas.style.cursor = crosshairDataUri;
+    }
   }, [personaMode]);
 
   // Update route on map (river modes)

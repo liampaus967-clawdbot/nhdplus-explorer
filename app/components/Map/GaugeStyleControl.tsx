@@ -1,6 +1,15 @@
 'use client';
 
 import React from 'react';
+import {
+  Gauge,
+  TrendingUp,
+  Minus,
+  TrendingDown,
+  ThermometerSnowflake,
+  Thermometer,
+  Sun,
+} from 'lucide-react';
 import styles from './GaugeStyleControl.module.css';
 
 export type GaugeStyleMode = 'percentile' | 'trend' | 'temperature' | 'temp_trend';
@@ -34,18 +43,16 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
 
       {/* 4-way Segmented Toggle */}
       <div className={styles.toggle4}>
-        <div 
-          className={styles.toggleSlider4} 
-          style={{ transform: `translateX(${modeIndex * 100}%)` }} 
+        <div
+          className={styles.toggleSlider4}
+          style={{ transform: `translateX(${modeIndex * 100}%)` }}
         />
         <button
           className={`${styles.toggleButton4} ${mode === 'percentile' ? styles.toggleActive : ''}`}
           onClick={() => onModeChange('percentile')}
           title="Flow Level"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-          </svg>
+          <Gauge size={14} />
           <span>Level</span>
         </button>
         <button
@@ -53,10 +60,7 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
           onClick={() => onModeChange('trend')}
           title="Flow Trend"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
-            <polyline points="16 7 22 7 22 13" />
-          </svg>
+          <TrendingUp size={14} />
           <span>Trend</span>
         </button>
         <button
@@ -64,9 +68,7 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
           onClick={() => onModeChange('temperature')}
           title="Water Temperature"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z" />
-          </svg>
+          <Thermometer size={14} />
           <span>Temp</span>
         </button>
         <button
@@ -74,10 +76,7 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
           onClick={() => onModeChange('temp_trend')}
           title="Temperature Trend"
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0z" />
-            <path d="M18 6l3 3-3 3" strokeWidth="2" />
-          </svg>
+          <Sun size={14} />
           <span>T-Trend</span>
         </button>
       </div>
@@ -85,46 +84,45 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
       {/* Legend */}
       <div className={styles.legend}>
         {mode === 'percentile' && (
-          <>
-            <div className={styles.gradientBar}>
-              <div className={styles.gradientTrack} />
-            </div>
-            <div className={styles.gradientLabels}>
-              <span>Very Low</span>
+          <div className={styles.iconLegend}>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="pctl-low">
+                <Gauge size={18} strokeWidth={2.5} />
+              </div>
               <span>Low</span>
+            </div>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="pctl-normal">
+                <Gauge size={18} strokeWidth={2.5} />
+              </div>
               <span>Normal</span>
+            </div>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="pctl-high">
+                <Gauge size={18} strokeWidth={2.5} />
+              </div>
               <span>High</span>
-              <span>Very High</span>
             </div>
-            <div className={styles.percentileHint}>
-              Based on historical percentile
-            </div>
-          </>
+          </div>
         )}
 
         {mode === 'trend' && (
-          <div className={styles.trendLegend}>
-            <div className={styles.trendItem}>
-              <div className={styles.trendIcon} data-trend="rising">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M12 19V5M5 12l7-7 7 7" />
-                </svg>
+          <div className={styles.iconLegend}>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="trend-rising">
+                <TrendingUp size={18} strokeWidth={2.5} />
               </div>
               <span>Rising</span>
             </div>
-            <div className={styles.trendItem}>
-              <div className={styles.trendIcon} data-trend="stable">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M5 12h14" />
-                </svg>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="trend-stable">
+                <Minus size={18} strokeWidth={2.5} />
               </div>
               <span>Stable</span>
             </div>
-            <div className={styles.trendItem}>
-              <div className={styles.trendIcon} data-trend="falling">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M12 5v14M5 12l7 7 7-7" />
-                </svg>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="trend-falling">
+                <TrendingDown size={18} strokeWidth={2.5} />
               </div>
               <span>Falling</span>
             </div>
@@ -132,48 +130,47 @@ export function GaugeStyleControl({ mode, onModeChange, visible = true }: GaugeS
         )}
 
         {mode === 'temperature' && (
-          <>
-            <div className={styles.gradientBar}>
-              <div className={styles.tempGradientTrack} />
-            </div>
-            <div className={styles.gradientLabels}>
+          <div className={styles.iconLegend}>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="temp-cold">
+                <ThermometerSnowflake size={18} strokeWidth={2.5} />
+              </div>
               <span>Cold</span>
-              <span>Cool</span>
+            </div>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="temp-moderate">
+                <Thermometer size={18} strokeWidth={2.5} />
+              </div>
               <span>Moderate</span>
-              <span>Warm</span>
+            </div>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="temp-hot">
+                <Sun size={18} strokeWidth={2.5} />
+              </div>
               <span>Hot</span>
             </div>
-            <div className={styles.percentileHint}>
-              Water temperature (°F)
-            </div>
-          </>
+          </div>
         )}
 
         {mode === 'temp_trend' && (
-          <div className={styles.trendLegend}>
-            <div className={styles.trendItem}>
-              <div className={styles.trendIcon} data-trend="warming">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M12 19V5M5 12l7-7 7 7" />
-                </svg>
+          <div className={styles.iconLegend}>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="ttrend-cooling">
+                <TrendingDown size={18} strokeWidth={2.5} />
               </div>
-              <span>Warming</span>
+              <span>Cooling</span>
             </div>
-            <div className={styles.trendItem}>
-              <div className={styles.trendIcon} data-trend="temp-stable">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M5 12h14" />
-                </svg>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="ttrend-stable">
+                <Minus size={18} strokeWidth={2.5} />
               </div>
               <span>Stable</span>
             </div>
-            <div className={styles.trendItem}>
-              <div className={styles.trendIcon} data-trend="cooling">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M12 5v14M5 12l7 7 7-7" />
-                </svg>
+            <div className={styles.iconLegendItem}>
+              <div className={styles.iconSquare} data-variant="ttrend-warming">
+                <TrendingUp size={18} strokeWidth={2.5} />
               </div>
-              <span>Cooling</span>
+              <span>Warming</span>
             </div>
           </div>
         )}

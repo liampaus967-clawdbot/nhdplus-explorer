@@ -749,6 +749,790 @@
           ]
         }
       ]
+    },
+    {
+      "type": "frame",
+      "id": "YntAt",
+      "x": 2,
+      "y": 954,
+      "name": "Iteration 6 — Gauge Mode Icons (Square)",
+      "layout": "vertical",
+      "gap": 32,
+      "padding": 32,
+      "children": [
+        {
+          "type": "frame",
+          "id": "U04Mr",
+          "name": "Flow Percentile",
+          "gap": 24,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "DO6XV",
+              "name": "fpLabel",
+              "fill": "#555",
+              "content": "Flow Percentile",
+              "fontFamily": "DM Sans",
+              "fontSize": 13,
+              "fontWeight": "bold"
+            },
+            {
+              "type": "frame",
+              "id": "VHIdP",
+              "name": "Icon / Flow Pctl Low",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#D4A574",
+                    "position": 0
+                  },
+                  {
+                    "color": "#A0724A",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#A0724A50",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "uWSd0",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "gauge",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "FvsWm",
+              "name": "Icon / Flow Pctl Normal",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#86EFAC",
+                    "position": 0
+                  },
+                  {
+                    "color": "#22c55e",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#22c55e50",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "iavi9",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "gauge",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "hUxz6",
+              "name": "Icon / Flow Pctl High",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#7499d1",
+                    "position": 0
+                  },
+                  {
+                    "color": "#3956ed",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#7c3aed50",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "0r7s4",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "gauge",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "K5ARy",
+          "name": "Flow Trend",
+          "gap": 24,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "nO0RO",
+              "name": "ftLabel",
+              "fill": "#555",
+              "content": "Flow Trend",
+              "fontFamily": "DM Sans",
+              "fontSize": 13,
+              "fontWeight": "bold"
+            },
+            {
+              "type": "frame",
+              "id": "ZhL6z",
+              "name": "Icon / Flow Trend Rising",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#60A5FA",
+                    "position": 0
+                  },
+                  {
+                    "color": "#3b82f6",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#3b82f650",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "IEn3s",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "trending-up",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "0gRKv",
+              "name": "Icon / Flow Trend Stable",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#86EFAC",
+                    "position": 0
+                  },
+                  {
+                    "color": "#22c55e",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#22c55e50",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "K7jj5",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "minus",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "Nkllg",
+              "name": "Icon / Flow Trend Falling",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FCA5A5",
+                    "position": 0
+                  },
+                  {
+                    "color": "#ef4444",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#ef444450",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "TPqU8",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "trending-down",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "A3cAF",
+          "name": "Temperature",
+          "gap": 24,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "kJJQi",
+              "name": "tmpLabel",
+              "fill": "#555",
+              "content": "Temperature",
+              "fontFamily": "DM Sans",
+              "fontSize": 13,
+              "fontWeight": "bold"
+            },
+            {
+              "type": "frame",
+              "id": "e3hlH",
+              "name": "Icon / Temp Cold",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#60A5FA",
+                    "position": 0
+                  },
+                  {
+                    "color": "#3b82f6",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#3b82f650",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "04M2h",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "thermometer-snowflake",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "lhC9O",
+              "name": "Icon / Temp Moderate",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#86EFAC",
+                    "position": 0
+                  },
+                  {
+                    "color": "#22c55e",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#22c55e50",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "JdRCw",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "thermometer",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "aHUhb",
+              "name": "Icon / Temp Hot",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FCA5A5",
+                    "position": 0
+                  },
+                  {
+                    "color": "#dc2626",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#dc262650",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "dMqdu",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "thermometer-sun",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
+          "id": "m5XFc",
+          "name": "Temp Trend",
+          "gap": 24,
+          "alignItems": "center",
+          "children": [
+            {
+              "type": "text",
+              "id": "CjtBs",
+              "name": "ttLabel",
+              "fill": "#555",
+              "content": "Temp Trend",
+              "fontFamily": "DM Sans",
+              "fontSize": 13,
+              "fontWeight": "bold"
+            },
+            {
+              "type": "frame",
+              "id": "ZniZF",
+              "name": "Icon / Temp Trend Cooling",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#60A5FA",
+                    "position": 0
+                  },
+                  {
+                    "color": "#3b82f6",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#3b82f650",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "q3Ekz",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "trending-down",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "3kNn8",
+              "name": "Icon / Temp Trend Stable",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#86EFAC",
+                    "position": 0
+                  },
+                  {
+                    "color": "#22c55e",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#22c55e50",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "Tre7q",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "minus",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "KVBaT",
+              "name": "Icon / Temp Trend Warming",
+              "reusable": true,
+              "width": 44,
+              "height": 44,
+              "fill": {
+                "type": "gradient",
+                "gradientType": "radial",
+                "enabled": true,
+                "rotation": 0,
+                "size": {
+                  "width": 1,
+                  "height": 1
+                },
+                "colors": [
+                  {
+                    "color": "#FCA5A5",
+                    "position": 0
+                  },
+                  {
+                    "color": "#ef4444",
+                    "position": 1
+                  }
+                ]
+              },
+              "cornerRadius": 10,
+              "stroke": {
+                "align": "outside",
+                "thickness": 1.5,
+                "fill": "#1A1A1A"
+              },
+              "effect": {
+                "type": "shadow",
+                "shadowType": "outer",
+                "color": "#ef444450",
+                "offset": {
+                  "x": 0,
+                  "y": 2
+                },
+                "blur": 6
+              },
+              "layout": "none",
+              "children": [
+                {
+                  "type": "icon_font",
+                  "id": "t8HbJ",
+                  "x": 7,
+                  "y": 7,
+                  "width": 30,
+                  "height": 30,
+                  "iconFontName": "trending-up",
+                  "iconFontFamily": "lucide",
+                  "fill": "#1A1A1A"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     }
   ]
 }

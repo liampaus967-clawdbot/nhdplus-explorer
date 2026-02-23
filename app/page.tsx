@@ -1,32 +1,52 @@
-'use client';
+"use client";
 
-import { useEffect, useCallback, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import styles from './page.module.css';
+import { useEffect, useCallback, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import styles from "./page.module.css";
 
 // Types
-import { BasemapStyle, PersonaMode, SnapResult } from './types';
+import { BasemapStyle, PersonaMode, SnapResult } from "./types";
 
 // Hooks
-import { useRoute, useElevationProfile, useLakeRoute } from './hooks';
-import { useGaugeStatus } from './hooks/useGaugeStatus';
+import { useRoute, useElevationProfile, useLakeRoute } from "./hooks";
+import { useGaugeStatus } from "./hooks/useGaugeStatus";
 
 // Components
-import { Header } from './components/Header';
-import { Sidebar, IconRail } from './components/Sidebar';
-import { MapControls, NavigationControls, LayerVisibility, DrawingControls, GaugeStyleControl, GaugeStyleMode } from './components/Map';
+import { Header } from "./components/Header";
+import { Sidebar, IconRail } from "./components/Sidebar";
+import {
+  MapControls,
+  NavigationControls,
+  LayerVisibility,
+  DrawingControls,
+  GaugeStyleControl,
+  GaugeStyleMode,
+} from "./components/Map";
 
 // Layers
-import { addAllLayers, updateRouteData, clearRouteData, updateProfileHighlight, updateGaugeColors, updateGaugeTrendColors, updateGaugeTemperatureColors, updateGaugeTempTrendColors } from './layers';
+import {
+  addAllLayers,
+  updateRouteData,
+  clearRouteData,
+  updateProfileHighlight,
+  updateGaugeColors,
+  updateGaugeTrendColors,
+  updateGaugeTemperatureColors,
+  updateGaugeTempTrendColors,
+} from "./layers";
 
 // Constants
-import { MAP_CONFIG, BASEMAP_STYLES, COLORS } from './constants';
+import { MAP_CONFIG, BASEMAP_STYLES, COLORS } from "./constants";
 
 // Utils
-import { getPointAtDistance, buildLineCoordsBetweenDistances } from './utils';
+import { getPointAtDistance, buildLineCoordsBetweenDistances } from "./utils";
 
 // Services
-import { WeatherData, ChopAssessment, fetchRouteWindConditions } from './services/weather';
+import {
+  WeatherData,
+  ChopAssessment,
+  fetchRouteWindConditions,
+} from "./services/weather";
 
 export default function Home() {
   // Map refs
@@ -37,10 +57,10 @@ export default function Home() {
   const lakeMarkers = useRef<mapboxgl.Marker[]>([]);
 
   // State
-  const [basemap, setBasemap] = useState<BasemapStyle>('outdoors');
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const basemapRef = useRef<BasemapStyle>('outdoors');
-  const [personaMode, setPersonaMode] = useState<PersonaMode>('home');
+  const [basemap, setBasemap] = useState<BasemapStyle>("outdoors");
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const basemapRef = useRef<BasemapStyle>("outdoors");
+  const [personaMode, setPersonaMode] = useState<PersonaMode>("home");
   const [styleVersion, setStyleVersion] = useState(0); // Increments on style.load to trigger re-application of settings
   const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
     blmLands: true,
@@ -52,7 +72,7 @@ export default function Home() {
     campgrounds: true,
     rapids: true,
     waterfalls: true,
-    gauges: true,
+    gauges: false,
   });
 
   // Custom hooks
@@ -107,18 +127,25 @@ export default function Home() {
   } = useLakeRoute();
 
   // Gauge status for coloring gauges by flow
-  const { statusMap: gaugeStatusMap, trendMap: gaugeTrendMap, temperatureMap: gaugeTemperatureMap, tempTrendMap: gaugeTempTrendMap } = useGaugeStatus();
-  const [gaugeStyleMode, setGaugeStyleMode] = useState<GaugeStyleMode>('percentile');
+  const {
+    statusMap: gaugeStatusMap,
+    trendMap: gaugeTrendMap,
+    temperatureMap: gaugeTemperatureMap,
+    tempTrendMap: gaugeTempTrendMap,
+  } = useGaugeStatus();
+  const [gaugeStyleMode, setGaugeStyleMode] =
+    useState<GaugeStyleMode>("percentile");
 
   // Lake wind data state
   const [lakeWindData, setLakeWindData] = useState<WeatherData | null>(null);
-  const [lakeChopAssessment, setLakeChopAssessment] = useState<ChopAssessment | null>(null);
+  const [lakeChopAssessment, setLakeChopAssessment] =
+    useState<ChopAssessment | null>(null);
   const [lakeWindLoading, setLakeWindLoading] = useState(false);
   const [lakeName, setLakeName] = useState<string | null>(null);
 
   // Clear lake markers
   const clearLakeMarkers = useCallback(() => {
-    lakeMarkers.current.forEach(m => m.remove());
+    lakeMarkers.current.forEach((m) => m.remove());
     lakeMarkers.current = [];
   }, []);
 
@@ -148,10 +175,10 @@ export default function Home() {
       const lastMarker = lakeMarkers.current.pop();
       lastMarker?.remove();
     }
-    
+
     // Call the undo from hook (updates waypoints and lakeRoute)
     lakeUndo();
-    
+
     // Update map line - will be synced via useEffect on lakeRoute change
   }, [lakeUndo]);
 
@@ -161,9 +188,11 @@ export default function Home() {
     clearLakeMarkers();
     if (map.current) {
       // Clear lake route from map
-      const source = map.current.getSource('lake-route') as mapboxgl.GeoJSONSource;
+      const source = map.current.getSource(
+        "lake-route",
+      ) as mapboxgl.GeoJSONSource;
       if (source) {
-        source.setData({ type: 'FeatureCollection', features: [] });
+        source.setData({ type: "FeatureCollection", features: [] });
       }
     }
   }, [clearLakeRoute, clearLakeMarkers]);
@@ -180,18 +209,18 @@ export default function Home() {
   const handleMapClick = useCallback(
     async (lng: number, lat: number) => {
       // Home mode - no route creation, just pan/scan
-      if (personaMode === 'home') {
+      if (personaMode === "home") {
         return;
       }
 
       // Lake mode - custom handling
-      if (personaMode === 'lake') {
-        if (lakeDrawingMode === 'waypoint') {
+      if (personaMode === "lake") {
+        if (lakeDrawingMode === "waypoint") {
           // Add waypoint
           const wp = addWaypoint(lng, lat);
-          
+
           // Add marker
-          const marker = new mapboxgl.Marker({ color: '#67e8f9' })
+          const marker = new mapboxgl.Marker({ color: "#67e8f9" })
             .setLngLat([lng, lat])
             .addTo(map.current!);
           lakeMarkers.current.push(marker);
@@ -228,33 +257,60 @@ export default function Home() {
         }
       }
     },
-    [personaMode, lakeDrawingMode, isLakeDrawing, putIn, takeOut, snapToRiver, setPutIn, setTakeOut, calculateRoute, addWaypoint, startFreehand, finishFreehand]
+    [
+      personaMode,
+      lakeDrawingMode,
+      isLakeDrawing,
+      putIn,
+      takeOut,
+      snapToRiver,
+      setPutIn,
+      setTakeOut,
+      calculateRoute,
+      addWaypoint,
+      startFreehand,
+      finishFreehand,
+    ],
   );
 
   // Handle map mouse move (for freehand drawing)
   const handleMapMouseMove = useCallback(
     (lng: number, lat: number) => {
-      if (personaMode === 'lake' && lakeDrawingMode === 'freehand' && isLakeDrawing) {
+      if (
+        personaMode === "lake" &&
+        lakeDrawingMode === "freehand" &&
+        isLakeDrawing
+      ) {
         addFreehandPoint(lng, lat);
-        
+
         // Update preview line on map
         const coords = getFreehandPreview();
         if (coords.length > 1 && map.current) {
-          const source = map.current.getSource('lake-route') as mapboxgl.GeoJSONSource;
+          const source = map.current.getSource(
+            "lake-route",
+          ) as mapboxgl.GeoJSONSource;
           if (source) {
             source.setData({
-              type: 'FeatureCollection',
-              features: [{
-                type: 'Feature',
-                properties: { type: 'lake-route-preview' },
-                geometry: { type: 'LineString', coordinates: coords }
-              }]
+              type: "FeatureCollection",
+              features: [
+                {
+                  type: "Feature",
+                  properties: { type: "lake-route-preview" },
+                  geometry: { type: "LineString", coordinates: coords },
+                },
+              ],
             });
           }
         }
       }
     },
-    [personaMode, lakeDrawingMode, isLakeDrawing, addFreehandPoint, getFreehandPreview]
+    [
+      personaMode,
+      lakeDrawingMode,
+      isLakeDrawing,
+      addFreehandPoint,
+      getFreehandPreview,
+    ],
   );
 
   // Handle paddle speed change (river modes)
@@ -265,7 +321,7 @@ export default function Home() {
         await calculateRoute(putIn, takeOut, flowCondition, newSpeed);
       }
     },
-    [putIn, takeOut, flowCondition, setPaddleSpeed, calculateRoute]
+    [putIn, takeOut, flowCondition, setPaddleSpeed, calculateRoute],
   );
 
   // Handle swap points
@@ -282,16 +338,24 @@ export default function Home() {
       setTakeOut(tempPutIn);
       await calculateRoute(takeOut, tempPutIn, flowCondition, paddleSpeed);
     }
-  }, [putIn, takeOut, flowCondition, paddleSpeed, setPutIn, setTakeOut, calculateRoute]);
+  }, [
+    putIn,
+    takeOut,
+    flowCondition,
+    paddleSpeed,
+    setPutIn,
+    setTakeOut,
+    calculateRoute,
+  ]);
 
   // Handle theme toggle
   const handleThemeToggle = useCallback(() => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   }, []);
 
   // Apply theme to document
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute("data-theme", theme);
   }, [theme]);
 
   // Handle basemap change
@@ -302,55 +366,65 @@ export default function Home() {
       basemapRef.current = newBasemap;
       map.current.setStyle(BASEMAP_STYLES[newBasemap]);
     },
-    [basemap]
+    [basemap],
   );
 
   // Handle layer visibility change
-  const handleLayerVisibilityChange = useCallback((newVisibility: LayerVisibility) => {
-    setLayerVisibility(newVisibility);
-    if (!map.current) return;
+  const handleLayerVisibilityChange = useCallback(
+    (newVisibility: LayerVisibility) => {
+      setLayerVisibility(newVisibility);
+      if (!map.current) return;
 
-    const layerMapping: Record<keyof LayerVisibility, string[]> = {
-      blmLands: ['blm-lands-fill', 'blm-lands-outline'],
-      wilderness: ['wilderness-fill', 'wilderness-outline'],
-      rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
-      lakes: ['lakes-fill', 'lakes-outline', 'lakes-labels'],
-      wildScenicRivers: ['wsr-line', 'wsr-labels'],
-      accessPoints: ['access-points-backdrop'],
-      campgrounds: ['campgrounds-backdrop'],
-      rapids: ['rapids-backdrop'],
-      waterfalls: ['waterfalls-backdrop'],
-      gauges: ['gauges-circles', 'gauges-labels'],
-    };
+      const layerMapping: Record<keyof LayerVisibility, string[]> = {
+        blmLands: ["blm-lands-fill", "blm-lands-outline"],
+        wilderness: ["wilderness-fill", "wilderness-outline"],
+        rivers: ["rivers-line", "rivers-glow", "rivers-labels"],
+        lakes: ["lakes-fill", "lakes-outline", "lakes-labels"],
+        wildScenicRivers: ["wsr-line", "wsr-labels"],
+        accessPoints: ["access-points-backdrop"],
+        campgrounds: ["campgrounds-backdrop"],
+        rapids: ["rapids-backdrop"],
+        waterfalls: ["waterfalls-backdrop"],
+        gauges: ["gauges-circles", "gauges-labels"],
+      };
 
-    Object.entries(newVisibility).forEach(([key, visible]) => {
-      const layers = layerMapping[key as keyof LayerVisibility];
-      layers?.forEach((layerId) => {
-        if (map.current?.getLayer(layerId)) {
-          map.current.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
-        }
+      Object.entries(newVisibility).forEach(([key, visible]) => {
+        const layers = layerMapping[key as keyof LayerVisibility];
+        layers?.forEach((layerId) => {
+          if (map.current?.getLayer(layerId)) {
+            map.current.setLayoutProperty(
+              layerId,
+              "visibility",
+              visible ? "visible" : "none",
+            );
+          }
+        });
       });
-    });
-  }, []);
+    },
+    [],
+  );
 
   // Handle persona mode change
-  const handleModeChange = useCallback((newMode: PersonaMode) => {
-    // Clear lake route when switching away from lake mode
-    if (personaMode === 'lake' && newMode !== 'lake') {
-      handleLakeClear();
-    }
-    // Clear river route when switching to lake mode
-    if (newMode === 'lake' && personaMode !== 'lake') {
-      handleClearRoute();
-    }
-    setPersonaMode(newMode);
-  }, [personaMode, handleLakeClear, handleClearRoute]);
+  const handleModeChange = useCallback(
+    (newMode: PersonaMode) => {
+      // Clear lake route when switching away from lake mode
+      if (personaMode === "lake" && newMode !== "lake") {
+        handleLakeClear();
+      }
+      // Clear river route when switching to lake mode
+      if (newMode === "lake" && personaMode !== "lake") {
+        handleClearRoute();
+      }
+      setPersonaMode(newMode);
+    },
+    [personaMode, handleLakeClear, handleClearRoute],
+  );
 
   // Initialize map
   useEffect(() => {
     if (map.current || !mapContainer.current) return;
 
-    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
+    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
@@ -366,54 +440,55 @@ export default function Home() {
     const setupLayers = () => {
       if (map.current) {
         addAllLayers(map.current, basemapRef.current);
-        
+
         // Add lake route source and layers
-        if (!map.current.getSource('lake-route')) {
-          map.current.addSource('lake-route', {
-            type: 'geojson',
-            data: { type: 'FeatureCollection', features: [] }
+        if (!map.current.getSource("lake-route")) {
+          map.current.addSource("lake-route", {
+            type: "geojson",
+            data: { type: "FeatureCollection", features: [] },
           });
-          
+
           // Glow layer for submitted routes (animated pulse)
           map.current.addLayer({
-            id: 'lake-route-glow',
-            type: 'line',
-            source: 'lake-route',
-            filter: ['==', ['get', 'submitted'], true],
+            id: "lake-route-glow",
+            type: "line",
+            source: "lake-route",
+            filter: ["==", ["get", "submitted"], true],
             paint: {
-              'line-color': '#f59e0b',
-              'line-width': 12,
-              'line-opacity': 0.3,
-              'line-blur': 8
-            }
+              "line-color": "#f59e0b",
+              "line-width": 12,
+              "line-opacity": 0.3,
+              "line-blur": 8,
+            },
           });
-          
+
           // Main route line - cyan while drawing, orange when submitted
           map.current.addLayer({
-            id: 'lake-route-line',
-            type: 'line',
-            source: 'lake-route',
+            id: "lake-route-line",
+            type: "line",
+            source: "lake-route",
             paint: {
-              'line-color': [
-                'case',
-                ['==', ['get', 'submitted'], true], '#f59e0b', // Orange when submitted
-                '#006BF7' // Cyan while drawing
+              "line-color": [
+                "case",
+                ["==", ["get", "submitted"], true],
+                "#f59e0b", // Orange when submitted
+                "#006BF7", // Cyan while drawing
               ],
-              'line-width': 4,
-              'line-opacity': 0.9
-            }
+              "line-width": 4,
+              "line-opacity": 0.9,
+            },
           });
         }
-        
-        map.current.getCanvas().style.cursor = 'crosshair';
+
+        map.current.getCanvas().style.cursor = "crosshair";
       }
     };
 
-    map.current.on('load', setupLayers);
-    map.current.on('style.load', () => {
+    map.current.on("load", setupLayers);
+    map.current.on("style.load", () => {
       setupLayers();
       // Increment styleVersion to trigger re-application of gauge colors and layer visibility
-      setStyleVersion(v => v + 1);
+      setStyleVersion((v) => v + 1);
     });
 
     return () => {
@@ -434,12 +509,12 @@ export default function Home() {
       handleMapMouseMove(e.lngLat.lng, e.lngLat.lat);
     };
 
-    map.current.on('click', onClick);
-    map.current.on('mousemove', onMouseMove);
-    
+    map.current.on("click", onClick);
+    map.current.on("mousemove", onMouseMove);
+
     return () => {
-      map.current?.off('click', onClick);
-      map.current?.off('mousemove', onMouseMove);
+      map.current?.off("click", onClick);
+      map.current?.off("mousemove", onMouseMove);
     };
   }, [handleMapClick, handleMapMouseMove]);
 
@@ -451,10 +526,12 @@ export default function Home() {
       updateRouteData(map.current, route.route);
 
       if (route.route.features.length > 0) {
-        const coords = route.route.features.flatMap((f: any) => f.geometry.coordinates);
+        const coords = route.route.features.flatMap(
+          (f: any) => f.geometry.coordinates,
+        );
         const bounds = coords.reduce(
           (b: mapboxgl.LngLatBounds, c: [number, number]) => b.extend(c),
-          new mapboxgl.LngLatBounds(coords[0], coords[0])
+          new mapboxgl.LngLatBounds(coords[0], coords[0]),
         );
         map.current.fitBounds(bounds, { padding: 80 });
       }
@@ -464,27 +541,31 @@ export default function Home() {
   // Update lake route on map
   useEffect(() => {
     if (!map.current) return;
-    
-    const source = map.current.getSource('lake-route') as mapboxgl.GeoJSONSource;
+
+    const source = map.current.getSource(
+      "lake-route",
+    ) as mapboxgl.GeoJSONSource;
     if (!source) return;
 
     // If no route or no geojson, clear the map
     if (!lakeRoute?.geojson) {
-      source.setData({ type: 'FeatureCollection', features: [] });
+      source.setData({ type: "FeatureCollection", features: [] });
       return;
     }
 
     // Update with new route data
     source.setData(lakeRoute.geojson);
-    
+
     // Fit bounds to lake route (only when route has meaningful length)
-    const lineFeature = lakeRoute.geojson.features.find(f => f.geometry.type === 'LineString');
-    if (lineFeature && lineFeature.geometry.type === 'LineString') {
+    const lineFeature = lakeRoute.geojson.features.find(
+      (f) => f.geometry.type === "LineString",
+    );
+    if (lineFeature && lineFeature.geometry.type === "LineString") {
       const coords = lineFeature.geometry.coordinates as [number, number][];
       if (coords.length > 1) {
         const bounds = coords.reduce(
           (b: mapboxgl.LngLatBounds, c: [number, number]) => b.extend(c),
-          new mapboxgl.LngLatBounds(coords[0], coords[0])
+          new mapboxgl.LngLatBounds(coords[0], coords[0]),
         );
         map.current.fitBounds(bounds, { padding: 80 });
       }
@@ -500,13 +581,13 @@ export default function Home() {
 
     // Query the first waypoint to find which lake it's on
     const firstWp = lakeWaypoints[0];
-    
+
     fetch(`/api/lake-at-point?lng=${firstWp.lng}&lat=${firstWp.lat}`)
-      .then(res => {
+      .then((res) => {
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         return res.json();
       })
-      .then(data => {
+      .then((data) => {
         setLakeName(data.lake?.name || null);
       })
       .catch(() => {
@@ -522,8 +603,10 @@ export default function Home() {
       return;
     }
 
-    const lineFeature = lakeRoute.geojson.features.find(f => f.geometry.type === 'LineString');
-    if (!lineFeature || lineFeature.geometry.type !== 'LineString') return;
+    const lineFeature = lakeRoute.geojson.features.find(
+      (f) => f.geometry.type === "LineString",
+    );
+    if (!lineFeature || lineFeature.geometry.type !== "LineString") return;
 
     const coords = lineFeature.geometry.coordinates as [number, number][];
     if (coords.length < 2) return;
@@ -538,7 +621,7 @@ export default function Home() {
         }
       })
       .catch((err) => {
-        console.error('Failed to fetch wind data:', err);
+        console.error("Failed to fetch wind data:", err);
       })
       .finally(() => {
         setLakeWindLoading(false);
@@ -548,49 +631,60 @@ export default function Home() {
   // Update gauge colors when flow status data loads, mode changes, or style reloads
   useEffect(() => {
     if (!map.current) return;
-    
-    if (gaugeStyleMode === 'percentile' && gaugeStatusMap) {
+
+    if (gaugeStyleMode === "percentile" && gaugeStatusMap) {
       updateGaugeColors(map.current, gaugeStatusMap);
-    } else if (gaugeStyleMode === 'trend' && gaugeTrendMap) {
+    } else if (gaugeStyleMode === "trend" && gaugeTrendMap) {
       updateGaugeTrendColors(map.current, gaugeTrendMap);
-    } else if (gaugeStyleMode === 'temperature' && gaugeTemperatureMap) {
+    } else if (gaugeStyleMode === "temperature" && gaugeTemperatureMap) {
       updateGaugeTemperatureColors(map.current, gaugeTemperatureMap);
-    } else if (gaugeStyleMode === 'temp_trend' && gaugeTempTrendMap) {
+    } else if (gaugeStyleMode === "temp_trend" && gaugeTempTrendMap) {
       updateGaugeTempTrendColors(map.current, gaugeTempTrendMap);
     }
-  }, [gaugeStatusMap, gaugeTrendMap, gaugeTemperatureMap, gaugeTempTrendMap, gaugeStyleMode, styleVersion]);
+  }, [
+    gaugeStatusMap,
+    gaugeTrendMap,
+    gaugeTemperatureMap,
+    gaugeTempTrendMap,
+    gaugeStyleMode,
+    styleVersion,
+  ]);
 
   // Reapply layer visibility after style changes
   useEffect(() => {
     if (!map.current || styleVersion === 0) return;
-    
+
     // Wait a tick for layers to be fully added
     const timeout = setTimeout(() => {
       if (!map.current) return;
-      
+
       const layerMapping: Record<keyof LayerVisibility, string[]> = {
-        blmLands: ['blm-lands-fill', 'blm-lands-outline'],
-        wilderness: ['wilderness-fill', 'wilderness-outline'],
-        rivers: ['rivers-line', 'rivers-glow', 'rivers-labels'],
-        lakes: ['lakes-fill', 'lakes-outline', 'lakes-labels'],
-        wildScenicRivers: ['wsr-line', 'wsr-labels'],
-        accessPoints: ['access-points-backdrop'],
-        campgrounds: ['campgrounds-backdrop'],
-        rapids: ['rapids-backdrop'],
-        waterfalls: ['waterfalls-backdrop'],
-        gauges: ['gauges-circles', 'gauges-labels'],
+        blmLands: ["blm-lands-fill", "blm-lands-outline"],
+        wilderness: ["wilderness-fill", "wilderness-outline"],
+        rivers: ["rivers-line", "rivers-glow", "rivers-labels"],
+        lakes: ["lakes-fill", "lakes-outline", "lakes-labels"],
+        wildScenicRivers: ["wsr-line", "wsr-labels"],
+        accessPoints: ["access-points-backdrop"],
+        campgrounds: ["campgrounds-backdrop"],
+        rapids: ["rapids-backdrop"],
+        waterfalls: ["waterfalls-backdrop"],
+        gauges: ["gauges-circles", "gauges-labels"],
       };
 
       Object.entries(layerVisibility).forEach(([key, visible]) => {
         const layers = layerMapping[key as keyof LayerVisibility];
         layers?.forEach((layerId) => {
           if (map.current?.getLayer(layerId)) {
-            map.current.setLayoutProperty(layerId, 'visibility', visible ? 'visible' : 'none');
+            map.current.setLayoutProperty(
+              layerId,
+              "visibility",
+              visible ? "visible" : "none",
+            );
           }
         });
       });
     }, 50);
-    
+
     return () => clearTimeout(timeout);
   }, [styleVersion, layerVisibility]);
 
@@ -599,31 +693,52 @@ export default function Home() {
     if (!map.current || !route) return;
 
     if (profileSelection) {
-      const startPoint = getPointAtDistance(route, Math.min(profileSelection.startM, profileSelection.endM));
-      const endPoint = getPointAtDistance(route, Math.max(profileSelection.startM, profileSelection.endM));
+      const startPoint = getPointAtDistance(
+        route,
+        Math.min(profileSelection.startM, profileSelection.endM),
+      );
+      const endPoint = getPointAtDistance(
+        route,
+        Math.max(profileSelection.startM, profileSelection.endM),
+      );
 
       if (startPoint && endPoint) {
         const lineCoords = buildLineCoordsBetweenDistances(
           route,
           Math.min(profileSelection.startM, profileSelection.endM),
-          Math.max(profileSelection.startM, profileSelection.endM)
+          Math.max(profileSelection.startM, profileSelection.endM),
         );
 
         updateProfileHighlight(map.current, {
-          type: 'FeatureCollection',
+          type: "FeatureCollection",
           features: [
-            { type: 'Feature', properties: { type: 'start' }, geometry: { type: 'Point', coordinates: startPoint } },
-            { type: 'Feature', properties: { type: 'end' }, geometry: { type: 'Point', coordinates: endPoint } },
             {
-              type: 'Feature',
-              properties: { type: 'line' },
-              geometry: { type: 'LineString', coordinates: lineCoords.length > 1 ? lineCoords : [startPoint, endPoint] },
+              type: "Feature",
+              properties: { type: "start" },
+              geometry: { type: "Point", coordinates: startPoint },
+            },
+            {
+              type: "Feature",
+              properties: { type: "end" },
+              geometry: { type: "Point", coordinates: endPoint },
+            },
+            {
+              type: "Feature",
+              properties: { type: "line" },
+              geometry: {
+                type: "LineString",
+                coordinates:
+                  lineCoords.length > 1 ? lineCoords : [startPoint, endPoint],
+              },
             },
           ],
         });
       }
     } else {
-      updateProfileHighlight(map.current, { type: 'FeatureCollection', features: [] });
+      updateProfileHighlight(map.current, {
+        type: "FeatureCollection",
+        features: [],
+      });
     }
   }, [profileSelection, route]);
 
@@ -643,7 +758,11 @@ export default function Home() {
           />
           {/* Lake Mode Drawing Controls - hidden when route is submitted */}
           <DrawingControls
-            visible={personaMode === 'lake' && (lakeWaypoints.length > 0 || isLakeDrawing) && !isLakeSubmitted}
+            visible={
+              personaMode === "lake" &&
+              (lakeWaypoints.length > 0 || isLakeDrawing) &&
+              !isLakeSubmitted
+            }
             drawingMode={lakeDrawingMode}
             waypointCount={lakeWaypoints.length}
             hasRoute={!!(lakeRoute && lakeRoute.distance_mi > 0)}
@@ -666,7 +785,7 @@ export default function Home() {
           {error && (
             <div className={styles.error}>
               {error}
-              {error.includes('Upstream') && (
+              {error.includes("Upstream") && (
                 <button className={styles.swapBtn} onClick={handleSwapPoints}>
                   Swap Points
                 </button>
@@ -704,7 +823,9 @@ export default function Home() {
             lakeWaypoints={lakeWaypoints}
             onDeleteLakeWaypoint={deleteWaypoint}
             onLakeUndo={handleLakeUndo}
-            onLakeSaveRoute={() => { /* TODO: implement save */ }}
+            onLakeSaveRoute={() => {
+              /* TODO: implement save */
+            }}
             isLakeDrawing={isLakeDrawing}
             lakeWindData={lakeWindData}
             lakeChopAssessment={lakeChopAssessment}

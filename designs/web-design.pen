@@ -7841,7 +7841,10 @@
                       "height": 34,
                       "fill": "$--bg",
                       "cornerRadius": 8,
-                      "padding": [0, 10],
+                      "padding": [
+                        0,
+                        10
+                      ],
                       "justifyContent": "space_between",
                       "alignItems": "center",
                       "children": [
@@ -8694,8 +8697,8 @@
     {
       "type": "frame",
       "id": "gaugeControlDark",
-      "x": -314,
-      "y": 0,
+      "x": 677,
+      "y": 1060,
       "name": "Gauge Style Control - Dark",
       "width": 220,
       "fill": "$--bg-secondary",

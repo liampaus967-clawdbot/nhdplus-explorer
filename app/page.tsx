@@ -547,7 +547,7 @@ export default function Home() {
           });
         }
 
-        map.current.getCanvas().style.cursor = "crosshair";
+        // Cursor is set dynamically based on personaMode in separate useEffect
       }
     };
 
@@ -584,6 +584,16 @@ export default function Home() {
       map.current?.off("mousemove", onMouseMove);
     };
   }, [handleMapClick, handleMapMouseMove]);
+
+  // Update cursor based on persona mode
+  useEffect(() => {
+    if (!map.current) return;
+    
+    // Home mode: regular grab cursor for panning
+    // Other modes: crosshair for selecting points
+    const cursor = personaMode === "home" ? "grab" : "crosshair";
+    map.current.getCanvas().style.cursor = cursor;
+  }, [personaMode]);
 
   // Update route on map (river modes)
   useEffect(() => {

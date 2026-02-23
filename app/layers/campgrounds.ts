@@ -13,7 +13,31 @@ export function addCampgroundsSource(map: mapboxgl.Map) {
 export function addCampgroundsBackdrop(map: mapboxgl.Map) {
   if (map.getLayer('campgrounds-backdrop')) return;
   
-  // Base layer (normal size)
+  // Highlight glow layer (behind main icon)
+  map.addLayer({
+    id: 'campgrounds-highlight',
+    type: 'circle',
+    source: 'campgrounds',
+    'source-layer': SOURCE_LAYERS.campgrounds,
+    minzoom: 8,
+    paint: {
+      'circle-radius': [
+        'case',
+        ['boolean', ['feature-state', 'highlighted'], false],
+        24,
+        0
+      ],
+      'circle-color': '#22c55e',
+      'circle-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'highlighted'], false],
+        0.4,
+        0
+      ],
+      'circle-blur': 0.5,
+    },
+  });
+  
   map.addLayer({
     id: 'campgrounds-backdrop',
     type: 'symbol',
@@ -33,41 +57,7 @@ export function addCampgroundsBackdrop(map: mapboxgl.Map) {
       'icon-anchor': 'bottom',
     },
     paint: {
-      'icon-opacity': [
-        'case',
-        ['boolean', ['feature-state', 'highlighted'], false],
-        0,  // Hide when highlighted (larger version shows instead)
-        1
-      ],
-    },
-  });
-  
-  // Highlighted layer (larger size)
-  map.addLayer({
-    id: 'campgrounds-highlight',
-    type: 'symbol',
-    source: 'campgrounds',
-    'source-layer': SOURCE_LAYERS.campgrounds,
-    minzoom: 8,
-    layout: {
-      'icon-image': 'poi-campground',
-      'icon-size': [
-        'interpolate', ['linear'], ['zoom'],
-        6, 0.5,
-        10, 1.0,
-        14, 2.5,
-        18, 3.5,
-      ],
-      'icon-allow-overlap': true,
-      'icon-anchor': 'bottom',
-    },
-    paint: {
-      'icon-opacity': [
-        'case',
-        ['boolean', ['feature-state', 'highlighted'], false],
-        1,  // Show when highlighted
-        0
-      ],
+      'icon-opacity': 1,
     },
   });
 }

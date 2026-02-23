@@ -13,31 +13,7 @@ export function addAccessPointsSource(map: mapboxgl.Map) {
 export function addAccessPointsBackdrop(map: mapboxgl.Map) {
   if (map.getLayer('access-points-backdrop')) return;
   
-  // Highlight glow layer (behind main icon)
-  map.addLayer({
-    id: 'access-points-highlight',
-    type: 'circle',
-    source: 'access-points',
-    'source-layer': SOURCE_LAYERS.accessPoints,
-    minzoom: 8,
-    paint: {
-      'circle-radius': [
-        'case',
-        ['boolean', ['feature-state', 'highlighted'], false],
-        24,
-        0
-      ],
-      'circle-color': '#3b82f6',
-      'circle-opacity': [
-        'case',
-        ['boolean', ['feature-state', 'highlighted'], false],
-        0.4,
-        0
-      ],
-      'circle-blur': 0.5,
-    },
-  });
-  
+  // Base layer (normal size)
   map.addLayer({
     id: 'access-points-backdrop',
     type: 'symbol',
@@ -57,7 +33,41 @@ export function addAccessPointsBackdrop(map: mapboxgl.Map) {
       'icon-anchor': 'bottom',
     },
     paint: {
-      'icon-opacity': 1,
+      'icon-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'highlighted'], false],
+        0,  // Hide when highlighted (larger version shows instead)
+        1
+      ],
+    },
+  });
+  
+  // Highlighted layer (larger size)
+  map.addLayer({
+    id: 'access-points-highlight',
+    type: 'symbol',
+    source: 'access-points',
+    'source-layer': SOURCE_LAYERS.accessPoints,
+    minzoom: 8,
+    layout: {
+      'icon-image': 'poi-access-point',
+      'icon-size': [
+        'interpolate', ['linear'], ['zoom'],
+        6, 0.5,
+        10, 1.0,
+        14, 2.5,
+        18, 3.5,
+      ],
+      'icon-allow-overlap': true,
+      'icon-anchor': 'bottom',
+    },
+    paint: {
+      'icon-opacity': [
+        'case',
+        ['boolean', ['feature-state', 'highlighted'], false],
+        1,  // Show when highlighted
+        0
+      ],
     },
   });
 }

@@ -72,6 +72,8 @@ export function useFlowStatus(comid: number | null) {
 /**
  * Hook to fetch the BEST flow data from a list of COMIDs (for routes)
  * Finds the COMID with the highest confidence data (prefers USGS gauges)
+ * 
+ * Also fetches FGP data client-side as a fallback/enhancement
  */
 export function useBestFlowForRoute(comids: number[] | null) {
   const [data, setData] = useState<FlowData | null>(null);
@@ -88,12 +90,47 @@ export function useBestFlowForRoute(comids: number[] | null) {
     setError(null);
 
     const comidStr = comids.join(',');
-    fetch(`/api/flow?comids=${comidStr}&best=true`)
-      .then(res => {
+    
+    // Fetch both API data and FGP data in parallel
+    Promise.all([
+      fetch(`/api/flow?comids=${comidStr}&best=true`).then(res => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
+      }),
+      fetch(FGP_LIVE_URL).then(res => res.ok ? res.json() : null).catch(() => null)
+    ])
+      .then(([apiData, fgpData]) => {
+        // If API returned NWM source but we have FGP data for this gauge, use FGP
+        if (apiData?.gauge_id && apiData.source === 'nwm' && fgpData?.sites) {
+          const fgp = fgpData.sites[apiData.gauge_id];
+          if (fgp && fgp.flow !== null) {
+            console.log('[FGP Client] Enhancing NWM data with FGP for gauge', apiData.gauge_id);
+            // Convert FGP status to our status enum
+            const percentile = fgp.percentile;
+            let status: FlowData['status'] = 'unknown';
+            if (percentile !== null) {
+              if (percentile < 10) status = 'very_low';
+              else if (percentile < 25) status = 'low';
+              else if (percentile < 75) status = 'normal';
+              else if (percentile < 90) status = 'high';
+              else status = 'very_high';
+            }
+            
+            setData({
+              ...apiData,
+              source: 'usgs',
+              confidence: 1.0,
+              flow_cfs: fgp.flow,
+              flow_cms: fgp.flow / 35.3147,
+              status,
+              percentile,
+              updated_at: new Date().toISOString(),
+            });
+            return;
+          }
+        }
+        setData(apiData);
       })
-      .then(setData)
       .catch(err => setError(err.message))
       .finally(() => setLoading(false));
   }, [comids?.join(',')]);

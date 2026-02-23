@@ -425,13 +425,14 @@ export default function Home() {
     [basemap],
   );
 
-  // All river layer IDs for visibility toggling (all 5 regions)
+  // All river layer IDs for visibility toggling (all 6 regions)
   const allRiverLayerIds = [
     "rivers-line", "rivers-arrows", "rivers-labels",
     "rivers-southeast-line", "rivers-southeast-arrows", "rivers-southeast-labels",
     "rivers-midwest-line", "rivers-midwest-arrows", "rivers-midwest-labels",
     "rivers-plains-line", "rivers-plains-arrows", "rivers-plains-labels",
     "rivers-west-line", "rivers-west-arrows", "rivers-west-labels",
+    "rivers-midatlantic-line", "rivers-midatlantic-arrows", "rivers-midatlantic-labels",
   ];
 
   // Handle layer visibility change

@@ -8,6 +8,7 @@ const RIVER_REGIONS = [
   { id: 'rivers-midwest', tileset: TILESETS.riversMidwest, sourceLayer: SOURCE_LAYERS.riversMidwest },
   { id: 'rivers-plains', tileset: TILESETS.riversPlains, sourceLayer: SOURCE_LAYERS.riversPlains },
   { id: 'rivers-west', tileset: TILESETS.riversWest, sourceLayer: SOURCE_LAYERS.riversWest },
+  { id: 'rivers-midatlantic', tileset: TILESETS.riversMidatlantic, sourceLayer: SOURCE_LAYERS.riversMidatlantic },
 ];
 
 export function addRiversSource(map: mapboxgl.Map) {

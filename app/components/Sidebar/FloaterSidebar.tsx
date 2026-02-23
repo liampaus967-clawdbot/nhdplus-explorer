@@ -194,16 +194,44 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
         <div className={styles.conditionItem}>
           <div className={styles.conditionHeader}>
             <span className={styles.conditionName}>Difficulty</span>
-            <span className={`${styles.conditionBadge} ${styles.conditionGood}`}>
+            <span 
+              className={styles.conditionBadge}
+              style={{
+                backgroundColor: stats.gradient_ft_mi < 5 
+                  ? 'rgba(34, 197, 94, 0.15)' 
+                  : stats.gradient_ft_mi < 15 
+                    ? 'rgba(251, 191, 36, 0.15)' 
+                    : 'rgba(239, 68, 68, 0.15)',
+                color: stats.gradient_ft_mi < 5 
+                  ? 'var(--success)' 
+                  : stats.gradient_ft_mi < 15 
+                    ? 'var(--warning)' 
+                    : 'var(--danger)',
+                border: `1px solid ${stats.gradient_ft_mi < 5 
+                  ? 'rgba(34, 197, 94, 0.3)' 
+                  : stats.gradient_ft_mi < 15 
+                    ? 'rgba(251, 191, 36, 0.3)' 
+                    : 'rgba(239, 68, 68, 0.3)'}`
+              }}
+            >
               {stats.gradient_ft_mi < 5 ? 'Easy' : stats.gradient_ft_mi < 15 ? 'Moderate' : 'Difficult'}
             </span>
           </div>
-          <div className={styles.conditionTrack}>
-            <div
-              className={styles.conditionFill}
+          <div className={styles.difficultyTrackContainer}>
+            <div className={styles.difficultyTrack}>
+              <div className={styles.difficultySegment} data-level="easy" />
+              <div className={styles.difficultySegment} data-level="moderate" />
+              <div className={styles.difficultySegment} data-level="difficult" />
+            </div>
+            <div 
+              className={styles.difficultyIndicator}
               style={{
-                width: `${Math.min(stats.gradient_ft_mi / 30 * 100, 100)}%`,
-                background: stats.gradient_ft_mi < 5 ? 'var(--success)' : stats.gradient_ft_mi < 15 ? 'var(--warning)' : 'var(--danger)',
+                left: `${Math.min(stats.gradient_ft_mi / 30 * 100, 97)}%`,
+                backgroundColor: stats.gradient_ft_mi < 5 
+                  ? 'var(--success)' 
+                  : stats.gradient_ft_mi < 15 
+                    ? 'var(--warning)' 
+                    : 'var(--danger)',
               }}
             />
           </div>
@@ -211,6 +239,9 @@ export function FloaterSidebar({ route, putIn, takeOut, onClearRoute }: FloaterS
             <span>Easy</span>
             <span>Moderate</span>
             <span>Difficult</span>
+          </div>
+          <div className={styles.gradientValue}>
+            {stats.gradient_ft_mi.toFixed(1)} ft/mi gradient
           </div>
         </div>
       </div>

@@ -264,3 +264,55 @@
   font-style: italic;
   padding-left: 4px;
 }
+
+/* Difficulty Track - Segmented Design */
+.difficultyTrackContainer {
+  position: relative;
+  height: 10px;
+  margin: 4px 0;
+}
+
+.difficultyTrack {
+  display: flex;
+  gap: 3px;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.difficultySegment {
+  flex: 1;
+  border-radius: 2px;
+  transition: opacity 0.2s ease;
+}
+
+.difficultySegment[data-level="easy"] {
+  background: linear-gradient(90deg, rgba(34, 197, 94, 0.2) 0%, rgba(34, 197, 94, 0.35) 100%);
+}
+
+.difficultySegment[data-level="moderate"] {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.35) 100%);
+}
+
+.difficultySegment[data-level="difficult"] {
+  background: linear-gradient(90deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.35) 100%);
+}
+
+.difficultyIndicator {
+  position: absolute;
+  top: 0;
+  width: 4px;
+  height: 10px;
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+  transform: translateX(-50%);
+}
+
+.gradientValue {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+}

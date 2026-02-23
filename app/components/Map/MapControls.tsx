@@ -49,7 +49,7 @@ const WATER_FEATURES: LayerDef[] = [
 const POINTS_OF_INTEREST: LayerDef[] = [
   { key: 'accessPoints', label: 'Access Points', icon: <MapPin size={14} />, iconBg: 'rgba(59,130,246,0.15)' },
   { key: 'campgrounds', label: 'Campgrounds', icon: <Tent size={14} />, iconBg: 'rgba(34,197,94,0.15)' },
-  { key: 'rapids', label: 'Rapids', icon: <Zap size={14} />, iconBg: 'rgba(239,68,68,0.15)' },
+  { key: 'rapids', label: 'Predicted Rapids', icon: <Zap size={14} />, iconBg: 'rgba(239,68,68,0.15)' },
   { key: 'waterfalls', label: 'Waterfalls', icon: <ArrowDownToLine size={14} />, iconBg: 'rgba(103,232,249,0.15)' },
   { key: 'dams', label: 'Dams', icon: <Construction size={14} />, iconBg: 'rgba(217,119,6,0.15)' },
 ];

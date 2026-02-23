@@ -3,7 +3,7 @@ import { addRiversSource, addRiversLayers } from './rivers';
 import { addLakesSource, addLakesLayers } from './lakes';
 import { addAccessPointsSource, addAccessPointsBackdrop } from './accessPoints';
 import { addCampgroundsSource, addCampgroundsBackdrop } from './campgrounds';
-import { addRapidsSource, addRapidsBackdrop } from './rapids';
+import { addRapidsSource, addRapidsCircles } from './rapids';
 import { addWaterfallsSource, addWaterfallsBackdrop } from './waterfalls';
 import { addDamsSource, addDamsBackdrop } from './dams';
 import { addRouteSource, addRouteLayers } from './routeLayer';
@@ -55,7 +55,7 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   // Register custom POI pin icons, then add symbol layers
   await addPoiIcons(map);
   addWaterfallsBackdrop(map);
-  addRapidsBackdrop(map);
+  addRapidsCircles(map);
   addDamsBackdrop(map);
   addCampgroundsBackdrop(map);
   addAccessPointsBackdrop(map);

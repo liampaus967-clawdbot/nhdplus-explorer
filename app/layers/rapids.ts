@@ -1,5 +1,5 @@
 import mapboxgl from 'mapbox-gl';
-import { TILESETS, SOURCE_LAYERS } from '../constants';
+import { TILESETS, SOURCE_LAYERS, COLORS } from '../constants';
 
 export function addRapidsSource(map: mapboxgl.Map) {
   if (map.getSource('rapids')) return;
@@ -9,36 +9,29 @@ export function addRapidsSource(map: mapboxgl.Map) {
   });
 }
 
-export function addRapidsBackdrop(map: mapboxgl.Map) {
-  if (map.getLayer('rapids-backdrop')) return;
+export function addRapidsCircles(map: mapboxgl.Map) {
+  if (map.getLayer('rapids-circles')) return;
   map.addLayer({
-    id: 'rapids-backdrop',
-    type: 'symbol',
+    id: 'rapids-circles',
+    type: 'circle',
     source: 'rapids',
     'source-layer': SOURCE_LAYERS.rapids,
-    minzoom: 8,
-    layout: {
-      'icon-image': 'poi-rapid',
-      'icon-size': [
-        'interpolate', ['linear'], ['zoom'],
-        6, 0.3,
-        10, 0.6,
-        14, 1.5,
-        18, 2,
-      ],
-      'icon-allow-overlap': false,
-      'icon-anchor': 'bottom',
-    },
+    minzoom: 7,
     paint: {
-      'icon-opacity': 1,
+      'circle-radius': [
+        'interpolate', ['linear'], ['zoom'],
+        7, 3,
+        10, 4,
+        14, 6,
+      ],
+      'circle-color': COLORS.rapid,
+      'circle-stroke-color': '#ffffff',
+      'circle-stroke-width': 1,
+      'circle-opacity': 0.9,
     },
   });
 }
 
-export function addRapidsSymbols(_map: mapboxgl.Map) {
-  // Icons handled by backdrop symbol layer
-}
-
 export function addRapidsLayers(map: mapboxgl.Map) {
-  addRapidsBackdrop(map);
+  addRapidsCircles(map);
 }

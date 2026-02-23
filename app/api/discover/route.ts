@@ -81,9 +81,9 @@ export async function GET(request: NextRequest) {
   };
   
   try {
-    // === CAMPGROUNDS (fast index lookup) ===
+    // === CAMPGROUNDS (fast index lookup, dedup by name+location) ===
     const campgroundResult = await query(`
-      SELECT DISTINCT ON (id)
+      SELECT DISTINCT ON (name, ROUND(lat::numeric, 4), ROUND(lon::numeric, 4))
         id,
         name,
         lat as latitude,
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
       FROM water_access.campgrounds
       WHERE nearest_comid = ANY($1::bigint[])
         AND is_duplicate = false
-      ORDER BY id
+      ORDER BY name, ROUND(lat::numeric, 4), ROUND(lon::numeric, 4), id
       LIMIT 10
     `, [comids]);
     
@@ -232,9 +232,9 @@ export async function GET(request: NextRequest) {
     
     result.hazards.count = result.hazards.items.length;
     
-    // === ACCESS POINTS (fast index lookup) ===
+    // === ACCESS POINTS (fast index lookup, dedup by name+location) ===
     const accessResult = await query(`
-      SELECT DISTINCT ON (id)
+      SELECT DISTINCT ON (name, ROUND(lat::numeric, 4), ROUND(lon::numeric, 4))
         id,
         name,
         lat as latitude,
@@ -243,7 +243,7 @@ export async function GET(request: NextRequest) {
       FROM water_access.access_points_clean
       WHERE nearest_comid = ANY($1::bigint[])
         AND is_duplicate = false
-      ORDER BY id
+      ORDER BY name, ROUND(lat::numeric, 4), ROUND(lon::numeric, 4), id
       LIMIT 10
     `, [comids]);
     

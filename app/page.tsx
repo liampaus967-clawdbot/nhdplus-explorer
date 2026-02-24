@@ -661,6 +661,8 @@ export default function Home() {
         canvas.removeEventListener("mousedown", onMouseDown);
         canvas.removeEventListener("mouseup", onMouseUp);
         canvas.removeEventListener("mouseleave", onMouseUp);
+        // Reset cursor when leaving home mode
+        canvas.style.cursor = "";
       };
     } else {
       // Other modes: larger crosshair for selecting points

@@ -907,7 +907,6 @@ export default function Home() {
       <div className={styles.body}>
         <div className={styles.mapWrapper}>
           <div ref={mapContainer} className={styles.map} />
-          <NavigationControls map={map.current} />
           <MapControls
             layers={layerVisibility}
             onLayersChange={handleLayerVisibilityChange}

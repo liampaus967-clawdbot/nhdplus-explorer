@@ -196,8 +196,8 @@
 
 .weatherControl {
   position: absolute;
-  bottom: 32px;
-  left: 16px;
+  top: 16px;
+  right: 16px;
   z-index: 10;
 }
 
@@ -219,7 +219,7 @@
   }
 
   .weatherControl {
-    bottom: 16px;
-    left: 8px;
+    top: 8px;
+    right: 8px;
   }
 }

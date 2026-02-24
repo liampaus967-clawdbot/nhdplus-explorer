@@ -112,6 +112,10 @@ interface WeatherProps {
   onRefresh: () => void;
   isReady?: boolean;
   loadProgress?: number;
+  // Wind particle props
+  windEnabled?: boolean;
+  onWindToggle?: (enabled: boolean) => void;
+  windLoading?: boolean;
 }
 
 interface MapControlsProps {
@@ -406,6 +410,23 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange, 
                       </button>
                     );
                   })}
+
+                  {/* Wind Particles Card */}
+                  {weather.onWindToggle && (
+                    <button
+                      className={`${styles.variableCard} ${weather.windEnabled ? styles.variableCardWind : ''}`}
+                      onClick={() => weather.onWindToggle!(!weather.windEnabled)}
+                    >
+                      <span className={`${styles.variableIcon} ${weather.windEnabled ? styles.variableIconWind : ''}`}>
+                        <Wind size={16} />
+                      </span>
+                      <span className={styles.variableName}>
+                        Wind Particles
+                        {weather.windLoading && <span className={styles.loadingDots}>...</span>}
+                      </span>
+                      <span className={styles.variableUnit}>animated</span>
+                    </button>
+                  )}
                 </div>
               </>
             )}

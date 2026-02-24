@@ -957,6 +957,9 @@ export default function Home() {
               onRefresh: refreshWeather,
               isReady: weatherLayersReady,
               loadProgress: weatherLoadProgress,
+              windEnabled: windEnabled,
+              onWindToggle: setWindEnabled,
+              windLoading: windLoading,
             }}
           />
           {/* Lake Mode Drawing Controls - hidden when route is submitted */}

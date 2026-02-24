@@ -467,6 +467,27 @@
   color: var(--accent);
 }
 
+/* Wind Particles card styling */
+.variableCardWind {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.5);
+}
+
+.variableIconWind {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.loadingDots {
+  opacity: 0.6;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
 .variableName {
   font-size: 12px;
   font-weight: 600;

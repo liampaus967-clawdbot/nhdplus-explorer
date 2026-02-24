@@ -522,9 +522,6 @@ export default function Home() {
       pitch: MAP_CONFIG.pitch,
     });
 
-    map.current.addControl(new mapboxgl.NavigationControl());
-    map.current.addControl(new mapboxgl.FullscreenControl());
-
     const setupLayers = () => {
       if (map.current) {
         addAllLayers(map.current, basemapRef.current);
@@ -907,6 +904,7 @@ export default function Home() {
       <div className={styles.body}>
         <div className={styles.mapWrapper}>
           <div ref={mapContainer} className={styles.map} />
+          <NavigationControls map={map.current} />
           <MapControls
             layers={layerVisibility}
             onLayersChange={handleLayerVisibilityChange}

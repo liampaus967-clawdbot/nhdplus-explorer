@@ -21,6 +21,7 @@ import {
   DrawingControls,
   GaugeStyleControl,
   GaugeStyleMode,
+  WeatherBottomBar,
 } from "./components/Map";
 
 // Layers
@@ -153,7 +154,7 @@ export default function Home() {
     error: weatherError,
     refresh: refreshWeather,
   } = useWeatherMetadata();
-  const [weatherEnabled, setWeatherEnabled] = useState(true);
+  const [weatherEnabled, setWeatherEnabled] = useState(false);
   const [selectedWeatherVariable, setSelectedWeatherVariable] = useState<string | null>(null);
   const [selectedWeatherForecast, setSelectedWeatherForecast] = useState("00");
   const [weatherOpacity, setWeatherOpacityState] = useState(0.7);
@@ -791,12 +792,6 @@ export default function Home() {
     styleVersion,
   ]);
 
-  // Auto-select first weather variable when metadata loads
-  useEffect(() => {
-    if (weatherMetadata && weatherMetadata.variables.length > 0 && !selectedWeatherVariable) {
-      setSelectedWeatherVariable(weatherMetadata.variables[0].id);
-    }
-  }, [weatherMetadata, selectedWeatherVariable]);
 
   // Initialize preloaded weather layers when map and metadata are ready
   useEffect(() => {
@@ -946,7 +941,7 @@ export default function Home() {
               enabled: weatherEnabled,
               onToggle: setWeatherEnabled,
               selectedVariable: selectedWeatherVariable,
-              onVariableChange: setSelectedWeatherVariable,
+              onVariableChange: (id: string) => setSelectedWeatherVariable(id || null),
               selectedForecast: selectedWeatherForecast,
               onForecastChange: setSelectedWeatherForecast,
               opacity: weatherOpacity,
@@ -977,6 +972,20 @@ export default function Home() {
             mode={gaugeStyleMode}
             onModeChange={setGaugeStyleMode}
           />
+          {weatherEnabled && selectedWeatherVariable && weatherMetadata && (
+            <WeatherBottomBar
+              metadata={weatherMetadata}
+              selectedVariable={selectedWeatherVariable}
+              selectedForecast={selectedWeatherForecast}
+              onForecastChange={setSelectedWeatherForecast}
+              opacity={weatherOpacity}
+              onOpacityChange={setWeatherOpacityState}
+              onClose={() => {
+                setSelectedWeatherVariable(null);
+                setWeatherEnabled(false);
+              }}
+            />
+          )}
         </div>
 
         <IconRail mode={personaMode} onModeChange={handleModeChange} />

@@ -44,8 +44,8 @@
 /* ─── Panel ─── */
 .panel {
   position: absolute;
-  top: 88px;
-  left: 0;
+  top: 0;
+  left: 50px;
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -263,8 +263,7 @@
 /* ─── Button Divider ─── */
 .btnDivider {
   width: 24px;
-  height: 1px;
-  background: var(--border);
+  height: 0;
   margin: 2px auto;
 }
 

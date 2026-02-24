@@ -194,6 +194,13 @@
   font-weight: 500;
 }
 
+.weatherControl {
+  position: absolute;
+  bottom: 32px;
+  left: 16px;
+  z-index: 10;
+}
+
 @media (max-width: 900px) {
   .body {
     flex-direction: column;
@@ -209,5 +216,10 @@
     border-left: none;
     border-top: 1px solid var(--border);
     overflow-y: visible;
+  }
+
+  .weatherControl {
+    bottom: 16px;
+    left: 8px;
   }
 }

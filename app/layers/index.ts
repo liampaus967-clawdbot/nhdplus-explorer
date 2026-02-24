@@ -27,6 +27,7 @@ export * from './wilderness';
 export * from './nationalForests';
 export * from './nationalParks';
 export * from './gauges';
+export * from './weather';
 
 /**
  * Add all map sources and layers

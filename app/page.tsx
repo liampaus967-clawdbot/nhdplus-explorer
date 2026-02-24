@@ -8,7 +8,7 @@ import styles from "./page.module.css";
 import { BasemapStyle, PersonaMode, SnapResult } from "./types";
 
 // Hooks
-import { useRoute, useElevationProfile, useLakeRoute } from "./hooks";
+import { useRoute, useElevationProfile, useLakeRoute, useWeatherMetadata } from "./hooks";
 import { useGaugeStatus } from "./hooks/useGaugeStatus";
 
 // Components
@@ -21,6 +21,7 @@ import {
   DrawingControls,
   GaugeStyleControl,
   GaugeStyleMode,
+  WeatherControl,
 } from "./components/Map";
 
 // Layers
@@ -33,6 +34,10 @@ import {
   updateGaugeTrendColors,
   updateGaugeTemperatureColors,
   updateGaugeTempTrendColors,
+  updateWeatherSource,
+  addWeatherLayer,
+  removeWeatherLayer,
+  setWeatherOpacity,
 } from "./layers";
 
 // Constants
@@ -145,6 +150,18 @@ export default function Home() {
     useState<ChopAssessment | null>(null);
   const [lakeWindLoading, setLakeWindLoading] = useState(false);
   const [lakeName, setLakeName] = useState<string | null>(null);
+
+  // Weather layer state
+  const {
+    metadata: weatherMetadata,
+    loading: weatherLoading,
+    error: weatherError,
+    refresh: refreshWeather,
+  } = useWeatherMetadata();
+  const [weatherEnabled, setWeatherEnabled] = useState(false);
+  const [selectedWeatherVariable, setSelectedWeatherVariable] = useState<string | null>(null);
+  const [selectedWeatherForecast, setSelectedWeatherForecast] = useState("00");
+  const [weatherOpacity, setWeatherOpacityState] = useState(0.7);
 
   // Clear lake markers
   const clearLakeMarkers = useCallback(() => {
@@ -763,6 +780,31 @@ export default function Home() {
     styleVersion,
   ]);
 
+  // Auto-select first weather variable when metadata loads
+  useEffect(() => {
+    if (weatherMetadata && weatherMetadata.variables.length > 0 && !selectedWeatherVariable) {
+      setSelectedWeatherVariable(weatherMetadata.variables[0].id);
+    }
+  }, [weatherMetadata, selectedWeatherVariable]);
+
+  // Update weather layer when settings change
+  useEffect(() => {
+    if (!map.current || !weatherMetadata || !selectedWeatherVariable) return;
+
+    if (weatherEnabled) {
+      updateWeatherSource(map.current, weatherMetadata, selectedWeatherVariable, selectedWeatherForecast);
+      addWeatherLayer(map.current, weatherOpacity);
+    } else {
+      removeWeatherLayer(map.current);
+    }
+  }, [weatherEnabled, weatherMetadata, selectedWeatherVariable, selectedWeatherForecast, weatherOpacity, styleVersion]);
+
+  // Update weather opacity
+  useEffect(() => {
+    if (!map.current || !weatherEnabled) return;
+    setWeatherOpacity(map.current, weatherOpacity);
+  }, [weatherOpacity, weatherEnabled]);
+
   // Reapply layer visibility after style changes
   useEffect(() => {
     if (!map.current || styleVersion === 0) return;
@@ -893,6 +935,23 @@ export default function Home() {
             mode={gaugeStyleMode}
             onModeChange={setGaugeStyleMode}
           />
+          {/* Weather Control */}
+          <div className={styles.weatherControl}>
+            <WeatherControl
+              metadata={weatherMetadata}
+              loading={weatherLoading}
+              error={weatherError}
+              enabled={weatherEnabled}
+              onToggle={setWeatherEnabled}
+              selectedVariable={selectedWeatherVariable}
+              onVariableChange={setSelectedWeatherVariable}
+              selectedForecast={selectedWeatherForecast}
+              onForecastChange={setSelectedWeatherForecast}
+              opacity={weatherOpacity}
+              onOpacityChange={setWeatherOpacityState}
+              onRefresh={refreshWeather}
+            />
+          </div>
         </div>
 
         <IconRail mode={personaMode} onModeChange={handleModeChange} />

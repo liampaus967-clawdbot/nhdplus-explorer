@@ -100,16 +100,27 @@
 .panelContent {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 14px 14px 16px;
-  max-height: 420px;
+  gap: 10px;
+  padding: 12px;
+  max-height: 600px;
   overflow-y: auto;
 }
 
 .section {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
 
 .sectionLabel {
@@ -126,9 +137,8 @@
   align-items: center;
   justify-content: space-between;
   height: 34px;
-  padding: 0 10px;
-  background: var(--bg);
-  border-radius: 8px;
+  padding: 0 8px;
+  border-radius: 6px;
   cursor: pointer;
   transition: background 0.1s;
 }

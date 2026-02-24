@@ -155,15 +155,26 @@ function LayerRow({ def, checked, onChange }: { def: LayerDef; checked: boolean;
 
 /* ─── Section ─── */
 
-function Section({ title, layers, visibility, onToggle }: {
+function Section({ title, layers, visibility, onToggle, onBatchToggle }: {
   title: string;
   layers: LayerDef[];
   visibility: LayerVisibility;
   onToggle: (key: keyof LayerVisibility, value: boolean) => void;
+  onBatchToggle: (updates: Partial<LayerVisibility>) => void;
 }) {
+  const allOn = layers.every((l) => visibility[l.key]);
+  const toggleAll = (value: boolean) => {
+    const updates: Partial<LayerVisibility> = {};
+    layers.forEach((l) => { updates[l.key] = value; });
+    onBatchToggle(updates);
+  };
+
   return (
     <div className={styles.section}>
-      <span className={styles.sectionLabel}>{title}</span>
+      <div className={styles.sectionHeader}>
+        <span className={styles.sectionLabel}>{title}</span>
+        <ToggleSwitch checked={allOn} onChange={toggleAll} />
+      </div>
       {layers.map((l) => (
         <LayerRow
           key={l.key}
@@ -189,6 +200,10 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange, 
 
   const updateLayer = (key: keyof LayerVisibility, value: boolean) => {
     onLayersChange({ ...layers, [key]: value });
+  };
+
+  const batchUpdateLayers = (updates: Partial<LayerVisibility>) => {
+    onLayersChange({ ...layers, ...updates });
   };
 
   // Resolve weather variables from metadata, falling back to static defs
@@ -260,7 +275,7 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange, 
 
       {/* Layer Panel */}
       {openPanel === 'layers' && (
-        <div className={styles.panel} style={{ width: 280 }}>
+        <div className={styles.panel} style={{ width: 320 }}>
           <div className={styles.panelHeader}>
             <span className={styles.panelTitle}>Map Layers</span>
             <button className={styles.closeBtn} onClick={() => setOpenPanel(null)}>
@@ -268,10 +283,10 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange, 
             </button>
           </div>
           <div className={styles.panelContent}>
-            <Section title="PUBLIC LANDS" layers={PUBLIC_LANDS} visibility={layers} onToggle={updateLayer} />
-            <Section title="WATER FEATURES" layers={WATER_FEATURES} visibility={layers} onToggle={updateLayer} />
-            <Section title="WATER MONITORING" layers={WATER_MONITORING} visibility={layers} onToggle={updateLayer} />
-            <Section title="POINTS OF INTEREST" layers={POINTS_OF_INTEREST} visibility={layers} onToggle={updateLayer} />
+            <Section title="PUBLIC LANDS" layers={PUBLIC_LANDS} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
+            <Section title="WATER FEATURES" layers={WATER_FEATURES} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
+            <Section title="WATER MONITORING" layers={WATER_MONITORING} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
+            <Section title="POINTS OF INTEREST" layers={POINTS_OF_INTEREST} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
           </div>
         </div>
       )}

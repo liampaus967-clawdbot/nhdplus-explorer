@@ -17,6 +17,7 @@ interface WeatherControlProps {
   opacity: number;
   onOpacityChange: (opacity: number) => void;
   onRefresh: () => void;
+  theme?: "light" | "dark";
 }
 
 export function WeatherControl({
@@ -32,8 +33,10 @@ export function WeatherControl({
   opacity,
   onOpacityChange,
   onRefresh,
+  theme = "dark",
 }: WeatherControlProps) {
   const [expanded, setExpanded] = useState(false);
+  const isLight = theme === "light";
 
   // Get selected variable details
   const variable = useMemo(() => {
@@ -62,6 +65,41 @@ export function WeatherControl({
       .join(", ");
     return `linear-gradient(to right, ${stops})`;
   }, [variable]);
+
+  // Theme-based colors
+  const colors = isLight
+    ? {
+        bg: "rgba(255, 255, 255, 0.95)",
+        bgHover: "rgba(0, 0, 0, 0.05)",
+        bgSecondary: "rgba(0, 0, 0, 0.05)",
+        text: "#1f2937",
+        textMuted: "rgba(0, 0, 0, 0.6)",
+        textDim: "rgba(0, 0, 0, 0.5)",
+        border: "rgba(0, 0, 0, 0.1)",
+        toggleInactive: "rgba(0, 0, 0, 0.1)",
+        toggleInactiveText: "rgba(0, 0, 0, 0.6)",
+        sliderBg: "rgba(0, 0, 0, 0.1)",
+        selectedBg: "rgba(59, 130, 246, 0.15)",
+        selectedBorder: "rgba(59, 130, 246, 0.4)",
+        selectedText: "#2563eb",
+        accent: "#2563eb",
+      }
+    : {
+        bg: "rgba(30, 30, 40, 0.95)",
+        bgHover: "rgba(255, 255, 255, 0.05)",
+        bgSecondary: "rgba(255, 255, 255, 0.05)",
+        text: "#fff",
+        textMuted: "rgba(255, 255, 255, 0.6)",
+        textDim: "rgba(255, 255, 255, 0.5)",
+        border: "rgba(255, 255, 255, 0.1)",
+        toggleInactive: "rgba(255, 255, 255, 0.1)",
+        toggleInactiveText: "rgba(255, 255, 255, 0.6)",
+        sliderBg: "rgba(255, 255, 255, 0.1)",
+        selectedBg: "rgba(59, 130, 246, 0.2)",
+        selectedBorder: "rgba(59, 130, 246, 0.5)",
+        selectedText: "#60a5fa",
+        accent: "#60a5fa",
+      };
 
   return (
     <div className="weather-control">
@@ -182,11 +220,12 @@ export function WeatherControl({
 
       <style jsx>{`
         .weather-control {
-          background: rgba(30, 30, 40, 0.95);
+          background: ${colors.bg};
           border-radius: 8px;
           overflow: hidden;
           min-width: 200px;
           font-size: 13px;
+          box-shadow: ${isLight ? "0 2px 8px rgba(0,0,0,0.15)" : "0 2px 8px rgba(0,0,0,0.3)"};
         }
 
         .weather-header {
@@ -199,7 +238,7 @@ export function WeatherControl({
         }
 
         .weather-header:hover {
-          background: rgba(255, 255, 255, 0.05);
+          background: ${colors.bgHover};
         }
 
         .weather-title {
@@ -207,13 +246,14 @@ export function WeatherControl({
           align-items: center;
           gap: 8px;
           font-weight: 500;
-          color: #fff;
+          color: ${colors.text};
         }
 
         .weather-actions {
           display: flex;
           align-items: center;
           gap: 8px;
+          color: ${colors.textMuted};
         }
 
         .toggle-btn {
@@ -223,8 +263,8 @@ export function WeatherControl({
           font-weight: 600;
           border: none;
           cursor: pointer;
-          background: rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.6);
+          background: ${colors.toggleInactive};
+          color: ${colors.toggleInactiveText};
           transition: all 0.15s;
         }
 
@@ -244,7 +284,7 @@ export function WeatherControl({
         .weather-error {
           padding: 10px;
           text-align: center;
-          color: rgba(255, 255, 255, 0.6);
+          color: ${colors.textMuted};
           font-size: 12px;
         }
 
@@ -253,11 +293,11 @@ export function WeatherControl({
           align-items: center;
           justify-content: center;
           gap: 8px;
-          color: #f87171;
+          color: #ef4444;
         }
 
         .refresh-btn {
-          background: rgba(255, 255, 255, 0.1);
+          background: ${colors.bgSecondary};
           border: none;
           border-radius: 4px;
           padding: 4px;
@@ -271,13 +311,14 @@ export function WeatherControl({
           justify-content: space-between;
           align-items: center;
           padding: 6px 10px;
-          background: rgba(255, 255, 255, 0.05);
+          background: ${colors.bgSecondary};
           border-radius: 6px;
         }
 
         .model-label {
-          color: rgba(255, 255, 255, 0.8);
+          color: ${colors.text};
           font-size: 12px;
+          opacity: 0.8;
         }
 
         .freshness {
@@ -288,17 +329,17 @@ export function WeatherControl({
 
         .freshness.fresh {
           background: rgba(16, 185, 129, 0.2);
-          color: #10b981;
+          color: ${isLight ? "#059669" : "#10b981"};
         }
 
         .freshness.stale {
           background: rgba(245, 158, 11, 0.2);
-          color: #f59e0b;
+          color: ${isLight ? "#d97706" : "#f59e0b"};
         }
 
         .freshness.old {
           background: rgba(239, 68, 68, 0.2);
-          color: #ef4444;
+          color: ${isLight ? "#dc2626" : "#ef4444"};
         }
 
         .variable-selector {
@@ -312,23 +353,23 @@ export function WeatherControl({
           align-items: center;
           gap: 8px;
           padding: 8px 10px;
-          background: rgba(255, 255, 255, 0.05);
+          background: ${colors.bgSecondary};
           border: 1px solid transparent;
           border-radius: 6px;
-          color: rgba(255, 255, 255, 0.7);
+          color: ${colors.textMuted};
           cursor: pointer;
           transition: all 0.15s;
           text-align: left;
         }
 
         .variable-btn:hover {
-          background: rgba(255, 255, 255, 0.1);
+          background: ${isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.1)"};
         }
 
         .variable-btn.selected {
-          background: rgba(59, 130, 246, 0.2);
-          border-color: rgba(59, 130, 246, 0.5);
-          color: #60a5fa;
+          background: ${colors.selectedBg};
+          border-color: ${colors.selectedBorder};
+          color: ${colors.selectedText};
         }
 
         .forecast-slider,
@@ -342,19 +383,19 @@ export function WeatherControl({
           justify-content: space-between;
           margin-bottom: 6px;
           font-size: 12px;
-          color: rgba(255, 255, 255, 0.6);
+          color: ${colors.textMuted};
         }
 
         .forecast-value,
         .opacity-value {
-          color: #60a5fa;
+          color: ${colors.accent};
           font-weight: 500;
         }
 
         input[type="range"] {
           width: 100%;
           -webkit-appearance: none;
-          background: rgba(255, 255, 255, 0.1);
+          background: ${colors.sliderBg};
           height: 4px;
           border-radius: 2px;
           cursor: pointer;
@@ -364,7 +405,7 @@ export function WeatherControl({
           -webkit-appearance: none;
           width: 14px;
           height: 14px;
-          background: #60a5fa;
+          background: ${colors.accent};
           border-radius: 50%;
           cursor: pointer;
         }
@@ -375,7 +416,7 @@ export function WeatherControl({
 
         .legend-title {
           font-size: 11px;
-          color: rgba(255, 255, 255, 0.5);
+          color: ${colors.textDim};
           margin-bottom: 6px;
         }
 
@@ -389,7 +430,7 @@ export function WeatherControl({
           display: flex;
           justify-content: space-between;
           font-size: 10px;
-          color: rgba(255, 255, 255, 0.5);
+          color: ${colors.textDim};
         }
       `}</style>
     </div>

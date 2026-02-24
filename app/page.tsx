@@ -947,6 +947,7 @@ export default function Home() {
               opacity={weatherOpacity}
               onOpacityChange={setWeatherOpacityState}
               onRefresh={refreshWeather}
+              theme={theme}
             />
           </div>
         </div>

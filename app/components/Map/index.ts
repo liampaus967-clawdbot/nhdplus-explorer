@@ -5,5 +5,6 @@ export { DrawingControls } from './DrawingControls';
 export { GaugeStyleControl } from './GaugeStyleControl';
 export { WeatherControl } from './WeatherControl';
 export { WeatherBottomBar } from './WeatherBottomBar';
+export { DeckWindParticleLayer } from './DeckWindParticleLayer';
 export type { LayerVisibility } from './MapControls';
 export type { GaugeStyleMode } from './GaugeStyleControl';

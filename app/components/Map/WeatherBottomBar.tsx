@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { X } from 'lucide-react';
+import { X, Wind } from 'lucide-react';
 import { WeatherMetadata, WeatherVariable } from '../../hooks/useWeatherMetadata';
 import styles from './WeatherBottomBar.module.css';
 
@@ -13,6 +13,9 @@ interface WeatherBottomBarProps {
   opacity: number;
   onOpacityChange: (opacity: number) => void;
   onClose: () => void;
+  windEnabled?: boolean;
+  onWindToggle?: (enabled: boolean) => void;
+  windLoading?: boolean;
 }
 
 export function WeatherBottomBar({
@@ -23,6 +26,9 @@ export function WeatherBottomBar({
   opacity,
   onOpacityChange,
   onClose,
+  windEnabled = false,
+  onWindToggle,
+  windLoading = false,
 }: WeatherBottomBarProps) {
   const variable = useMemo(
     () => metadata.variables.find((v) => v.id === selectedVariable),
@@ -91,6 +97,18 @@ export function WeatherBottomBar({
           />
         </div>
       </div>
+
+      {/* Wind Particles Toggle */}
+      {onWindToggle && (
+        <button
+          className={`${styles.windBtn} ${windEnabled ? styles.windActive : ''}`}
+          onClick={() => onWindToggle(!windEnabled)}
+          title="Toggle animated wind particles"
+        >
+          <Wind size={14} />
+          <span>Wind{windLoading ? '...' : ''}</span>
+        </button>
+      )}
     </div>
   );
 }

@@ -5,3 +5,4 @@ export { useMapInstance } from './useMapInstance';
 export { useApiError } from './useApiError';
 export { useWeatherMetadata } from './useWeatherMetadata';
 export { usePreloadedWeatherLayers } from './usePreloadedWeatherLayers';
+export { useWindData } from './useWindData';

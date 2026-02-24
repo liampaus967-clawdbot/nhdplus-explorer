@@ -8,7 +8,7 @@ import styles from "./page.module.css";
 import { BasemapStyle, PersonaMode, SnapResult } from "./types";
 
 // Hooks
-import { useRoute, useElevationProfile, useLakeRoute, useWeatherMetadata, usePreloadedWeatherLayers } from "./hooks";
+import { useRoute, useElevationProfile, useLakeRoute, useWeatherMetadata, usePreloadedWeatherLayers, useWindData } from "./hooks";
 import { useGaugeStatus } from "./hooks/useGaugeStatus";
 
 // Components
@@ -22,6 +22,7 @@ import {
   GaugeStyleControl,
   GaugeStyleMode,
   WeatherBottomBar,
+  DeckWindParticleLayer,
 } from "./components/Map";
 
 // Layers
@@ -158,6 +159,13 @@ export default function Home() {
   const [selectedWeatherVariable, setSelectedWeatherVariable] = useState<string | null>(null);
   const [selectedWeatherForecast, setSelectedWeatherForecast] = useState("00");
   const [weatherOpacity, setWeatherOpacityState] = useState(0.7);
+
+  // Wind particle state
+  const [windEnabled, setWindEnabled] = useState(false);
+  const { windData, loading: windLoading } = useWindData({
+    forecastHour: selectedWeatherForecast,
+    enabled: windEnabled,
+  });
 
   // Preloaded weather layers for instant forecast switching
   const {
@@ -983,9 +991,20 @@ export default function Home() {
               onClose={() => {
                 setSelectedWeatherVariable(null);
                 setWeatherEnabled(false);
+                setWindEnabled(false);
               }}
+              windEnabled={windEnabled}
+              onWindToggle={setWindEnabled}
+              windLoading={windLoading}
             />
           )}
+          {/* Wind Particle Layer */}
+          <DeckWindParticleLayer
+            map={map.current}
+            windData={windData}
+            enabled={windEnabled}
+            opacity={weatherOpacity}
+          />
         </div>
 
         <IconRail mode={personaMode} onModeChange={handleModeChange} />

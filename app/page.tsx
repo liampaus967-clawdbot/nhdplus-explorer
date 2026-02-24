@@ -21,7 +21,6 @@ import {
   DrawingControls,
   GaugeStyleControl,
   GaugeStyleMode,
-  WeatherControl,
 } from "./components/Map";
 
 // Layers
@@ -154,7 +153,7 @@ export default function Home() {
     error: weatherError,
     refresh: refreshWeather,
   } = useWeatherMetadata();
-  const [weatherEnabled, setWeatherEnabled] = useState(false);
+  const [weatherEnabled, setWeatherEnabled] = useState(true);
   const [selectedWeatherVariable, setSelectedWeatherVariable] = useState<string | null>(null);
   const [selectedWeatherForecast, setSelectedWeatherForecast] = useState("00");
   const [weatherOpacity, setWeatherOpacityState] = useState(0.7);
@@ -940,6 +939,22 @@ export default function Home() {
             onLayersChange={handleLayerVisibilityChange}
             basemap={basemap}
             onBasemapChange={handleBasemapChange}
+            weather={{
+              metadata: weatherMetadata,
+              loading: weatherLoading,
+              error: weatherError,
+              enabled: weatherEnabled,
+              onToggle: setWeatherEnabled,
+              selectedVariable: selectedWeatherVariable,
+              onVariableChange: setSelectedWeatherVariable,
+              selectedForecast: selectedWeatherForecast,
+              onForecastChange: setSelectedWeatherForecast,
+              opacity: weatherOpacity,
+              onOpacityChange: setWeatherOpacityState,
+              onRefresh: refreshWeather,
+              isReady: weatherLayersReady,
+              loadProgress: weatherLoadProgress,
+            }}
           />
           {/* Lake Mode Drawing Controls - hidden when route is submitted */}
           <DrawingControls
@@ -962,26 +977,6 @@ export default function Home() {
             mode={gaugeStyleMode}
             onModeChange={setGaugeStyleMode}
           />
-          {/* Weather Control */}
-          <div className={styles.weatherControl}>
-            <WeatherControl
-              metadata={weatherMetadata}
-              loading={weatherLoading}
-              error={weatherError}
-              enabled={weatherEnabled}
-              onToggle={setWeatherEnabled}
-              selectedVariable={selectedWeatherVariable}
-              onVariableChange={setSelectedWeatherVariable}
-              selectedForecast={selectedWeatherForecast}
-              onForecastChange={setSelectedWeatherForecast}
-              opacity={weatherOpacity}
-              onOpacityChange={setWeatherOpacityState}
-              onRefresh={refreshWeather}
-              isReady={weatherLayersReady}
-              loadProgress={weatherLoadProgress}
-              theme={theme}
-            />
-          </div>
         </div>
 
         <IconRail mode={personaMode} onModeChange={handleModeChange} />

@@ -260,20 +260,322 @@
   align-items: center;
 }
 
+/* ─── Button Divider ─── */
+.btnDivider {
+  width: 24px;
+  height: 1px;
+  background: var(--border);
+  margin: 2px auto;
+}
+
+.iconBtnLive {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(16, 185, 129, 0.3);
+}
+
+/* ─── Weather Panel ─── */
+.weatherTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weatherTitleIcon {
+  color: var(--accent);
+}
+
+.weatherTabs {
+  display: flex;
+  padding: 0 14px;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.weatherTab {
+  padding: 10px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  font-family: Inter, sans-serif;
+  transition: color 0.15s;
+}
+
+.weatherTab:hover {
+  color: var(--text);
+}
+
+.weatherTabActive {
+  color: var(--accent);
+}
+
+.weatherTabActive::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px 2px 0 0;
+}
+
+.weatherContent {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.weatherLoading,
+.weatherError {
+  padding: 16px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.weatherError {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #ef4444;
+}
+
+.weatherRefreshBtn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px;
+  cursor: pointer;
+  color: inherit;
+  display: flex;
+}
+
+/* ─── Model Badge ─── */
+.modelBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--bg);
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  font-family: Inter, sans-serif;
+}
+
+.modelDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  flex-shrink: 0;
+}
+
+.modelAge {
+  color: #10b981;
+  font-weight: 600;
+}
+
+/* ─── Weather Progress ─── */
+.weatherProgress {
+  padding: 8px 10px;
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+.weatherProgressText {
+  font-size: 11px;
+  color: var(--accent);
+  margin-bottom: 6px;
+  font-family: Inter, sans-serif;
+}
+
+.weatherProgressBar {
+  height: 3px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.weatherProgressFill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.2s ease-out;
+}
+
+/* ─── Variable Grid ─── */
+.variableGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.variableCard {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  font-family: Inter, sans-serif;
+}
+
+.variableCard:hover {
+  border-color: var(--accent);
+}
+
+.variableCardSelected {
+  background: rgba(96, 165, 250, 0.1);
+  border-color: var(--accent);
+}
+
+.variableIcon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-tertiary);
+  border-radius: 7px;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+}
+
+.variableIconSelected {
+  background: rgba(96, 165, 250, 0.2);
+  color: var(--accent);
+}
+
+.variableName {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.variableUnit {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* ─── Forecast / Opacity Sliders ─── */
+.forecastSection {
+  padding: 4px 0;
+}
+
+.forecastHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: Inter, sans-serif;
+}
+
+.forecastValue {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.rangeSlider {
+  width: 100%;
+  -webkit-appearance: none;
+  background: var(--bg-tertiary);
+  height: 4px;
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+}
+
+.rangeSlider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid var(--bg-secondary);
+}
+
+/* ─── Settings ─── */
+.weatherSettings {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settingsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background: var(--bg);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text);
+  font-family: Inter, sans-serif;
+}
+
+/* ─── Color Legend ─── */
+.weatherLegend {
+  padding: 12px 14px;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+}
+
+.legendTitle {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  font-family: Inter, sans-serif;
+}
+
+.legendBar {
+  height: 10px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+.legendLabels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-dim);
+  font-family: Inter, sans-serif;
+}
+
 /* ─── Scrollbar ─── */
-.panelContent::-webkit-scrollbar {
+.panelContent::-webkit-scrollbar,
+.weatherContent::-webkit-scrollbar {
   width: 6px;
 }
 
-.panelContent::-webkit-scrollbar-track {
+.panelContent::-webkit-scrollbar-track,
+.weatherContent::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.panelContent::-webkit-scrollbar-thumb {
+.panelContent::-webkit-scrollbar-thumb,
+.weatherContent::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 3px;
 }
 
-.panelContent::-webkit-scrollbar-thumb:hover {
+.panelContent::-webkit-scrollbar-thumb:hover,
+.weatherContent::-webkit-scrollbar-thumb:hover {
   background: var(--text-dim);
 }

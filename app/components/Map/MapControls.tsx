@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import {
-  Layers, Map, X, Check,
+  Layers, Map, X, Check, Cloud, Thermometer, Wind, CloudRain, Snowflake, Flame, RefreshCw,
   LandPlot, TreePine, Waves, Droplets, Sparkles,
   MapPin, Tent, Zap, ArrowDownToLine, Gauge, Construction,
-  Trees, Mountain, Satellite, Moon,
+  Trees, Mountain, Satellite, Moon, CloudSun,
 } from 'lucide-react';
 import { BasemapStyle } from '../../types';
+import { WeatherMetadata, WeatherVariable } from '../../hooks/useWeatherMetadata';
 import styles from './MapControls.module.css';
 
 /* ─── Layer Visibility ─── */
@@ -76,13 +77,49 @@ const BASEMAPS: BasemapDef[] = [
   { key: 'dark', label: 'Dark', icon: <Moon size={16} /> },
 ];
 
+/* ─── Weather variable card defs ─── */
+
+interface WeatherVarDef {
+  id: string;
+  icon: React.ReactNode;
+  label: string;
+  unit: string;
+}
+
+const WEATHER_VARS: WeatherVarDef[] = [
+  { id: 'temperature_2m', icon: <Thermometer size={16} />, label: 'Temperature', unit: '°C' },
+  { id: 'wind_gust', icon: <Wind size={16} />, label: 'Wind Gust', unit: 'mph' },
+  { id: 'cloud_cover', icon: <Cloud size={16} />, label: 'Cloud Cover', unit: '%' },
+  { id: 'precipitation', icon: <CloudRain size={16} />, label: 'Precipitation', unit: 'in' },
+  { id: 'snow', icon: <Snowflake size={16} />, label: 'Snow', unit: 'in' },
+  { id: 'smoke', icon: <Flame size={16} />, label: 'Smoke', unit: 'μg/m³' },
+];
+
 /* ─── Props ─── */
+
+interface WeatherProps {
+  metadata: WeatherMetadata | null;
+  loading: boolean;
+  error: Error | null;
+  enabled: boolean;
+  onToggle: (enabled: boolean) => void;
+  selectedVariable: string | null;
+  onVariableChange: (variableId: string) => void;
+  selectedForecast: string;
+  onForecastChange: (forecast: string) => void;
+  opacity: number;
+  onOpacityChange: (opacity: number) => void;
+  onRefresh: () => void;
+  isReady?: boolean;
+  loadProgress?: number;
+}
 
 interface MapControlsProps {
   layers: LayerVisibility;
   onLayersChange: (layers: LayerVisibility) => void;
   basemap: BasemapStyle;
   onBasemapChange: (basemap: BasemapStyle) => void;
+  weather?: WeatherProps;
 }
 
 /* ─── Toggle Switch ─── */
@@ -141,10 +178,12 @@ function Section({ title, layers, visibility, onToggle }: {
 
 /* ─── Main Component ─── */
 
-type OpenPanel = 'layers' | 'basemap' | null;
+type OpenPanel = 'layers' | 'basemap' | 'weather' | null;
+type WeatherTab = 'layers' | 'forecast';
 
-export function MapControls({ layers, onLayersChange, basemap, onBasemapChange }: MapControlsProps) {
+export function MapControls({ layers, onLayersChange, basemap, onBasemapChange, weather }: MapControlsProps) {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
+  const [weatherTab, setWeatherTab] = useState<WeatherTab>('layers');
   const containerRef = useRef<HTMLDivElement>(null);
 
   const togglePanel = (panel: OpenPanel) => {
@@ -154,6 +193,47 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange }
   const updateLayer = (key: keyof LayerVisibility, value: boolean) => {
     onLayersChange({ ...layers, [key]: value });
   };
+
+  // Resolve weather variables from metadata, falling back to static defs
+  const weatherVars = useMemo(() => {
+    if (!weather?.metadata) return WEATHER_VARS;
+    return weather.metadata.variables.map((v) => {
+      const staticDef = WEATHER_VARS.find((w) => w.id === v.id);
+      return {
+        id: v.id,
+        icon: staticDef?.icon ?? <Thermometer size={16} />,
+        label: v.name,
+        unit: v.units,
+      };
+    });
+  }, [weather?.metadata]);
+
+  // Format age text from metadata
+  const ageText = useMemo(() => {
+    if (!weather?.metadata?.data_freshness) return '';
+    const minutes = weather.metadata.data_freshness.age_minutes;
+    if (minutes < 60) return `${minutes}m ago`;
+    if (minutes < 1440) return `${Math.floor(minutes / 60)}h ago`;
+    return `${Math.floor(minutes / 1440)}d ago`;
+  }, [weather?.metadata]);
+
+  // Build gradient for legend
+  const selectedVar = useMemo(() => {
+    if (!weather?.metadata || !weather.selectedVariable) return null;
+    return weather.metadata.variables.find((v) => v.id === weather.selectedVariable) || null;
+  }, [weather?.metadata, weather?.selectedVariable]);
+
+  const gradient = useMemo(() => {
+    const colorStops = selectedVar?.color_stops || [];
+    if (colorStops.length < 2) return 'linear-gradient(to right, #333, #666)';
+    const stops = colorStops
+      .map((stop, i) => {
+        const percent = (i / (colorStops.length - 1)) * 100;
+        return `${stop.color} ${percent}%`;
+      })
+      .join(', ');
+    return `linear-gradient(to right, ${stops})`;
+  }, [selectedVar]);
 
   // Close on click outside
   useEffect(() => {
@@ -187,6 +267,19 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange }
         >
           <Map size={20} />
         </button>
+
+        {weather && (
+          <>
+            <div className={styles.btnDivider} />
+            <button
+              className={`${styles.iconBtn} ${openPanel === 'weather' ? styles.iconBtnActive : ''} ${weather.enabled ? styles.iconBtnLive : ''}`}
+              onClick={() => togglePanel('weather')}
+              title="Weather"
+            >
+              <CloudSun size={20} />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Layer Panel */}
@@ -240,6 +333,150 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange }
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* Weather Panel (Option A) */}
+      {openPanel === 'weather' && weather && (
+        <div className={styles.panel} style={{ width: 320 }}>
+          {/* Header */}
+          <div className={styles.panelHeader}>
+            <div className={styles.weatherTitle}>
+              <Cloud size={18} className={styles.weatherTitleIcon} />
+              <span className={styles.panelTitle}>Weather</span>
+            </div>
+            <button className={styles.closeBtn} onClick={() => setOpenPanel(null)}>
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Tabs */}
+          <div className={styles.weatherTabs}>
+            {(['layers', 'forecast'] as WeatherTab[]).map((tab) => (
+              <button
+                key={tab}
+                className={`${styles.weatherTab} ${weatherTab === tab ? styles.weatherTabActive : ''}`}
+                onClick={() => setWeatherTab(tab)}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className={styles.weatherContent}>
+            {weather.loading && !weather.metadata && (
+              <div className={styles.weatherLoading}>Loading weather data...</div>
+            )}
+
+            {weather.error && !weather.metadata && (
+              <div className={styles.weatherError}>
+                <span>Error loading weather</span>
+                <button className={styles.weatherRefreshBtn} onClick={weather.onRefresh}>
+                  <RefreshCw size={14} />
+                </button>
+              </div>
+            )}
+
+            {weather.metadata && weatherTab === 'layers' && (
+              <>
+                {/* Model badge */}
+                <div className={styles.modelBadge}>
+                  <span className={styles.modelDot} />
+                  <span>HRRR {weather.metadata.model_run?.cycle_formatted || '...'}</span>
+                  <span className={styles.modelAge}>{ageText}</span>
+                </div>
+
+                {/* Loading progress */}
+                {weather.enabled && !weather.isReady && (weather.loadProgress ?? 100) < 100 && (
+                  <div className={styles.weatherProgress}>
+                    <div className={styles.weatherProgressText}>
+                      Loading forecasts... {weather.loadProgress}%
+                    </div>
+                    <div className={styles.weatherProgressBar}>
+                      <div
+                        className={styles.weatherProgressFill}
+                        style={{ width: `${weather.loadProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Variable grid */}
+                <div className={styles.variableGrid}>
+                  {weatherVars.map((v) => {
+                    const isSelected = weather.selectedVariable === v.id;
+                    return (
+                      <button
+                        key={v.id}
+                        className={`${styles.variableCard} ${isSelected ? styles.variableCardSelected : ''}`}
+                        onClick={() => weather.onVariableChange(v.id)}
+                      >
+                        <span className={`${styles.variableIcon} ${isSelected ? styles.variableIconSelected : ''}`}>
+                          {v.icon}
+                        </span>
+                        <span className={styles.variableName}>{v.label}</span>
+                        <span className={styles.variableUnit}>{v.unit}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {weather.metadata && weatherTab === 'forecast' && (
+              <>
+                {/* Forecast hour selector */}
+                {weather.metadata.forecast_hours.length > 1 && (
+                  <div className={styles.forecastSection}>
+                    <div className={styles.forecastHeader}>
+                      <span>Forecast Hour</span>
+                      <span className={styles.forecastValue}>+{weather.selectedForecast}h</span>
+                    </div>
+                    <input
+                      type="range"
+                      className={styles.rangeSlider}
+                      min="0"
+                      max={weather.metadata.forecast_hours.length - 1}
+                      value={weather.metadata.forecast_hours.indexOf(weather.selectedForecast)}
+                      onChange={(e) =>
+                        weather.onForecastChange(weather.metadata!.forecast_hours[parseInt(e.target.value)])
+                      }
+                    />
+                  </div>
+                )}
+
+                {/* Opacity slider */}
+                <div className={styles.forecastSection}>
+                  <div className={styles.forecastHeader}>
+                    <span>Opacity</span>
+                    <span className={styles.forecastValue}>{Math.round(weather.opacity * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    className={styles.rangeSlider}
+                    min="0"
+                    max="100"
+                    value={weather.opacity * 100}
+                    onChange={(e) => weather.onOpacityChange(parseInt(e.target.value) / 100)}
+                  />
+                </div>
+              </>
+            )}
+
+          </div>
+
+          {/* Color Legend */}
+          {weather.enabled && selectedVar && selectedVar.color_stops && (
+            <div className={styles.weatherLegend}>
+              <div className={styles.legendTitle}>{selectedVar.name}</div>
+              <div className={styles.legendBar} style={{ background: gradient }} />
+              <div className={styles.legendLabels}>
+                <span>{selectedVar.color_stops[0].value}{selectedVar.units}</span>
+                <span>{selectedVar.color_stops[selectedVar.color_stops.length - 1].value}{selectedVar.units}</span>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

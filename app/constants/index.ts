@@ -49,6 +49,7 @@ export const TILESETS = {
   blmLands: 'mapbox://lman967.blm_polygons',
   wilderness: 'mapbox://lman967.wilderness_areas',
   nationalForests: 'mapbox://lman967.national_forests',
+  nationalParks: 'mapbox://lman967.national_parks',
   gauges: 'mapbox://lman967.usgs_gauges',
 };
 
@@ -69,6 +70,7 @@ export const SOURCE_LAYERS = {
   blmLands: 'blm_polygons',
   wilderness: 'wilderness_areas',
   nationalForests: 'national_forests',
+  nationalParks: 'national_parks',
   gauges: 'usgs_gauges',
 };
 
@@ -91,6 +93,7 @@ export const COLORS = {
   blmLands: '#c9a227', // Yellow/tan for BLM lands
   wilderness: '#1a5d1a', // Deep green for wilderness areas
   nationalForests: '#228b22', // Forest green for USFS lands
+  nationalParks: '#8b4513', // Saddle brown for NPS lands
   gauge: '#f59e0b', // Amber/orange for gauges - visible against blue rivers
   gaugeVeryLow: '#dc2626', // Red - very low flow
   gaugeLow: '#f97316', // Orange - low flow

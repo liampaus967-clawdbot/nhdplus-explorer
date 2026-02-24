@@ -18,6 +18,8 @@ interface WeatherControlProps {
   onOpacityChange: (opacity: number) => void;
   onRefresh: () => void;
   theme?: "light" | "dark";
+  isReady?: boolean;
+  loadProgress?: number;
 }
 
 export function WeatherControl({
@@ -34,6 +36,8 @@ export function WeatherControl({
   onOpacityChange,
   onRefresh,
   theme = "dark",
+  isReady = true,
+  loadProgress = 100,
 }: WeatherControlProps) {
   const [expanded, setExpanded] = useState(false);
   const isLight = theme === "light";
@@ -141,6 +145,16 @@ export function WeatherControl({
 
           {metadata && (
             <>
+              {/* Loading progress bar */}
+              {enabled && !isReady && loadProgress < 100 && (
+                <div className="loading-progress">
+                  <div className="loading-text">Loading forecasts... {loadProgress}%</div>
+                  <div className="progress-bar">
+                    <div className="progress-fill" style={{ width: `${loadProgress}%` }} />
+                  </div>
+                </div>
+              )}
+
               {/* Model info */}
               <div className="weather-info">
                 <span className="model-label">
@@ -294,6 +308,31 @@ export function WeatherControl({
           justify-content: center;
           gap: 8px;
           color: #ef4444;
+        }
+
+        .loading-progress {
+          padding: 8px 10px;
+          background: ${colors.bgSecondary};
+          border-radius: 6px;
+        }
+
+        .loading-text {
+          font-size: 11px;
+          color: ${colors.accent};
+          margin-bottom: 6px;
+        }
+
+        .progress-bar {
+          height: 4px;
+          background: ${colors.sliderBg};
+          border-radius: 2px;
+          overflow: hidden;
+        }
+
+        .progress-fill {
+          height: 100%;
+          background: ${colors.accent};
+          transition: width 0.2s ease-out;
         }
 
         .refresh-btn {

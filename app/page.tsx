@@ -8,7 +8,7 @@ import styles from "./page.module.css";
 import { BasemapStyle, PersonaMode, SnapResult } from "./types";
 
 // Hooks
-import { useRoute, useElevationProfile, useLakeRoute, useWeatherMetadata } from "./hooks";
+import { useRoute, useElevationProfile, useLakeRoute, useWeatherMetadata, usePreloadedWeatherLayers } from "./hooks";
 import { useGaugeStatus } from "./hooks/useGaugeStatus";
 
 // Components
@@ -34,10 +34,6 @@ import {
   updateGaugeTrendColors,
   updateGaugeTemperatureColors,
   updateGaugeTempTrendColors,
-  updateWeatherSource,
-  addWeatherLayer,
-  removeWeatherLayer,
-  setWeatherOpacity,
 } from "./layers";
 
 // Constants
@@ -162,6 +158,25 @@ export default function Home() {
   const [selectedWeatherVariable, setSelectedWeatherVariable] = useState<string | null>(null);
   const [selectedWeatherForecast, setSelectedWeatherForecast] = useState("00");
   const [weatherOpacity, setWeatherOpacityState] = useState(0.7);
+
+  // Preloaded weather layers for instant forecast switching
+  const {
+    initialize: initializeWeatherLayers,
+    setActiveForecast: setWeatherForecast,
+    isReady: weatherLayersReady,
+    loadProgress: weatherLoadProgress,
+    loadedCount: weatherLoadedCount,
+    totalCount: weatherTotalCount,
+    cleanup: cleanupWeatherLayers,
+    setOpacity: setWeatherLayerOpacity,
+    reinitialize: reinitializeWeatherLayers,
+  } = usePreloadedWeatherLayers({
+    map: map.current,
+    metadata: weatherMetadata,
+    variableId: selectedWeatherVariable,
+    enabled: weatherEnabled,
+    baseOpacity: weatherOpacity,
+  });
 
   // Clear lake markers
   const clearLakeMarkers = useCallback(() => {
@@ -784,23 +799,38 @@ export default function Home() {
     }
   }, [weatherMetadata, selectedWeatherVariable]);
 
-  // Update weather layer when settings change
+  // Initialize preloaded weather layers when map and metadata are ready
   useEffect(() => {
-    if (!map.current || !weatherMetadata || !selectedWeatherVariable) return;
-
-    if (weatherEnabled) {
-      updateWeatherSource(map.current, weatherMetadata, selectedWeatherVariable, selectedWeatherForecast);
-      addWeatherLayer(map.current, weatherOpacity);
-    } else {
-      removeWeatherLayer(map.current);
+    if (map.current && weatherMetadata && selectedWeatherVariable && weatherEnabled) {
+      initializeWeatherLayers();
     }
-  }, [weatherEnabled, weatherMetadata, selectedWeatherVariable, selectedWeatherForecast, weatherOpacity, styleVersion]);
+  }, [weatherMetadata, selectedWeatherVariable, weatherEnabled, initializeWeatherLayers]);
 
-  // Update weather opacity
+  // Switch active forecast when slider changes (instant - all layers pre-loaded)
   useEffect(() => {
-    if (!map.current || !weatherEnabled) return;
-    setWeatherOpacity(map.current, weatherOpacity);
-  }, [weatherOpacity, weatherEnabled]);
+    if (weatherLayersReady && weatherEnabled) {
+      setWeatherForecast(selectedWeatherForecast);
+    }
+  }, [selectedWeatherForecast, weatherLayersReady, weatherEnabled, setWeatherForecast]);
+
+  // Sync opacity changes with preloaded layers
+  useEffect(() => {
+    setWeatherLayerOpacity(weatherOpacity);
+  }, [weatherOpacity, setWeatherLayerOpacity]);
+
+  // Cleanup weather layers when disabled
+  useEffect(() => {
+    if (!weatherEnabled) {
+      cleanupWeatherLayers();
+    }
+  }, [weatherEnabled, cleanupWeatherLayers]);
+
+  // Reinitialize layers when variable changes
+  useEffect(() => {
+    if (weatherEnabled && selectedWeatherVariable && weatherMetadata) {
+      reinitializeWeatherLayers();
+    }
+  }, [selectedWeatherVariable]); // Only trigger on variable ID change
 
   // Reapply layer visibility after style changes
   useEffect(() => {
@@ -947,6 +977,8 @@ export default function Home() {
               opacity={weatherOpacity}
               onOpacityChange={setWeatherOpacityState}
               onRefresh={refreshWeather}
+              isReady={weatherLayersReady}
+              loadProgress={weatherLoadProgress}
               theme={theme}
             />
           </div>

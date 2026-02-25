@@ -32,6 +32,7 @@ interface DeckWindParticleLayerProps {
   trailLength?: number;
   maxAge?: number;
   opacity?: number;
+  styleVersion?: number; // Increment to reinitialize after basemap change
 }
 
 // Smoother color scale for wind speed (m/s)
@@ -65,21 +66,25 @@ export function DeckWindParticleLayer({
   trailLength = 15,
   maxAge = 80,
   opacity = 0.7,
+  styleVersion = 0,
 }: DeckWindParticleLayerProps) {
   const overlayRef = useRef<MapboxOverlay | null>(null);
   const particlesRef = useRef<Particle[]>([]);
   const animationFrameRef = useRef<number | null>(null);
   const [viewBounds, setViewBounds] = useState<ViewBounds | null>(null);
   const [zoom, setZoom] = useState(3);
+  const lastStyleVersionRef = useRef(styleVersion);
 
   // Calculate particle count based on zoom level
+  // Higher counts at low zoom for better national-scale coverage
   const getParticleCount = useCallback((currentZoom: number) => {
-    if (currentZoom < 4) return baseParticleCount;
-    if (currentZoom < 6) return Math.floor(baseParticleCount * 0.5);
-    if (currentZoom < 8) return Math.floor(baseParticleCount * 0.2);
-    if (currentZoom < 10) return Math.floor(baseParticleCount * 0.08);
-    if (currentZoom < 12) return Math.floor(baseParticleCount * 0.04);
-    return Math.floor(baseParticleCount * 0.025);
+    if (currentZoom < 3) return Math.floor(baseParticleCount * 2);    // National view - more particles
+    if (currentZoom < 4) return Math.floor(baseParticleCount * 1.5);  // Wide regional
+    if (currentZoom < 6) return baseParticleCount;
+    if (currentZoom < 8) return Math.floor(baseParticleCount * 0.4);
+    if (currentZoom < 10) return Math.floor(baseParticleCount * 0.15);
+    if (currentZoom < 12) return Math.floor(baseParticleCount * 0.06);
+    return Math.floor(baseParticleCount * 0.03);
   }, [baseParticleCount]);
 
   // Calculate speed factor based on zoom
@@ -111,8 +116,10 @@ export function DeckWindParticleLayer({
     const currentViewBounds = forceViewBounds ?? viewBounds;
     const particleCount = getParticleCount(currentZoom);
     
+    // Always use intersection of view bounds and data bounds
+    // This ensures particles cover the entire visible data area at all zoom levels
     let spawnBounds = dataBounds;
-    if (currentViewBounds && currentZoom > 4) {
+    if (currentViewBounds) {
       spawnBounds = {
         west: Math.max(dataBounds.west, currentViewBounds.west),
         east: Math.min(dataBounds.east, currentViewBounds.east),
@@ -189,8 +196,9 @@ export function DeckWindParticleLayer({
         particle.x < 0 || particle.x >= width ||
         particle.y < 0 || particle.y >= height
       ) {
+        // Always respawn within visible data area (intersection of view and data bounds)
         let spawnBounds = bounds;
-        if (viewBounds && zoom > 4) {
+        if (viewBounds) {
           spawnBounds = {
             west: Math.max(bounds.west, viewBounds.west),
             east: Math.min(bounds.east, viewBounds.east),
@@ -299,16 +307,29 @@ export function DeckWindParticleLayer({
     };
   }, [map]);
 
-  // Reinitialize particles when zoom changes significantly
+  // Reinitialize particles when zoom changes or view moves significantly
   useEffect(() => {
     if (enabled && windData && viewBounds) {
       initParticles(viewBounds, zoom);
     }
-  }, [zoom > 6 ? Math.floor(zoom) : 0, enabled, windData]);
+  }, [Math.floor(zoom), enabled, windData, viewBounds?.west ? Math.floor(viewBounds.west) : 0]);
 
-  // Animation loop
+  // Animation loop (reinitializes when styleVersion changes, e.g., after basemap switch)
   useEffect(() => {
     if (!enabled || !windData || !map) return;
+
+    // If style changed, remove old overlay and create new one
+    if (styleVersion !== lastStyleVersionRef.current) {
+      lastStyleVersionRef.current = styleVersion;
+      if (overlayRef.current) {
+        try {
+          map.removeControl(overlayRef.current as unknown as mapboxgl.IControl);
+        } catch (e) {
+          // Ignore - may already be gone after style change
+        }
+        overlayRef.current = null;
+      }
+    }
 
     if (!overlayRef.current) {
       overlayRef.current = new MapboxOverlay({
@@ -354,7 +375,7 @@ export function DeckWindParticleLayer({
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [enabled, windData, map, initParticles, updateParticles, createLayers]);
+  }, [enabled, windData, map, initParticles, updateParticles, createLayers, styleVersion]);
 
   // Cleanup on unmount
   useEffect(() => {

@@ -626,7 +626,7 @@ export default function Home() {
     };
   }, [handleMapClick, handleMapMouseMove]);
 
-  // Update cursor based on persona mode
+  // Update cursor based on persona mode (also re-apply after style changes)
   useEffect(() => {
     if (!map.current) return;
     
@@ -668,7 +668,7 @@ export default function Home() {
       // Other modes: larger crosshair for selecting points
       canvas.style.cursor = crosshairDataUri;
     }
-  }, [personaMode]);
+  }, [personaMode, styleVersion]);
 
   // Update route on map (river modes)
   useEffect(() => {
@@ -829,12 +829,12 @@ export default function Home() {
     }
   }, [weatherEnabled, cleanupWeatherLayers]);
 
-  // Reinitialize layers when variable changes
+  // Reinitialize layers when variable changes OR when style reloads (basemap switch)
   useEffect(() => {
     if (weatherEnabled && selectedWeatherVariable && weatherMetadata) {
       reinitializeWeatherLayers();
     }
-  }, [selectedWeatherVariable]); // Only trigger on variable ID change
+  }, [selectedWeatherVariable, styleVersion]); // Trigger on variable change or style reload
 
   // Reapply layer visibility after style changes
   useEffect(() => {
@@ -1009,6 +1009,7 @@ export default function Home() {
             windData={windData}
             enabled={windEnabled}
             opacity={weatherOpacity}
+            styleVersion={styleVersion}
           />
         </div>
 

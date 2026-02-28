@@ -107,11 +107,48 @@ export function DeckWindParticleLayer({
     return Math.max(3, Math.floor(trailLength * 0.15));
   }, [trailLength]);
 
+  // Helper to find a valid spawn position (where alpha > 0)
+  const findValidSpawnPosition = useCallback((
+    spawnBounds: ViewBounds,
+    dataBounds: ViewBounds,
+    imageData: ImageData,
+    width: number,
+    height: number,
+    maxAttempts: number = 10
+  ): { x: number; y: number; lng: number; lat: number } | null => {
+    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+      const lng = spawnBounds.west + Math.random() * (spawnBounds.east - spawnBounds.west);
+      const lat = spawnBounds.south + Math.random() * (spawnBounds.north - spawnBounds.south);
+      
+      const x = ((lng - dataBounds.west) / (dataBounds.east - dataBounds.west)) * width;
+      const y = ((dataBounds.north - lat) / (dataBounds.north - dataBounds.south)) * height;
+      
+      const px = Math.floor(x);
+      const py = Math.floor(y);
+      
+      if (px >= 0 && px < width && py >= 0 && py < height) {
+        const idx = (py * width + px) * 4;
+        const alpha = imageData.data[idx + 3];
+        
+        // Only spawn where we have valid wind data (alpha > 0)
+        if (alpha > 0) {
+          return { x, y, lng, lat };
+        }
+      }
+    }
+    // Fallback: return random position anyway (will respawn quickly if invalid)
+    const lng = spawnBounds.west + Math.random() * (spawnBounds.east - spawnBounds.west);
+    const lat = spawnBounds.south + Math.random() * (spawnBounds.north - spawnBounds.south);
+    const x = ((lng - dataBounds.west) / (dataBounds.east - dataBounds.west)) * width;
+    const y = ((dataBounds.north - lat) / (dataBounds.north - dataBounds.south)) * height;
+    return { x, y, lng, lat };
+  }, []);
+
   // Initialize particles within view bounds
   const initParticles = useCallback((forceViewBounds?: ViewBounds, forceZoom?: number) => {
     if (!windData) return;
 
-    const { width, height, bounds: dataBounds } = windData;
+    const { imageData, width, height, bounds: dataBounds } = windData;
     const currentZoom = forceZoom ?? zoom;
     const currentViewBounds = forceViewBounds ?? viewBounds;
     const particleCount = getParticleCount(currentZoom);
@@ -131,24 +168,21 @@ export function DeckWindParticleLayer({
     const particles: Particle[] = [];
 
     for (let i = 0; i < particleCount; i++) {
-      const lng = spawnBounds.west + Math.random() * (spawnBounds.east - spawnBounds.west);
-      const lat = spawnBounds.south + Math.random() * (spawnBounds.north - spawnBounds.south);
-      
-      const x = ((lng - dataBounds.west) / (dataBounds.east - dataBounds.west)) * width;
-      const y = ((dataBounds.north - lat) / (dataBounds.north - dataBounds.south)) * height;
+      const pos = findValidSpawnPosition(spawnBounds, dataBounds, imageData, width, height);
+      if (!pos) continue;
 
       particles.push({
         id: i,
-        x,
-        y,
+        x: pos.x,
+        y: pos.y,
         age: Math.floor(Math.random() * maxAge),
         maxAge: maxAge + Math.floor(Math.random() * 30) - 15,
-        trail: [{ lng, lat, age: 0 }],
+        trail: [{ lng: pos.lng, lat: pos.lat, age: 0 }],
       });
     }
 
     particlesRef.current = particles;
-  }, [windData, zoom, viewBounds, maxAge, getParticleCount]);
+  }, [windData, zoom, viewBounds, maxAge, getParticleCount, findValidSpawnPosition]);
 
   // Update particle positions based on wind field
   const updateParticles = useCallback(() => {
@@ -191,7 +225,19 @@ export function DeckWindParticleLayer({
 
       particle.age++;
 
+      // Check if particle is in an invalid area (alpha = 0) - respawn immediately
+      const checkPx = Math.floor(particle.x);
+      const checkPy = Math.floor(particle.y);
+      let isInvalidArea = false;
+      if (checkPx >= 0 && checkPx < width && checkPy >= 0 && checkPy < height) {
+        const checkIdx = (checkPy * width + checkPx) * 4;
+        if (imageData.data[checkIdx + 3] === 0) {
+          isInvalidArea = true;
+        }
+      }
+
       if (
+        isInvalidArea ||
         particle.age > particle.maxAge ||
         particle.x < 0 || particle.x >= width ||
         particle.y < 0 || particle.y >= height
@@ -207,16 +253,18 @@ export function DeckWindParticleLayer({
           };
         }
         
-        const lng = spawnBounds.west + Math.random() * (spawnBounds.east - spawnBounds.west);
-        const lat = spawnBounds.south + Math.random() * (spawnBounds.north - spawnBounds.south);
-        particle.x = ((lng - bounds.west) / (bounds.east - bounds.west)) * width;
-        particle.y = ((bounds.north - lat) / (bounds.north - bounds.south)) * height;
-        particle.age = 0;
-        particle.maxAge = maxAge + Math.floor(Math.random() * 30) - 15;
-        particle.trail = [{ lng, lat, age: 0 }];
+        // Find a valid spawn position (where alpha > 0)
+        const pos = findValidSpawnPosition(spawnBounds, bounds, imageData, width, height);
+        if (pos) {
+          particle.x = pos.x;
+          particle.y = pos.y;
+          particle.age = 0;
+          particle.maxAge = maxAge + Math.floor(Math.random() * 30) - 15;
+          particle.trail = [{ lng: pos.lng, lat: pos.lat, age: 0 }];
+        }
       }
     });
-  }, [windData, speedFactor, trailLength, maxAge, viewBounds, zoom, getSpeedFactor, getTrailLength]);
+  }, [windData, speedFactor, trailLength, maxAge, viewBounds, zoom, getSpeedFactor, getTrailLength, findValidSpawnPosition]);
 
   // Create deck.gl layers with fading trails
   const createLayers = useCallback(() => {
@@ -352,9 +400,21 @@ export function DeckWindParticleLayer({
     let lastTime = 0;
     const targetFPS = 30;
     const frameInterval = 1000 / targetFPS;
+    const MIN_ZOOM_FOR_WIND = 2;
 
     const animate = (currentTime: number) => {
       if (currentTime - lastTime >= frameInterval) {
+        // Hide particles when zoom is below minimum threshold
+        const currentMapZoom = map.getZoom();
+        if (currentMapZoom < MIN_ZOOM_FOR_WIND) {
+          if (overlayRef.current) {
+            overlayRef.current.setProps({ layers: [] });
+          }
+          lastTime = currentTime;
+          animationFrameRef.current = requestAnimationFrame(animate);
+          return;
+        }
+
         updateParticles();
         
         if (overlayRef.current) {

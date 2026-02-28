@@ -360,7 +360,15 @@ export function DeckWindParticleLayer({
     if (enabled && windData && viewBounds) {
       initParticles(viewBounds, zoom);
     }
-  }, [Math.floor(zoom), enabled, windData, viewBounds?.west ? Math.floor(viewBounds.west) : 0]);
+  }, [
+    Math.floor(zoom), 
+    enabled, 
+    windData, 
+    viewBounds ? Math.floor(viewBounds.west * 2) : 0,
+    viewBounds ? Math.floor(viewBounds.east * 2) : 0,
+    viewBounds ? Math.floor(viewBounds.south * 2) : 0,
+    viewBounds ? Math.floor(viewBounds.north * 2) : 0
+  ]);
 
   // Animation loop (reinitializes when styleVersion changes, e.g., after basemap switch)
   useEffect(() => {

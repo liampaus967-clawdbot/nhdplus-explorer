@@ -83,7 +83,7 @@ function getFlowStatus(percentile: number | null): FlowStatus {
 async function calculatePercentile(siteNo: string, flowCfs: number): Promise<{ percentile: number | null; status: FlowStatus }> {
   const refResult = await query(`
     SELECT p10, p25, p50, p75, p90
-    FROM flow_percentiles
+    FROM us.flow_percentiles
     WHERE site_id = $1
   `, [siteNo]);
   
@@ -124,7 +124,7 @@ async function getFlowForComid(comid: number): Promise<FlowData> {
   // Check for USGS gauge on this reach
   const gaugeResult = await query(`
     SELECT site_no, site_name, comid
-    FROM usgs_gauges
+    FROM us.gauges
     WHERE comid = $1
     LIMIT 1
   `, [comid]);

@@ -72,7 +72,7 @@ export async function GET(request: NextRequest) {
           hazard_potential,
           river_name,
           nearest_comid
-        FROM hazards_dams
+        FROM us.dams
         WHERE nearest_comid = ANY($1::bigint[])
         ORDER BY dam_height_ft DESC NULLS LAST
         LIMIT 20
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
           height,
           description,
           nearest_comid
-        FROM water_access.waterfalls
+        FROM us.waterfalls
         WHERE nearest_comid = ANY($1::bigint[])
         LIMIT 20
       `, [comids]);
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
           lon as longitude,
           rapid_class,
           nearest_comid
-        FROM water_access.rapids
+        FROM us.rapids
         WHERE nearest_comid = ANY($1::bigint[])
         LIMIT 30
       `, [comids]);
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
           longitude,
           predicted_probability,
           comid
-        FROM water_access.usgs_rapids
+        FROM us.usgs_rapids
         WHERE comid = ANY($1::bigint[])
           AND has_rapids = true
         ORDER BY predicted_probability DESC
@@ -186,7 +186,7 @@ export async function GET(request: NextRequest) {
           dam_height_ft,
           hazard_potential,
           river_name
-        FROM hazards_dams
+        FROM us.dams
         WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)
         ORDER BY dam_height_ft DESC NULLS LAST
         LIMIT 50
@@ -214,7 +214,7 @@ export async function GET(request: NextRequest) {
           lon as longitude,
           height,
           description
-        FROM water_access.waterfalls
+        FROM us.waterfalls
         WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)::geography::geometry
         LIMIT 50
       `, [minLng, minLat, maxLng, maxLat]);
@@ -239,7 +239,7 @@ export async function GET(request: NextRequest) {
           lat as latitude,
           lon as longitude,
           rapid_class
-        FROM water_access.rapids
+        FROM us.rapids
         WHERE geom && ST_MakeEnvelope($1, $2, $3, $4, 4326)::geography::geometry
         LIMIT 50
       `, [minLng, minLat, maxLng, maxLat]);

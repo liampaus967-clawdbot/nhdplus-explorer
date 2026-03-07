@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
         drinking_water,
         toilets,
         nearest_comid
-      FROM water_access.campgrounds
+      FROM us.campgrounds
       WHERE nearest_comid = ANY($1::bigint[])
         AND is_duplicate = false
       ORDER BY name, ROUND(lat::numeric, 4), ROUND(lon::numeric, 4), id
@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
         dam_height_ft,
         hazard_potential,
         nearest_comid
-      FROM hazards_dams
+      FROM us.dams
       WHERE nearest_comid = ANY($1::bigint[])
       ORDER BY id
       LIMIT 10
@@ -155,7 +155,7 @@ export async function GET(request: NextRequest) {
         lon as longitude,
         height,
         nearest_comid
-      FROM water_access.waterfalls
+      FROM us.waterfalls
       WHERE nearest_comid = ANY($1::bigint[])
       ORDER BY id
       LIMIT 10
@@ -183,7 +183,7 @@ export async function GET(request: NextRequest) {
         lon as longitude,
         rapid_class,
         nearest_comid
-      FROM water_access.rapids
+      FROM us.rapids
       WHERE nearest_comid = ANY($1::bigint[])
       ORDER BY id
       LIMIT 15
@@ -210,7 +210,7 @@ export async function GET(request: NextRequest) {
         latitude,
         longitude,
         predicted_probability
-      FROM water_access.usgs_rapids
+      FROM us.usgs_rapids
       WHERE comid = ANY($1::bigint[])
         AND has_rapids = true
       ORDER BY id
@@ -240,9 +240,8 @@ export async function GET(request: NextRequest) {
         lat as latitude,
         lon as longitude,
         nearest_comid
-      FROM water_access.access_points_clean
-      WHERE nearest_comid = ANY($1::bigint[])
-        AND is_duplicate = false
+      FROM us.access_points
+      WHERE is_duplicate = false
       ORDER BY name, ROUND(lat::numeric, 4), ROUND(lon::numeric, 4), id
       LIMIT 10
     `, [comids]);
@@ -297,7 +296,7 @@ async function handlePointQuery(lat: number, lng: number, radiusM: number) {
           c.geom::geography,
           ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
         ) as distance_m
-      FROM water_access.campgrounds c
+      FROM us.campgrounds c
       WHERE ST_DWithin(
         c.geom::geography,
         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,
@@ -335,7 +334,7 @@ async function handlePointQuery(lat: number, lng: number, radiusM: number) {
           a.geom::geography,
           ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
         ) as distance_m
-      FROM water_access.access_points_clean a
+      FROM us.access_points a
       WHERE ST_DWithin(
         a.geom::geography,
         ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography,

@@ -86,7 +86,7 @@ export function Map({ basemap, route, onMapClick, onMapReady }: MapProps) {
       // Fit map to route bounds
       if (route.route.features.length > 0) {
         const coords = route.route.features.flatMap(
-          (f: any) => f.geometry.coordinates
+          (f: GeoJSON.Feature) => (f.geometry as GeoJSON.LineString).coordinates as [number, number][]
         );
         const bounds = coords.reduce(
           (b: mapboxgl.LngLatBounds, c: [number, number]) => b.extend(c),

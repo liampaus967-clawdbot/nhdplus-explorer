@@ -1,15 +1,20 @@
 "use client";
 
-import { useEffect, useCallback, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
+import { useCallback } from "react";
 import styles from "./page.module.css";
 
-// Types
-import { BasemapStyle, PersonaMode, SnapResult } from "./types";
+// Contexts
+import {
+  useMapContext,
+  useRouteContext,
+  usePersonaModeContext,
+  useLakeContext,
+  useWeatherContext,
+  useGaugeContext,
+} from "./contexts";
 
 // Hooks
-import { useRoute, useElevationProfile, useLakeRoute, useWeatherMetadata, usePreloadedWeatherLayers, useWindData } from "./hooks";
-import { useGaugeStatus } from "./hooks/useGaugeStatus";
+import { usePoiHighlight } from "./hooks";
 
 // Components
 import { Header } from "./components/Header";
@@ -17,89 +22,35 @@ import { Sidebar, IconRail } from "./components/Sidebar";
 import {
   MapControls,
   NavigationControls,
-  LayerVisibility,
   DrawingControls,
   GaugeStyleControl,
-  GaugeStyleMode,
   WeatherBottomBar,
   DeckWindParticleLayer,
+  MapInteractionHandler,
 } from "./components/Map";
 
-// Layers
-import {
-  addAllLayers,
-  updateRouteData,
-  clearRouteData,
-  updateProfileHighlight,
-  updateGaugeColors,
-  updateGaugeTrendColors,
-  updateGaugeTemperatureColors,
-  updateGaugeTempTrendColors,
-} from "./layers";
-
-// Constants
-import { MAP_CONFIG, BASEMAP_STYLES, COLORS } from "./constants";
-
-// Utils
-import { getPointAtDistance, buildLineCoordsBetweenDistances } from "./utils";
-
-// Services
-import {
-  WeatherData,
-  ChopAssessment,
-  fetchRouteWindConditions,
-} from "./services/weather";
-
 export default function Home() {
-  // Map refs
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const putInMarker = useRef<mapboxgl.Marker | null>(null);
-  const takeOutMarker = useRef<mapboxgl.Marker | null>(null);
-  const lakeMarkers = useRef<mapboxgl.Marker[]>([]);
+  // Map context
+  const {
+    mapContainer,
+    map,
+    basemap,
+    theme,
+    styleVersion,
+    layerVisibility,
+    setBasemap,
+    toggleTheme,
+    setLayerVisibility,
+  } = useMapContext();
 
-  // State
-  const [basemap, setBasemap] = useState<BasemapStyle>("outdoors");
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
-  const basemapRef = useRef<BasemapStyle>("outdoors");
-  const [personaMode, setPersonaMode] = useState<PersonaMode>("home");
-  const [styleVersion, setStyleVersion] = useState(0); // Increments on style.load to trigger re-application of settings
-  const [layerVisibility, setLayerVisibility] = useState<LayerVisibility>({
-    blmLands: true,
-    wilderness: true,
-    nationalForests: true,
-    nationalParks: true,
-    rivers: true,
-    lakes: true,
-    wildScenicRivers: false,
-    accessPoints: true,
-    campgrounds: true,
-    rapids: false,
-    waterfalls: true,
-    dams: true,
-    gauges: false,
-  });
-
-  // Custom hooks
+  // Route context
   const {
     putIn,
     takeOut,
     route,
     loading,
     error,
-    flowCondition,
     paddleSpeed,
-    setPutIn,
-    setTakeOut,
-    setFlowCondition,
-    setPaddleSpeed,
-    snapToRiver,
-    calculateRoute,
-    clearRoute: clearRouteState,
-    swapPoints,
-  } = useRoute();
-
-  const {
     canvasRef,
     profileSelection,
     setProfileSelection,
@@ -108,842 +59,103 @@ export default function Home() {
     handleMouseMove,
     handleMouseUp,
     handleMouseLeave,
-  } = useElevationProfile();
+    clearRoute,
+    swapPoints,
+    handlePaddleSpeedChange,
+  } = useRouteContext();
 
-  // Lake mode hook
+  // Persona mode context
+  const { mode, setMode } = usePersonaModeContext();
+
+  // Lake context
   const {
     drawingMode: lakeDrawingMode,
+    setDrawingMode: setLakeDrawingMode,
     waypoints: lakeWaypoints,
     lakeRoute,
     paddleSpeed: lakePaddleSpeed,
     isDrawing: isLakeDrawing,
     isSubmitted: isLakeSubmitted,
-    setDrawingMode: setLakeDrawingMode,
-    addWaypoint,
     deleteWaypoint,
-    startFreehand,
-    addFreehandPoint,
-    finishFreehand,
-    getFreehandPreview,
-    submitRoute: submitLakeRoute,
     undo: lakeUndo,
-    clearRoute: clearLakeRoute,
+    clear: lakeClear,
+    submitRoute: lakeSubmitRoute,
     updatePaddleSpeed: updateLakePaddleSpeed,
-  } = useLakeRoute();
+    windData: lakeWindData,
+    chopAssessment: lakeChopAssessment,
+    windLoading: lakeWindLoading,
+    lakeName,
+  } = useLakeContext();
 
-  // Gauge status for coloring gauges by flow
-  const {
-    statusMap: gaugeStatusMap,
-    trendMap: gaugeTrendMap,
-    temperatureMap: gaugeTemperatureMap,
-    tempTrendMap: gaugeTempTrendMap,
-  } = useGaugeStatus();
-  const [gaugeStyleMode, setGaugeStyleMode] =
-    useState<GaugeStyleMode>("percentile");
-
-  // Lake wind data state
-  const [lakeWindData, setLakeWindData] = useState<WeatherData | null>(null);
-  const [lakeChopAssessment, setLakeChopAssessment] =
-    useState<ChopAssessment | null>(null);
-  const [lakeWindLoading, setLakeWindLoading] = useState(false);
-  const [lakeName, setLakeName] = useState<string | null>(null);
-
-  // Weather layer state
+  // Weather context
   const {
     metadata: weatherMetadata,
-    loading: weatherLoading,
-    error: weatherError,
-    refresh: refreshWeather,
-  } = useWeatherMetadata();
-  const [weatherEnabled, setWeatherEnabled] = useState(false);
-  const [selectedWeatherVariable, setSelectedWeatherVariable] = useState<string | null>(null);
-  const [selectedWeatherForecast, setSelectedWeatherForecast] = useState("00");
-  const [weatherOpacity, setWeatherOpacityState] = useState(0.7);
-
-  // Wind particle state
-  const [windEnabled, setWindEnabled] = useState(false);
-  const { windData, loading: windLoading } = useWindData({
-    forecastHour: selectedWeatherForecast,
-    enabled: windEnabled,
-  });
-
-  // Preloaded weather layers for instant forecast switching
-  const {
-    initialize: initializeWeatherLayers,
-    setActiveForecast: setWeatherForecast,
-    isReady: weatherLayersReady,
+    metadataLoading: weatherLoading,
+    metadataError: weatherError,
+    refreshMetadata: refreshWeather,
+    weatherEnabled,
+    setWeatherEnabled,
+    selectedVariable: selectedWeatherVariable,
+    setSelectedVariable: setSelectedWeatherVariable,
+    selectedForecast: selectedWeatherForecast,
+    setSelectedForecast: setSelectedWeatherForecast,
+    opacity: weatherOpacity,
+    setOpacity: setWeatherOpacity,
+    isLayersReady: weatherLayersReady,
     loadProgress: weatherLoadProgress,
-    loadedCount: weatherLoadedCount,
-    totalCount: weatherTotalCount,
-    cleanup: cleanupWeatherLayers,
-    setOpacity: setWeatherLayerOpacity,
-    reinitialize: reinitializeWeatherLayers,
-  } = usePreloadedWeatherLayers({
-    map: map.current,
-    metadata: weatherMetadata,
-    variableId: selectedWeatherVariable,
-    enabled: weatherEnabled,
-    baseOpacity: weatherOpacity,
-  });
+    windEnabled,
+    setWindEnabled,
+    windData,
+    windLoading,
+  } = useWeatherContext();
 
-  // Clear lake markers
-  const clearLakeMarkers = useCallback(() => {
-    lakeMarkers.current.forEach((m) => m.remove());
-    lakeMarkers.current = [];
-  }, []);
+  // Gauge context
+  const { styleMode: gaugeStyleMode, setStyleMode: setGaugeStyleMode } = useGaugeContext();
 
-  // Clear route and markers (for river modes)
-  const handleClearRoute = useCallback(() => {
-    clearRouteState();
-    setProfileSelection(null);
+  // POI highlight hook
+  const { highlightPoi } = usePoiHighlight();
 
-    if (putInMarker.current) {
-      putInMarker.current.remove();
-      putInMarker.current = null;
-    }
-    if (takeOutMarker.current) {
-      takeOutMarker.current.remove();
-      takeOutMarker.current = null;
-    }
-
-    if (map.current) {
-      clearRouteData(map.current);
-    }
-  }, [clearRouteState, setProfileSelection]);
-
-  // Handle lake undo - removes last waypoint, marker, and updates map line
-  const handleLakeUndo = useCallback(() => {
-    // Remove last marker first
-    if (lakeMarkers.current.length > 0) {
-      const lastMarker = lakeMarkers.current.pop();
-      lastMarker?.remove();
-    }
-
-    // Call the undo from hook (updates waypoints and lakeRoute)
-    lakeUndo();
-
-    // Update map line - will be synced via useEffect on lakeRoute change
-  }, [lakeUndo]);
-
-  // Handle full lake clear
-  const handleLakeClear = useCallback(() => {
-    clearLakeRoute();
-    clearLakeMarkers();
-    if (map.current) {
-      // Clear lake route from map
-      const source = map.current.getSource(
-        "lake-route",
-      ) as mapboxgl.GeoJSONSource;
-      if (source) {
-        source.setData({ type: "FeatureCollection", features: [] });
+  // Handle mode change - clear appropriate routes when switching
+  const handleModeChange = useCallback(
+    (newMode: typeof mode) => {
+      // Clear lake route when switching away from lake mode
+      if (mode === "lake" && newMode !== "lake") {
+        lakeClear();
       }
-    }
-  }, [clearLakeRoute, clearLakeMarkers]);
-
-  // Handle lake submit (Done button) - clears markers and submits route
-  const handleLakeSubmit = useCallback(() => {
-    // Remove all waypoint markers from map
-    clearLakeMarkers();
-    // Submit the route (changes to orange)
-    submitLakeRoute();
-  }, [clearLakeMarkers, submitLakeRoute]);
-
-  // Track currently highlighted POI for cleanup
-  const highlightedPoi = useRef<{
-    source: string;
-    sourceLayer: string;
-    id: number;
-  } | null>(null);
+      // Clear river route when switching to lake mode
+      if (newMode === "lake" && mode !== "lake") {
+        clearRoute();
+      }
+      setMode(newMode);
+    },
+    [mode, lakeClear, clearRoute, setMode]
+  );
 
   // Handle POI highlight from sidebar
   const handleHighlightPoi = useCallback(
-    (
-      poiType: "campground" | "access_point",
-      id: number
-    ) => {
-      if (!map.current) return;
-
-      // Clear previous highlight
-      if (highlightedPoi.current) {
-        map.current.removeFeatureState({
-          source: highlightedPoi.current.source,
-          sourceLayer: highlightedPoi.current.sourceLayer,
-          id: highlightedPoi.current.id,
-        });
-      }
-
-      // Map POI type to source/layer names
-      const sourceMap = {
-        campground: { source: "campgrounds", sourceLayer: "campgrounds" },
-        access_point: { source: "access-points", sourceLayer: "access_points_clean" },
-      };
-
-      const { source, sourceLayer } = sourceMap[poiType];
-
-      // Set new highlight
-      map.current.setFeatureState(
-        { source, sourceLayer, id },
-        { highlighted: true }
-      );
-
-      // Track for cleanup
-      highlightedPoi.current = { source, sourceLayer, id };
-
-      // Auto-clear after 4 seconds
-      setTimeout(() => {
-        if (
-          highlightedPoi.current?.source === source &&
-          highlightedPoi.current?.id === id
-        ) {
-          map.current?.removeFeatureState({ source, sourceLayer, id });
-          highlightedPoi.current = null;
-        }
-      }, 4000);
+    (poiType: "campground" | "access_point", id: number) => {
+      highlightPoi(map.current, poiType, id);
     },
-    []
+    [highlightPoi, map]
   );
-
-  // Handle map click
-  const handleMapClick = useCallback(
-    async (lng: number, lat: number) => {
-      // Home mode - no route creation, just pan/scan
-      if (personaMode === "home") {
-        return;
-      }
-
-      // Lake mode - custom handling
-      if (personaMode === "lake") {
-        if (lakeDrawingMode === "waypoint") {
-          // Add waypoint
-          const wp = addWaypoint(lng, lat);
-
-          // Add marker
-          const marker = new mapboxgl.Marker({ color: "#67e8f9" })
-            .setLngLat([lng, lat])
-            .addTo(map.current!);
-          lakeMarkers.current.push(marker);
-        } else {
-          // Freehand mode
-          if (!isLakeDrawing) {
-            startFreehand(lng, lat);
-          } else {
-            finishFreehand(lng, lat);
-          }
-        }
-        return;
-      }
-
-      // River modes - snap to river
-      if (!putIn) {
-        const snap = await snapToRiver(lng, lat);
-        if (snap) {
-          setPutIn(snap);
-          if (putInMarker.current) putInMarker.current.remove();
-          putInMarker.current = new mapboxgl.Marker({ color: COLORS.putIn })
-            .setLngLat([snap.snap_point.lng, snap.snap_point.lat])
-            .addTo(map.current!);
-        }
-      } else if (!takeOut) {
-        const snap = await snapToRiver(lng, lat);
-        if (snap) {
-          setTakeOut(snap);
-          if (takeOutMarker.current) takeOutMarker.current.remove();
-          takeOutMarker.current = new mapboxgl.Marker({ color: COLORS.takeOut })
-            .setLngLat([snap.snap_point.lng, snap.snap_point.lat])
-            .addTo(map.current!);
-          await calculateRoute(putIn, snap);
-        }
-      }
-    },
-    [
-      personaMode,
-      lakeDrawingMode,
-      isLakeDrawing,
-      putIn,
-      takeOut,
-      snapToRiver,
-      setPutIn,
-      setTakeOut,
-      calculateRoute,
-      addWaypoint,
-      startFreehand,
-      finishFreehand,
-    ],
-  );
-
-  // Handle map mouse move (for freehand drawing)
-  const handleMapMouseMove = useCallback(
-    (lng: number, lat: number) => {
-      if (
-        personaMode === "lake" &&
-        lakeDrawingMode === "freehand" &&
-        isLakeDrawing
-      ) {
-        addFreehandPoint(lng, lat);
-
-        // Update preview line on map
-        const coords = getFreehandPreview();
-        if (coords.length > 1 && map.current) {
-          const source = map.current.getSource(
-            "lake-route",
-          ) as mapboxgl.GeoJSONSource;
-          if (source) {
-            source.setData({
-              type: "FeatureCollection",
-              features: [
-                {
-                  type: "Feature",
-                  properties: { type: "lake-route-preview" },
-                  geometry: { type: "LineString", coordinates: coords },
-                },
-              ],
-            });
-          }
-        }
-      }
-    },
-    [
-      personaMode,
-      lakeDrawingMode,
-      isLakeDrawing,
-      addFreehandPoint,
-      getFreehandPreview,
-    ],
-  );
-
-  // Handle paddle speed change (river modes)
-  const handlePaddleSpeedChange = useCallback(
-    async (newSpeed: number) => {
-      setPaddleSpeed(newSpeed);
-      if (putIn && takeOut) {
-        await calculateRoute(putIn, takeOut, flowCondition, newSpeed);
-      }
-    },
-    [putIn, takeOut, flowCondition, setPaddleSpeed, calculateRoute],
-  );
-
-  // Handle swap points
-  const handleSwapPoints = useCallback(async () => {
-    if (putIn && takeOut) {
-      if (putInMarker.current && takeOutMarker.current) {
-        const putInPos = putInMarker.current.getLngLat();
-        const takeOutPos = takeOutMarker.current.getLngLat();
-        putInMarker.current.setLngLat(takeOutPos);
-        takeOutMarker.current.setLngLat(putInPos);
-      }
-      const tempPutIn = putIn;
-      setPutIn(takeOut);
-      setTakeOut(tempPutIn);
-      await calculateRoute(takeOut, tempPutIn, flowCondition, paddleSpeed);
-    }
-  }, [
-    putIn,
-    takeOut,
-    flowCondition,
-    paddleSpeed,
-    setPutIn,
-    setTakeOut,
-    calculateRoute,
-  ]);
-
-  // Handle theme toggle
-  const handleThemeToggle = useCallback(() => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
-  }, []);
-
-  // Apply theme to document
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  // Handle basemap change
-  const handleBasemapChange = useCallback(
-    (newBasemap: BasemapStyle) => {
-      if (!map.current || newBasemap === basemap) return;
-      setBasemap(newBasemap);
-      basemapRef.current = newBasemap;
-      map.current.setStyle(BASEMAP_STYLES[newBasemap]);
-    },
-    [basemap],
-  );
-
-  // All river layer IDs for visibility toggling (all 6 regions)
-  const allRiverLayerIds = [
-    "rivers-line", "rivers-arrows", "rivers-labels",
-    "rivers-southeast-line", "rivers-southeast-arrows", "rivers-southeast-labels",
-    "rivers-midwest-line", "rivers-midwest-arrows", "rivers-midwest-labels",
-    "rivers-plains-line", "rivers-plains-arrows", "rivers-plains-labels",
-    "rivers-west-line", "rivers-west-arrows", "rivers-west-labels",
-    "rivers-midatlantic-line", "rivers-midatlantic-arrows", "rivers-midatlantic-labels",
-  ];
-
-  // Handle layer visibility change
-  const handleLayerVisibilityChange = useCallback(
-    (newVisibility: LayerVisibility) => {
-      setLayerVisibility(newVisibility);
-      if (!map.current) return;
-
-      const layerMapping: Record<keyof LayerVisibility, string[]> = {
-        blmLands: ["blm-lands-fill", "blm-lands-outline"],
-        wilderness: ["wilderness-fill", "wilderness-outline"],
-        nationalForests: ["national-forests-fill", "national-forests-outline"],
-        nationalParks: ["national-parks-fill", "national-parks-outline"],
-        rivers: allRiverLayerIds,
-        lakes: ["lakes-fill", "lakes-outline", "lakes-labels"],
-        wildScenicRivers: ["wsr-line", "wsr-labels"],
-        accessPoints: ["access-points-backdrop"],
-        campgrounds: ["campgrounds-backdrop"],
-        rapids: ["rapids-circles"],
-        waterfalls: ["waterfalls-backdrop"],
-        dams: ["dams-backdrop"],
-        gauges: ["gauges-circles", "gauges-labels"],
-      };
-
-      Object.entries(newVisibility).forEach(([key, visible]) => {
-        const layers = layerMapping[key as keyof LayerVisibility];
-        layers?.forEach((layerId) => {
-          if (map.current?.getLayer(layerId)) {
-            map.current.setLayoutProperty(
-              layerId,
-              "visibility",
-              visible ? "visible" : "none",
-            );
-          }
-        });
-      });
-    },
-    [allRiverLayerIds],
-  );
-
-  // Handle persona mode change
-  const handleModeChange = useCallback(
-    (newMode: PersonaMode) => {
-      // Clear lake route when switching away from lake mode
-      if (personaMode === "lake" && newMode !== "lake") {
-        handleLakeClear();
-      }
-      // Clear river route when switching to lake mode
-      if (newMode === "lake" && personaMode !== "lake") {
-        handleClearRoute();
-      }
-      setPersonaMode(newMode);
-    },
-    [personaMode, handleLakeClear, handleClearRoute],
-  );
-
-  // Initialize map
-  useEffect(() => {
-    if (map.current || !mapContainer.current) return;
-
-    mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: BASEMAP_STYLES.outdoors,
-      center: MAP_CONFIG.center,
-      zoom: MAP_CONFIG.zoom,
-      pitch: MAP_CONFIG.pitch,
-    });
-
-    const setupLayers = () => {
-      if (map.current) {
-        addAllLayers(map.current, basemapRef.current);
-
-        // Add lake route source and layers
-        if (!map.current.getSource("lake-route")) {
-          map.current.addSource("lake-route", {
-            type: "geojson",
-            data: { type: "FeatureCollection", features: [] },
-          });
-
-          // Glow layer for submitted routes (animated pulse)
-          map.current.addLayer({
-            id: "lake-route-glow",
-            type: "line",
-            source: "lake-route",
-            filter: ["==", ["get", "submitted"], true],
-            paint: {
-              "line-color": "#f59e0b",
-              "line-width": 12,
-              "line-opacity": 0.3,
-              "line-blur": 8,
-            },
-          });
-
-          // Main route line - cyan while drawing, orange when submitted
-          map.current.addLayer({
-            id: "lake-route-line",
-            type: "line",
-            source: "lake-route",
-            paint: {
-              "line-color": [
-                "case",
-                ["==", ["get", "submitted"], true],
-                "#f59e0b", // Orange when submitted
-                "#006BF7", // Cyan while drawing
-              ],
-              "line-width": 4,
-              "line-opacity": 0.9,
-            },
-          });
-        }
-
-        // Cursor is set dynamically based on personaMode in separate useEffect
-      }
-    };
-
-    map.current.on("load", setupLayers);
-    map.current.on("style.load", () => {
-      setupLayers();
-      // Increment styleVersion to trigger re-application of gauge colors and layer visibility
-      setStyleVersion((v) => v + 1);
-    });
-
-    return () => {
-      map.current?.remove();
-      map.current = null;
-    };
-  }, []);
-
-  // Handle click events
-  useEffect(() => {
-    if (!map.current) return;
-
-    const onClick = (e: mapboxgl.MapMouseEvent) => {
-      handleMapClick(e.lngLat.lng, e.lngLat.lat);
-    };
-
-    const onMouseMove = (e: mapboxgl.MapMouseEvent) => {
-      handleMapMouseMove(e.lngLat.lng, e.lngLat.lat);
-    };
-
-    map.current.on("click", onClick);
-    map.current.on("mousemove", onMouseMove);
-
-    return () => {
-      map.current?.off("click", onClick);
-      map.current?.off("mousemove", onMouseMove);
-    };
-  }, [handleMapClick, handleMapMouseMove]);
-
-  // Update cursor based on persona mode (also re-apply after style changes)
-  useEffect(() => {
-    if (!map.current) return;
-    
-    const canvas = map.current.getCanvas();
-    
-    // Custom larger crosshair cursor (32x32 SVG)
-    const crosshairSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
-      <line x1="16" y1="0" x2="16" y2="12" stroke="white" stroke-width="2"/>
-      <line x1="16" y1="20" x2="16" y2="32" stroke="white" stroke-width="2"/>
-      <line x1="0" y1="16" x2="12" y2="16" stroke="white" stroke-width="2"/>
-      <line x1="20" y1="16" x2="32" y2="16" stroke="white" stroke-width="2"/>
-      <line x1="16" y1="0" x2="16" y2="12" stroke="black" stroke-width="1"/>
-      <line x1="16" y1="20" x2="16" y2="32" stroke="black" stroke-width="1"/>
-      <line x1="0" y1="16" x2="12" y2="16" stroke="black" stroke-width="1"/>
-      <line x1="20" y1="16" x2="32" y2="16" stroke="black" stroke-width="1"/>
-      <circle cx="16" cy="16" r="2" fill="white" stroke="black" stroke-width="1"/>
-    </svg>`;
-    const crosshairDataUri = `url("data:image/svg+xml,${encodeURIComponent(crosshairSvg)}") 16 16, crosshair`;
-    
-    if (personaMode === "home") {
-      // Home mode: grab cursor, grabbing when mouse down
-      canvas.style.cursor = "grab";
-      
-      const onMouseDown = () => { canvas.style.cursor = "grabbing"; };
-      const onMouseUp = () => { canvas.style.cursor = "grab"; };
-      
-      canvas.addEventListener("mousedown", onMouseDown);
-      canvas.addEventListener("mouseup", onMouseUp);
-      canvas.addEventListener("mouseleave", onMouseUp);
-      
-      return () => {
-        canvas.removeEventListener("mousedown", onMouseDown);
-        canvas.removeEventListener("mouseup", onMouseUp);
-        canvas.removeEventListener("mouseleave", onMouseUp);
-        // Reset cursor when leaving home mode
-        canvas.style.cursor = "";
-      };
-    } else {
-      // Other modes: larger crosshair for selecting points
-      canvas.style.cursor = crosshairDataUri;
-    }
-  }, [personaMode, styleVersion]);
-
-  // Update route on map (river modes)
-  useEffect(() => {
-    if (!map.current) return;
-
-    if (route) {
-      updateRouteData(map.current, route.route);
-
-      if (route.route.features.length > 0) {
-        const coords = route.route.features.flatMap(
-          (f: any) => f.geometry.coordinates,
-        );
-        const bounds = coords.reduce(
-          (b: mapboxgl.LngLatBounds, c: [number, number]) => b.extend(c),
-          new mapboxgl.LngLatBounds(coords[0], coords[0]),
-        );
-        map.current.fitBounds(bounds, { padding: 80 });
-      }
-    }
-  }, [route]);
-
-  // Update lake route on map
-  useEffect(() => {
-    if (!map.current) return;
-
-    const source = map.current.getSource(
-      "lake-route",
-    ) as mapboxgl.GeoJSONSource;
-    if (!source) return;
-
-    // If no route or no geojson, clear the map
-    if (!lakeRoute?.geojson) {
-      source.setData({ type: "FeatureCollection", features: [] });
-      return;
-    }
-
-    // Update with new route data
-    source.setData(lakeRoute.geojson);
-
-    // Fit bounds to lake route (only when route has meaningful length)
-    const lineFeature = lakeRoute.geojson.features.find(
-      (f) => f.geometry.type === "LineString",
-    );
-    if (lineFeature && lineFeature.geometry.type === "LineString") {
-      const coords = lineFeature.geometry.coordinates as [number, number][];
-      if (coords.length > 1) {
-        const bounds = coords.reduce(
-          (b: mapboxgl.LngLatBounds, c: [number, number]) => b.extend(c),
-          new mapboxgl.LngLatBounds(coords[0], coords[0]),
-        );
-        map.current.fitBounds(bounds, { padding: 80 });
-      }
-    }
-  }, [lakeRoute]);
-
-  // Detect lake name when waypoints change (using PostGIS)
-  useEffect(() => {
-    if (lakeWaypoints.length === 0) {
-      setLakeName(null);
-      return;
-    }
-
-    // Query the first waypoint to find which lake it's on
-    const firstWp = lakeWaypoints[0];
-
-    fetch(`/api/lake-at-point?lng=${firstWp.lng}&lat=${firstWp.lat}`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`API error: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        setLakeName(data.lake?.name || null);
-      })
-      .catch(() => {
-        setLakeName(null);
-      });
-  }, [lakeWaypoints]);
-
-  // Fetch wind data when lake route changes
-  useEffect(() => {
-    if (!lakeRoute?.geojson) {
-      setLakeWindData(null);
-      setLakeChopAssessment(null);
-      return;
-    }
-
-    const lineFeature = lakeRoute.geojson.features.find(
-      (f) => f.geometry.type === "LineString",
-    );
-    if (!lineFeature || lineFeature.geometry.type !== "LineString") return;
-
-    const coords = lineFeature.geometry.coordinates as [number, number][];
-    if (coords.length < 2) return;
-
-    // Fetch wind conditions for the route
-    setLakeWindLoading(true);
-    fetchRouteWindConditions(coords)
-      .then((result) => {
-        if (result) {
-          setLakeWindData(result.avgWind);
-          setLakeChopAssessment(result.chop);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch wind data:", err);
-      })
-      .finally(() => {
-        setLakeWindLoading(false);
-      });
-  }, [lakeRoute]);
-
-  // Update gauge colors when flow status data loads, mode changes, or style reloads
-  useEffect(() => {
-    if (!map.current) return;
-
-    if (gaugeStyleMode === "percentile" && gaugeStatusMap) {
-      updateGaugeColors(map.current, gaugeStatusMap);
-    } else if (gaugeStyleMode === "trend" && gaugeTrendMap) {
-      updateGaugeTrendColors(map.current, gaugeTrendMap);
-    } else if (gaugeStyleMode === "temperature" && gaugeTemperatureMap) {
-      updateGaugeTemperatureColors(map.current, gaugeTemperatureMap);
-    } else if (gaugeStyleMode === "temp_trend" && gaugeTempTrendMap) {
-      updateGaugeTempTrendColors(map.current, gaugeTempTrendMap);
-    }
-  }, [
-    gaugeStatusMap,
-    gaugeTrendMap,
-    gaugeTemperatureMap,
-    gaugeTempTrendMap,
-    gaugeStyleMode,
-    styleVersion,
-  ]);
-
-
-  // Initialize preloaded weather layers when map and metadata are ready
-  useEffect(() => {
-    if (map.current && weatherMetadata && selectedWeatherVariable && weatherEnabled) {
-      initializeWeatherLayers();
-    }
-  }, [weatherMetadata, selectedWeatherVariable, weatherEnabled, initializeWeatherLayers]);
-
-  // Switch active forecast when slider changes (instant - all layers pre-loaded)
-  useEffect(() => {
-    if (weatherLayersReady && weatherEnabled) {
-      setWeatherForecast(selectedWeatherForecast);
-    }
-  }, [selectedWeatherForecast, weatherLayersReady, weatherEnabled, setWeatherForecast]);
-
-  // Sync opacity changes with preloaded layers
-  useEffect(() => {
-    setWeatherLayerOpacity(weatherOpacity);
-  }, [weatherOpacity, setWeatherLayerOpacity]);
-
-  // Cleanup weather layers when disabled
-  useEffect(() => {
-    if (!weatherEnabled) {
-      cleanupWeatherLayers();
-    }
-  }, [weatherEnabled, cleanupWeatherLayers]);
-
-  // Reinitialize layers when variable changes OR when style reloads (basemap switch)
-  useEffect(() => {
-    if (weatherEnabled && selectedWeatherVariable && weatherMetadata) {
-      reinitializeWeatherLayers();
-    }
-  }, [selectedWeatherVariable, styleVersion]); // Trigger on variable change or style reload
-
-  // Reapply layer visibility after style changes
-  useEffect(() => {
-    if (!map.current || styleVersion === 0) return;
-
-    // Wait a tick for layers to be fully added
-    const timeout = setTimeout(() => {
-      if (!map.current) return;
-
-      const layerMapping: Record<keyof LayerVisibility, string[]> = {
-        blmLands: ["blm-lands-fill", "blm-lands-outline"],
-        wilderness: ["wilderness-fill", "wilderness-outline"],
-        nationalForests: ["national-forests-fill", "national-forests-outline"],
-        nationalParks: ["national-parks-fill", "national-parks-outline"],
-        rivers: allRiverLayerIds,
-        lakes: ["lakes-fill", "lakes-outline", "lakes-labels"],
-        wildScenicRivers: ["wsr-line", "wsr-labels"],
-        accessPoints: ["access-points-backdrop"],
-        campgrounds: ["campgrounds-backdrop"],
-        rapids: ["rapids-circles"],
-        waterfalls: ["waterfalls-backdrop"],
-        dams: ["dams-backdrop"],
-        gauges: ["gauges-circles", "gauges-labels"],
-      };
-
-      Object.entries(layerVisibility).forEach(([key, visible]) => {
-        const layers = layerMapping[key as keyof LayerVisibility];
-        layers?.forEach((layerId) => {
-          if (map.current?.getLayer(layerId)) {
-            map.current.setLayoutProperty(
-              layerId,
-              "visibility",
-              visible ? "visible" : "none",
-            );
-          }
-        });
-      });
-    }, 50);
-
-    return () => clearTimeout(timeout);
-  }, [styleVersion, layerVisibility]);
-
-  // Update profile highlight on map
-  useEffect(() => {
-    if (!map.current || !route) return;
-
-    if (profileSelection) {
-      const startPoint = getPointAtDistance(
-        route,
-        Math.min(profileSelection.startM, profileSelection.endM),
-      );
-      const endPoint = getPointAtDistance(
-        route,
-        Math.max(profileSelection.startM, profileSelection.endM),
-      );
-
-      if (startPoint && endPoint) {
-        const lineCoords = buildLineCoordsBetweenDistances(
-          route,
-          Math.min(profileSelection.startM, profileSelection.endM),
-          Math.max(profileSelection.startM, profileSelection.endM),
-        );
-
-        updateProfileHighlight(map.current, {
-          type: "FeatureCollection",
-          features: [
-            {
-              type: "Feature",
-              properties: { type: "start" },
-              geometry: { type: "Point", coordinates: startPoint },
-            },
-            {
-              type: "Feature",
-              properties: { type: "end" },
-              geometry: { type: "Point", coordinates: endPoint },
-            },
-            {
-              type: "Feature",
-              properties: { type: "line" },
-              geometry: {
-                type: "LineString",
-                coordinates:
-                  lineCoords.length > 1 ? lineCoords : [startPoint, endPoint],
-              },
-            },
-          ],
-        });
-      }
-    } else {
-      updateProfileHighlight(map.current, {
-        type: "FeatureCollection",
-        features: [],
-      });
-    }
-  }, [profileSelection, route]);
 
   return (
     <main className={styles.main}>
-      <Header theme={theme} onThemeToggle={handleThemeToggle} />
+      <Header theme={theme} onThemeToggle={toggleTheme} />
 
       <div className={styles.body}>
         <div className={styles.mapWrapper}>
           <div ref={mapContainer} className={styles.map} />
+          
+          {/* Map interaction handler - handles clicks and mouse moves */}
+          <MapInteractionHandler />
+          
           <NavigationControls map={map.current} />
           <MapControls
             layers={layerVisibility}
-            onLayersChange={handleLayerVisibilityChange}
+            onLayersChange={setLayerVisibility}
             basemap={basemap}
-            onBasemapChange={handleBasemapChange}
+            onBasemapChange={setBasemap}
             weather={{
               metadata: weatherMetadata,
               loading: weatherLoading,
@@ -955,7 +167,7 @@ export default function Home() {
               selectedForecast: selectedWeatherForecast,
               onForecastChange: setSelectedWeatherForecast,
               opacity: weatherOpacity,
-              onOpacityChange: setWeatherOpacityState,
+              onOpacityChange: setWeatherOpacity,
               onRefresh: refreshWeather,
               isReady: weatherLayersReady,
               loadProgress: weatherLoadProgress,
@@ -964,10 +176,11 @@ export default function Home() {
               windLoading: windLoading,
             }}
           />
-          {/* Lake Mode Drawing Controls - hidden when route is submitted */}
+          
+          {/* Lake Mode Drawing Controls */}
           <DrawingControls
             visible={
-              personaMode === "lake" &&
+              mode === "lake" &&
               (lakeWaypoints.length > 0 || isLakeDrawing) &&
               !isLakeSubmitted
             }
@@ -975,16 +188,19 @@ export default function Home() {
             waypointCount={lakeWaypoints.length}
             hasRoute={!!(lakeRoute && lakeRoute.distance_mi > 0)}
             isDrawing={isLakeDrawing}
-            onUndo={handleLakeUndo}
-            onClear={handleLakeClear}
-            onSubmit={handleLakeSubmit}
+            onUndo={lakeUndo}
+            onClear={lakeClear}
+            onSubmit={lakeSubmitRoute}
           />
-          {/* Gauge Style Control - visible when gauges layer is on */}
+          
+          {/* Gauge Style Control */}
           <GaugeStyleControl
             visible={layerVisibility.gauges}
             mode={gaugeStyleMode}
             onModeChange={setGaugeStyleMode}
           />
+          
+          {/* Weather Bottom Bar */}
           {weatherEnabled && selectedWeatherVariable && weatherMetadata && (
             <WeatherBottomBar
               metadata={weatherMetadata}
@@ -992,7 +208,7 @@ export default function Home() {
               selectedForecast={selectedWeatherForecast}
               onForecastChange={setSelectedWeatherForecast}
               opacity={weatherOpacity}
-              onOpacityChange={setWeatherOpacityState}
+              onOpacityChange={setWeatherOpacity}
               onClose={() => {
                 setSelectedWeatherVariable(null);
                 setWeatherEnabled(false);
@@ -1003,6 +219,7 @@ export default function Home() {
               windLoading={windLoading}
             />
           )}
+          
           {/* Wind Particle Layer */}
           <DeckWindParticleLayer
             map={map.current}
@@ -1013,14 +230,14 @@ export default function Home() {
           />
         </div>
 
-        <IconRail mode={personaMode} onModeChange={handleModeChange} />
+        <IconRail mode={mode} onModeChange={handleModeChange} />
 
         <div className={styles.sidebar}>
           {error && (
             <div className={styles.error}>
               {error}
               {error.includes("Upstream") && (
-                <button className={styles.swapBtn} onClick={handleSwapPoints}>
+                <button className={styles.swapBtn} onClick={swapPoints}>
                   Swap Points
                 </button>
               )}
@@ -1032,7 +249,7 @@ export default function Home() {
           )}
 
           <Sidebar
-            mode={personaMode}
+            mode={mode}
             onModeChange={handleModeChange}
             route={route}
             putIn={putIn}
@@ -1043,7 +260,7 @@ export default function Home() {
             drawProfile={drawProfile}
             profileSelection={profileSelection}
             onClearSelection={() => setProfileSelection(null)}
-            onClearRoute={handleClearRoute}
+            onClearRoute={clearRoute}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -1056,7 +273,7 @@ export default function Home() {
             lakeRoute={lakeRoute}
             lakeWaypoints={lakeWaypoints}
             onDeleteLakeWaypoint={deleteWaypoint}
-            onLakeUndo={handleLakeUndo}
+            onLakeUndo={lakeUndo}
             onLakeSaveRoute={() => {
               /* TODO: implement save */
             }}

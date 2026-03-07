@@ -36,7 +36,7 @@ export const LAYER_MAPPING: Record<keyof LayerVisibility, string[]> = {
 
 interface MapContextValue {
   // Refs
-  mapContainer: React.RefObject<HTMLDivElement | null>;
+  mapContainer: React.RefObject<HTMLDivElement>;
   map: React.MutableRefObject<mapboxgl.Map | null>;
   
   // State
@@ -236,7 +236,7 @@ export function MapProvider({ children }: MapProviderProps) {
   }, [styleVersion, layerVisibility]);
 
   const value: MapContextValue = {
-    mapContainer,
+    mapContainer: mapContainer as React.RefObject<HTMLDivElement>,
     map,
     basemap,
     theme,

@@ -31,7 +31,7 @@ interface RouteContextValue {
   handlePaddleSpeedChange: (speed: number) => Promise<void>;
   
   // Elevation profile state and handlers
-  canvasRef: React.RefObject<HTMLCanvasElement | null>;
+  canvasRef: React.RefObject<HTMLCanvasElement>;
   profileSelection: { startM: number; endM: number } | null;
   setProfileSelection: (sel: { startM: number; endM: number } | null) => void;
   drawProfile: (profile: ElevationPoint[], steepSections: SteepSection[]) => void;

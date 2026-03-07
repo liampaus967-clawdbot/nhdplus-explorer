@@ -6,3 +6,5 @@ export { useApiError } from './useApiError';
 export { useWeatherMetadata } from './useWeatherMetadata';
 export { usePreloadedWeatherLayers } from './usePreloadedWeatherLayers';
 export { useWindData } from './useWindData';
+export { usePoiHighlight } from './useMapInteraction';
+export { useLayerVisibility, LAYER_MAPPING } from './useLayerVisibility';

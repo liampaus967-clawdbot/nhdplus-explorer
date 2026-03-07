@@ -27,7 +27,7 @@ export function middleware(request: NextRequest) {
   });
 }
 
-// Apply to all routes except static files and API routes you want public
+// Apply to all routes except static files and API routes
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|api/).*)'],
 };

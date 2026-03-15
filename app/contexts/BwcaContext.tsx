@@ -90,12 +90,8 @@ export function BwcaProvider({ children }: { children: React.ReactNode }) {
     }
   }, [map]);
 
-  // Show/hide BWCA layers based on mode
-  useEffect(() => {
-    if (map.current && map.current.isStyleLoaded()) {
-      setBwcaLayersVisibility(map.current, mode === 'bwca');
-    }
-  }, [map, mode]);
+  // Note: BWCA layer visibility is now controlled via the Map Layers panel
+  // The layers will show when the user toggles "BWCA Paddle Routes" in the layers menu
 
   // Update route on map when route changes
   useEffect(() => {

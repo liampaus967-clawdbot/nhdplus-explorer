@@ -27,6 +27,7 @@ export interface LayerVisibility {
   waterfalls: boolean;
   dams: boolean;
   gauges: boolean;
+  bwcaTrails: boolean;
 }
 
 /* ─── Layer definitions ─── */
@@ -61,6 +62,10 @@ const POINTS_OF_INTEREST: LayerDef[] = [
 
 const WATER_MONITORING: LayerDef[] = [
   { key: 'gauges', label: 'Flow Gauges', icon: <Gauge size={14} />, iconBg: 'rgba(14,165,233,0.15)' },
+];
+
+const BWCA_TRAILS: LayerDef[] = [
+  { key: 'bwcaTrails', label: 'BWCA Paddle Routes', icon: <TreePine size={14} />, iconBg: 'rgba(45,90,39,0.25)' },
 ];
 
 /* ─── Basemap definitions ─── */
@@ -290,6 +295,7 @@ export function MapControls({ layers, onLayersChange, basemap, onBasemapChange, 
             <Section title="PUBLIC LANDS" layers={PUBLIC_LANDS} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
             <Section title="WATER FEATURES" layers={WATER_FEATURES} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
             <Section title="WATER MONITORING" layers={WATER_MONITORING} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
+            <Section title="BOUNDARY WATERS" layers={BWCA_TRAILS} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
             <Section title="POINTS OF INTEREST" layers={POINTS_OF_INTEREST} visibility={layers} onToggle={updateLayer} onBatchToggle={batchUpdateLayers} />
           </div>
         </div>

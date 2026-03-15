@@ -32,6 +32,7 @@ export const LAYER_MAPPING: Record<keyof LayerVisibility, string[]> = {
   waterfalls: ["waterfalls-backdrop"],
   dams: ["dams-backdrop"],
   gauges: ["gauges-circles", "gauges-labels"],
+  bwcaTrails: ["bwca-routing-edges-paddle", "bwca-routing-edges-portage"],
 };
 
 interface MapContextValue {
@@ -83,6 +84,7 @@ const DEFAULT_LAYER_VISIBILITY: LayerVisibility = {
   waterfalls: true,
   dams: true,
   gauges: false,
+  bwcaTrails: false,
 };
 
 export function MapProvider({ children }: MapProviderProps) {

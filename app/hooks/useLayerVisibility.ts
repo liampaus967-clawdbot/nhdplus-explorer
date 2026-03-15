@@ -29,6 +29,7 @@ export const LAYER_MAPPING: Record<keyof LayerVisibility, string[]> = {
   waterfalls: ["waterfalls-backdrop"],
   dams: ["dams-backdrop"],
   gauges: ["gauges-circles", "gauges-labels"],
+  bwcaTrails: ["bwca-routing-edges-paddle", "bwca-routing-edges-portage"],
 };
 
 /**

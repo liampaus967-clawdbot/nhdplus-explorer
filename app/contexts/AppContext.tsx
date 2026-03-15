@@ -7,6 +7,7 @@ import { PersonaModeProvider } from './PersonaModeContext';
 import { WeatherProvider } from './WeatherContext';
 import { LakeProvider } from './LakeContext';
 import { GaugeProvider } from './GaugeContext';
+import { BwcaProvider } from './BwcaContext';
 
 interface AppProviderProps {
   children: ReactNode;
@@ -25,17 +26,19 @@ interface AppProviderProps {
 export function AppProvider({ children }: AppProviderProps) {
   return (
     <MapProvider>
-      <RouteProvider>
-        <LakeProvider>
-          <GaugeProvider>
-            <WeatherProvider>
-              <PersonaModeProvider>
-                {children}
-              </PersonaModeProvider>
-            </WeatherProvider>
-          </GaugeProvider>
-        </LakeProvider>
-      </RouteProvider>
+      <PersonaModeProvider>
+        <RouteProvider>
+          <LakeProvider>
+            <BwcaProvider>
+              <GaugeProvider>
+                <WeatherProvider>
+                  {children}
+                </WeatherProvider>
+              </GaugeProvider>
+            </BwcaProvider>
+          </LakeProvider>
+        </RouteProvider>
+      </PersonaModeProvider>
     </MapProvider>
   );
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { House, Waves, Compass, LifeBuoy, Anchor } from 'lucide-react';
+import { House, Waves, Compass, LifeBuoy, Anchor, TreePine } from 'lucide-react';
 import { PersonaMode } from '../../../types';
 import styles from './shared.module.css';
 
@@ -10,6 +10,7 @@ const MODE_CONFIG: Record<PersonaMode, { label: string; icon: React.ReactNode; v
   explorer: { label: 'Explorer', icon: <Compass size={16} /> },
   floater: { label: 'Floater', icon: <LifeBuoy size={16} /> },
   lake: { label: 'Lake Mode', icon: <Anchor size={16} />, variant: 'cyan' },
+  bwca: { label: 'Boundary Waters', icon: <TreePine size={16} /> },
 };
 
 export function ModeTag({ mode }: { mode: PersonaMode }) {

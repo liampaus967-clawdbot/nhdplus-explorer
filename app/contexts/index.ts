@@ -4,4 +4,5 @@ export { PersonaModeProvider, usePersonaModeContext } from './PersonaModeContext
 export { WeatherProvider, useWeatherContext } from './WeatherContext';
 export { LakeProvider, useLakeContext } from './LakeContext';
 export { GaugeProvider, useGaugeContext } from './GaugeContext';
+export { BwcaProvider, useBwcaContext } from './BwcaContext';
 export { AppProvider } from './AppContext';

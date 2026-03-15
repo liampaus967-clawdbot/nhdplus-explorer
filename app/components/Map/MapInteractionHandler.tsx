@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
-import { useMapContext, usePersonaModeContext, useRouteContext, useLakeContext } from '../../contexts';
+import { useMapContext, usePersonaModeContext, useRouteContext, useLakeContext, useBwcaContext } from '../../contexts';
 import { COLORS } from '../../constants';
 
 /**
@@ -30,12 +30,55 @@ export function MapInteractionHandler() {
     finishFreehand,
     getFreehandPreview,
   } = useLakeContext();
+  
+  const {
+    handleMapClick: handleBwcaClick,
+    startPoint: bwcaStartPoint,
+    endPoint: bwcaEndPoint,
+  } = useBwcaContext();
+
+  // BWCA markers
+  const bwcaStartMarker = useRef<mapboxgl.Marker | null>(null);
+  const bwcaEndMarker = useRef<mapboxgl.Marker | null>(null);
 
   // Handle map click
   const handleMapClick = useCallback(
     async (lng: number, lat: number) => {
       // Home mode - no route creation, just pan/scan
       if (mode === "home") {
+        return;
+      }
+
+      // BWCA mode - click to set start/end points
+      if (mode === "bwca") {
+        handleBwcaClick(lng, lat);
+        
+        // Update markers
+        if (map.current) {
+          // Remove existing markers
+          if (bwcaStartMarker.current) bwcaStartMarker.current.remove();
+          if (bwcaEndMarker.current) bwcaEndMarker.current.remove();
+          
+          // If we just set the start point
+          if (!bwcaStartPoint) {
+            bwcaStartMarker.current = new mapboxgl.Marker({ color: '#22c55e' })
+              .setLngLat([lng, lat])
+              .addTo(map.current);
+          } else if (!bwcaEndPoint) {
+            // We have start, setting end
+            bwcaStartMarker.current = new mapboxgl.Marker({ color: '#22c55e' })
+              .setLngLat([bwcaStartPoint.lng, bwcaStartPoint.lat])
+              .addTo(map.current);
+            bwcaEndMarker.current = new mapboxgl.Marker({ color: '#ef4444' })
+              .setLngLat([lng, lat])
+              .addTo(map.current);
+          } else {
+            // Both were set, starting fresh
+            bwcaStartMarker.current = new mapboxgl.Marker({ color: '#22c55e' })
+              .setLngLat([lng, lat])
+              .addTo(map.current);
+          }
+        }
         return;
       }
 
@@ -91,6 +134,9 @@ export function MapInteractionHandler() {
       finishFreehand,
       putInMarker,
       takeOutMarker,
+      handleBwcaClick,
+      bwcaStartPoint,
+      bwcaEndPoint,
     ]
   );
 

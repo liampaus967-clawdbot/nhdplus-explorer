@@ -1,12 +1,13 @@
 'use client';
 
-import { PersonaMode, RouteResult, SnapResult, ElevationPoint, SteepSection, LakeDrawingMode, LakeRoute, LakeWaypoint } from '../../types';
+import { PersonaMode, RouteResult, SnapResult, ElevationPoint, SteepSection, LakeDrawingMode, LakeRoute, LakeWaypoint, BwcaRouteResult } from '../../types';
 import { WeatherData, ChopAssessment } from '../../services/weather';
 import { WelcomeSidebar } from './WelcomeSidebar';
 import { WhitewaterSidebar } from './WhitewaterSidebar';
 import { ExplorerSidebar } from './ExplorerSidebar';
 import { FloaterSidebar } from './FloaterSidebar';
 import { LakeSidebar } from './LakeSidebar';
+import { BwcaSidebar } from './BwcaSidebar';
 
 interface SidebarProps {
   mode: PersonaMode;
@@ -43,6 +44,13 @@ interface SidebarProps {
   lakeName?: string | null;
   // POI highlight
   onHighlightPoi?: (poiType: 'campground' | 'access_point', id: number) => void;
+  // BWCA mode props
+  bwcaStartPoint?: { lng: number; lat: number } | null;
+  bwcaEndPoint?: { lng: number; lat: number } | null;
+  bwcaRoute?: BwcaRouteResult | null;
+  bwcaLoading?: boolean;
+  bwcaError?: string | null;
+  onBwcaClearRoute?: () => void;
 }
 
 export function Sidebar({
@@ -78,7 +86,28 @@ export function Sidebar({
   lakeWindLoading = false,
   lakeName = null,
   onHighlightPoi,
+  // BWCA props
+  bwcaStartPoint = null,
+  bwcaEndPoint = null,
+  bwcaRoute = null,
+  bwcaLoading = false,
+  bwcaError = null,
+  onBwcaClearRoute,
 }: SidebarProps) {
+  // BWCA mode - always show sidebar (for click-to-route)
+  if (mode === 'bwca') {
+    return (
+      <BwcaSidebar
+        startPoint={bwcaStartPoint}
+        endPoint={bwcaEndPoint}
+        route={bwcaRoute}
+        loading={bwcaLoading}
+        error={bwcaError}
+        onClearRoute={onBwcaClearRoute || (() => {})}
+      />
+    );
+  }
+
   // Home mode - always show welcome/explore sidebar
   if (mode === 'home') {
     return <WelcomeSidebar />;

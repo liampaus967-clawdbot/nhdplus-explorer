@@ -13,8 +13,10 @@ import { addNationalForestsSource, addNationalForestsLayers } from './nationalFo
 import { addNationalParksSource, addNationalParksLayers } from './nationalParks';
 import { addGaugesSource, addGaugesLayers } from './gauges';
 import { addPoiIcons } from './poiIcons';
+import { addBwcaLayers } from './bwca';
 
 export * from './rivers';
+export * from './bwca';
 export * from './lakes';
 export * from './accessPoints';
 export * from './campgrounds';
@@ -74,4 +76,7 @@ export async function addAllLayers(map: mapboxgl.Map, basemap: string) {
   
   // Route on top
   addRouteLayers(map);
+  
+  // BWCA layers (for Boundary Waters mode)
+  addBwcaLayers(map);
 }

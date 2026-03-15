@@ -11,6 +11,7 @@ import {
   useLakeContext,
   useWeatherContext,
   useGaugeContext,
+  useBwcaContext,
 } from "./contexts";
 
 // Hooks
@@ -112,6 +113,16 @@ export default function Home() {
   // Gauge context
   const { styleMode: gaugeStyleMode, setStyleMode: setGaugeStyleMode } = useGaugeContext();
 
+  // BWCA context
+  const {
+    startPoint: bwcaStartPoint,
+    endPoint: bwcaEndPoint,
+    route: bwcaRoute,
+    loading: bwcaLoading,
+    error: bwcaError,
+    clearRoute: bwcaClearRoute,
+  } = useBwcaContext();
+
   // POI highlight hook
   const { highlightPoi } = usePoiHighlight();
 
@@ -126,9 +137,18 @@ export default function Home() {
       if (newMode === "lake" && mode !== "lake") {
         clearRoute();
       }
+      // Clear BWCA route when switching away from BWCA mode
+      if (mode === "bwca" && newMode !== "bwca") {
+        bwcaClearRoute();
+      }
+      // Clear other routes when switching to BWCA mode
+      if (newMode === "bwca" && mode !== "bwca") {
+        clearRoute();
+        lakeClear();
+      }
       setMode(newMode);
     },
-    [mode, lakeClear, clearRoute, setMode]
+    [mode, lakeClear, clearRoute, bwcaClearRoute, setMode]
   );
 
   // Handle POI highlight from sidebar
@@ -283,6 +303,13 @@ export default function Home() {
             lakeWindLoading={lakeWindLoading}
             lakeName={lakeName}
             onHighlightPoi={handleHighlightPoi}
+            // BWCA props
+            bwcaStartPoint={bwcaStartPoint}
+            bwcaEndPoint={bwcaEndPoint}
+            bwcaRoute={bwcaRoute}
+            bwcaLoading={bwcaLoading}
+            bwcaError={bwcaError}
+            onBwcaClearRoute={bwcaClearRoute}
           />
         </div>
       </div>

@@ -109,7 +109,7 @@ export interface RouteResult {
 
 export type FlowCondition = 'low' | 'normal' | 'high';
 export type BasemapStyle = 'outdoors' | 'satellite' | 'dark';
-export type PersonaMode = 'home' | 'whitewater' | 'explorer' | 'floater' | 'lake';
+export type PersonaMode = 'home' | 'whitewater' | 'explorer' | 'floater' | 'lake' | 'bwca';
 
 // Lake mode specific types
 export type LakeDrawingMode = 'waypoint' | 'freehand';
@@ -126,4 +126,21 @@ export interface LakeRoute {
   geojson: GeoJSON.FeatureCollection | null;
   distance_mi: number;
   paddle_time_min: number;
+}
+
+// BWCA routing types
+export interface BwcaNode {
+  id: number;
+  lng: number;
+  lat: number;
+}
+
+export interface BwcaRouteResult {
+  route: GeoJSON.FeatureCollection | null;
+  distance_km: number;
+  paddle_segments: number;
+  portage_count: number;
+  total_cost: number;
+  start_node: number;
+  end_node: number;
 }

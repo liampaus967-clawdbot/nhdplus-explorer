@@ -1,10 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import mapboxgl from 'mapbox-gl';
 import { BwcaRouteResult } from '../types';
 import { useMapContext } from './MapContext';
 import { usePersonaModeContext } from './PersonaModeContext';
-import { setBwcaLayersVisibility, updateBwcaRoute, BWCA_ROUTE_LAYER } from '../layers/bwca';
+import { updateBwcaRoute } from '../layers/bwca';
 
 interface BwcaContextType {
   startPoint: { lng: number; lat: number } | null;
@@ -101,15 +102,17 @@ export function BwcaProvider({ children }: { children: React.ReactNode }) {
       // Fly to route bounds
       const features = route.route.features;
       if (features.length > 0) {
-        const bounds = new (window as any).mapboxgl.LngLatBounds();
+        const bounds = new mapboxgl.LngLatBounds();
         features.forEach((feature: any) => {
-          if (feature.geometry.type === 'LineString') {
+          if (feature.geometry?.type === 'LineString' && feature.geometry.coordinates) {
             feature.geometry.coordinates.forEach((coord: [number, number]) => {
               bounds.extend(coord);
             });
           }
         });
-        map.current.fitBounds(bounds, { padding: 50 });
+        if (!bounds.isEmpty()) {
+          map.current.fitBounds(bounds, { padding: 50 });
+        }
       }
     }
   }, [map, route]);

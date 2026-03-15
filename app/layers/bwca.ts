@@ -1,17 +1,17 @@
 import mapboxgl from 'mapbox-gl';
 
 // BWCA Tileset IDs
-export const BWCA_EDGES_TILESET = 'mapbox://lman967.bwca-routing-edges';
-export const BWCA_NODES_TILESET = 'mapbox://lman967.bwca-routing-nodes';
+export const BWCA_EDGES_TILESET = 'mapbox://lman967.bwca-edges';
+export const BWCA_NODES_TILESET = 'mapbox://lman967.bwca-nodes';
 
 // Layer IDs
-export const BWCA_EDGES_LAYER = 'bwca-routing-edges';
-export const BWCA_NODES_LAYER = 'bwca-routing-nodes';
+export const BWCA_EDGES_LAYER = 'bwca-edges';
+export const BWCA_NODES_LAYER = 'bwca-nodes';
 export const BWCA_ROUTE_LAYER = 'bwca-route';
 
 // Source layer names (from tileset recipe)
-export const BWCA_EDGES_SOURCE_LAYER = 'bwca_routing_edges';
-export const BWCA_NODES_SOURCE_LAYER = 'bwca_routing_nodes';
+export const BWCA_EDGES_SOURCE_LAYER = 'bwca_edges';
+export const BWCA_NODES_SOURCE_LAYER = 'bwca_nodes';
 
 /**
  * Add BWCA trail network layers to the map
@@ -42,13 +42,12 @@ export function addBwcaLayers(map: mapboxgl.Map) {
   }
 
   // Add edges layer - paddle trails
-  if (!map.getLayer(`${BWCA_EDGES_LAYER}-paddle`)) {
+  if (!map.getLayer(`${BWCA_EDGES_LAYER}-line`)) {
     map.addLayer({
-      id: `${BWCA_EDGES_LAYER}-paddle`,
+      id: `${BWCA_EDGES_LAYER}-line`,
       type: 'line',
       source: BWCA_EDGES_LAYER,
       'source-layer': BWCA_EDGES_SOURCE_LAYER,
-      filter: ['==', ['get', 'is_portage'], false],
       layout: {
         visibility: 'none',
         'line-join': 'round',
@@ -63,33 +62,6 @@ export function addBwcaLayers(map: mapboxgl.Map) {
           15, 4,
         ],
         'line-opacity': 0.7,
-      },
-    });
-  }
-
-  // Add edges layer - portages (dashed)
-  if (!map.getLayer(`${BWCA_EDGES_LAYER}-portage`)) {
-    map.addLayer({
-      id: `${BWCA_EDGES_LAYER}-portage`,
-      type: 'line',
-      source: BWCA_EDGES_LAYER,
-      'source-layer': BWCA_EDGES_SOURCE_LAYER,
-      filter: ['==', ['get', 'is_portage'], true],
-      layout: {
-        visibility: 'none',
-        'line-join': 'round',
-        'line-cap': 'round',
-      },
-      paint: {
-        'line-color': '#f97316',
-        'line-width': [
-          'interpolate', ['linear'], ['zoom'],
-          5, 1,
-          10, 2,
-          15, 3,
-        ],
-        'line-dasharray': [2, 2],
-        'line-opacity': 0.8,
       },
     });
   }
@@ -146,11 +118,8 @@ export function addBwcaLayers(map: mapboxgl.Map) {
 export function setBwcaLayersVisibility(map: mapboxgl.Map, visible: boolean) {
   const visibility = visible ? 'visible' : 'none';
   
-  if (map.getLayer(`${BWCA_EDGES_LAYER}-paddle`)) {
-    map.setLayoutProperty(`${BWCA_EDGES_LAYER}-paddle`, 'visibility', visibility);
-  }
-  if (map.getLayer(`${BWCA_EDGES_LAYER}-portage`)) {
-    map.setLayoutProperty(`${BWCA_EDGES_LAYER}-portage`, 'visibility', visibility);
+  if (map.getLayer(`${BWCA_EDGES_LAYER}-line`)) {
+    map.setLayoutProperty(`${BWCA_EDGES_LAYER}-line`, 'visibility', visibility);
   }
 }
 

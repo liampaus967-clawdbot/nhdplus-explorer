@@ -27,14 +27,14 @@ export async function POST(request: NextRequest) {
       WITH start_node AS (
         SELECT id, the_geom,
           ST_Distance(the_geom::geography, ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography) as dist
-        FROM public.paddle_routing_edges_noded_vertices_pgr
+        FROM public.bwca_edges_noded_vertices_pgr
         ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint($1, $2), 4326)
         LIMIT 1
       ),
       end_node AS (
         SELECT id, the_geom,
           ST_Distance(the_geom::geography, ST_SetSRID(ST_MakePoint($3, $4), 4326)::geography) as dist
-        FROM public.paddle_routing_edges_noded_vertices_pgr
+        FROM public.bwca_edges_noded_vertices_pgr
         ORDER BY the_geom <-> ST_SetSRID(ST_MakePoint($3, $4), 4326)
         LIMIT 1
       )
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
       WITH route AS (
         SELECT seq, node, edge, cost
         FROM pgr_dijkstra(
-          'SELECT id, source, target, cost, reverse_cost FROM public.paddle_routing_edges_noded',
+          'SELECT id, source, target, cost, reverse_cost FROM public.bwca_edges_noded',
           $1::bigint,
           $2::bigint,
           directed := false
@@ -81,10 +81,9 @@ export async function POST(request: NextRequest) {
           r.seq,
           r.edge,
           r.cost,
-          e.geom,
-          e.sub_id
+          e.geom
         FROM route r
-        JOIN public.paddle_routing_edges_noded e ON e.id = r.edge
+        JOIN public.bwca_edges_noded e ON e.id = r.edge
         WHERE r.edge > 0
       )
       SELECT 
@@ -97,15 +96,14 @@ export async function POST(request: NextRequest) {
               'properties', json_build_object(
                 'seq', seq,
                 'edge_id', edge,
-                'cost', cost,
-                'is_portage', sub_id IS NULL
+                'cost', cost
               )
             ) ORDER BY seq
           ), '[]'::json)
         ) as geojson,
         COALESCE(SUM(cost) / 1000, 0) as distance_km,
-        COUNT(*) FILTER (WHERE sub_id IS NOT NULL) as paddle_segments,
-        COUNT(*) FILTER (WHERE sub_id IS NULL) as portage_count,
+        COUNT(*) as paddle_segments,
+        0 as portage_count,
         COALESCE(SUM(cost), 0) as total_cost
       FROM route_edges
     `;
